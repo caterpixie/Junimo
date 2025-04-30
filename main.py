@@ -99,7 +99,7 @@ async def add_qotd(interaction: discord.Interaction, question: str):
     })
     save_qotd(qotd)
 
-    await interaction.response.send_message("<:pleh:1362947686936084590> QOTD submitted!" )
+    await interaction.response.send_message(f"Submitted QOTD: {question}", ephemeral=True)
 
 @qotd_group.command(name="post", description="Manually posts the next QOTD")
 async def post_qotd(interaction: discord.Interaction):
