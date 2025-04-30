@@ -9,9 +9,9 @@ from zoneinfo import ZoneInfo
 
 QOTD_FILE = "qotd.json"
 PUBLISHED_FILE = "published_qotd.json"
-
 GUILD_ID = discord.Object(id=1322072874214756375)
 
+# Helper functions
 def load_qotd():
     if not os.path.exists(QOTD_FILE):
         return []
@@ -55,7 +55,7 @@ class Client(commands.Bot):
         
         auto_post_qotd.start()
 
-# Lets embeds have several pages
+# Paginator function
 class Pages(ui.View):
     def __init__(self, embeds):
         super().__init__(timeout=None)
@@ -81,12 +81,16 @@ class Pages(ui.View):
             self.update_buttons()
             await interaction.response.edit_message(embed=self.embeds[self.current_page], view=self)
 
-intents = discord.Intents.default()
-intents.message_content = True
-bot = Client(command_prefix="!", intents=intents)
+# QOTD Command Group
+class QOTDGroup(app_commands.Group):
+    def __init__(self):
+        super().__init__(name="qotd", description="Manage QOTDs")
+
+qotd_group = QOTDGroup()
+
 
 # slash commands
-@bot.tree.command(name="addqotd", description="Adds a QOTD to the queue", guild=GUILD_ID)
+@qotd_group.command(name="add", description="Adds a QOTD to the queue", guild=GUILD_ID)
 async def add_qotd(interaction: discord.Interaction, question: str):
     qotd = load_qotd()
     qotd.append({
@@ -97,7 +101,7 @@ async def add_qotd(interaction: discord.Interaction, question: str):
 
     await interaction.response.send_message("<:pleh:1362947686936084590> QOTD submitted!" )
 
-@bot.tree.command(name="postqotd", description="Manually posts the next QOTD", guild=GUILD_ID)
+@qotd_group.command(name="post", description="Manually posts the next QOTD", guild=GUILD_ID)
 async def post_qotd(interaction: discord.Interaction):
     qotd = load_qotd()
     if not qotd:
@@ -123,7 +127,7 @@ async def post_qotd(interaction: discord.Interaction):
 
     await interaction.response.send_message(content=f"<@&{qotd_role}>", embed=embed, allowed_mentions=discord.AllowedMentions(roles=True))
 
-@bot.tree.command(name="viewqueue", description="View the list of upcoming QOTDs", guild=GUILD_ID)
+@qotd_group.command(name="view", description="View the list of upcoming QOTDs", guild=GUILD_ID)
 async def view_queue(interaction: discord.Interaction):
     qotd = load_qotd()
     if not qotd:
@@ -147,7 +151,7 @@ async def view_queue(interaction: discord.Interaction):
 
     await interaction.response.send_message(embed=pages[0], view=view, ephemeral=True)
 
-@bot.tree.command(name="deleteqotd", description="Deletes a QOTD in the queue by index #", guild=GUILD_ID)
+@qotd_group.command(name="delete", description="Deletes a QOTD in the queue by index #", guild=GUILD_ID)
 async def delete_qotd(interaction: discord.Interaction, index: int):
     qotd = load_qotd()
 
@@ -187,6 +191,10 @@ async def auto_post_qotd():
         embed.set_footer(text=f"| Author: {next['author']} | {len(qotd)} QOTDs left in queue |")
 
         await qotd_channel.send(content=f"<@&{qotd_role}>", embed=embed, allowed_mentions=discord.AllowedMentions(roles=True))
+
+intents = discord.Intents.default()
+intents.message_content = True
+bot = Client(command_prefix="!", intents=intents)
 
 token = os.getenv("DISCORD_TOKEN")
 bot.run(token)
