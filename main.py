@@ -41,20 +41,19 @@ class Client(commands.Bot):
 
     async def on_ready(self):
         print(f'Logged on as {self.user}')
-
+    
         if not self.synced:
             try:
-                guild = discord.Object(id=1322072874214756375)
-
-                synced = await self.tree.sync(guild=guild)
-                print(f'Synced {len(synced)} commands to guild {guild.id}')
+                self.tree.add_command(qotd_group, guild=GUILD_ID)
+    
+                synced = await self.tree.sync(guild=GUILD_ID)
+                print(f'Synced {len(synced)} commands to guild {GUILD_ID.id}')
                 self.synced = True
-
+    
             except Exception as e:
                 print(f'Error syncing commands: {e}')
         
         auto_post_qotd.start()
-        self.tree.add_command(qotd_group, guild=GUILD_ID)
 
 # Paginator function
 class Pages(ui.View):
