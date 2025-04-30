@@ -188,4 +188,5 @@ async def auto_post_qotd():
 
         await qotd_channel.send(content=f"<@&{qotd_role}>", embed=embed, allowed_mentions=discord.AllowedMentions(roles=True))
 
-bot.run(os.getenv("DISCORD_TOKEN"))
+token = os.getenv("DISCORD_TOKEN")
+bot.run(token)
