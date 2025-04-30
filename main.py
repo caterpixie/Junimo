@@ -54,6 +54,7 @@ class Client(commands.Bot):
                 print(f'Error syncing commands: {e}')
         
         auto_post_qotd.start()
+        self.tree.add_command(qotd_group, guild=GUILD_ID)
 
 # Paginator function
 class Pages(ui.View):
@@ -90,7 +91,7 @@ qotd_group = QOTDGroup()
 
 
 # slash commands
-@qotd_group.command(name="add", description="Adds a QOTD to the queue", guild=GUILD_ID)
+@qotd_group.command(name="add", description="Adds a QOTD to the queue")
 async def add_qotd(interaction: discord.Interaction, question: str):
     qotd = load_qotd()
     qotd.append({
@@ -101,7 +102,7 @@ async def add_qotd(interaction: discord.Interaction, question: str):
 
     await interaction.response.send_message("<:pleh:1362947686936084590> QOTD submitted!" )
 
-@qotd_group.command(name="post", description="Manually posts the next QOTD", guild=GUILD_ID)
+@qotd_group.command(name="post", description="Manually posts the next QOTD")
 async def post_qotd(interaction: discord.Interaction):
     qotd = load_qotd()
     if not qotd:
@@ -127,7 +128,7 @@ async def post_qotd(interaction: discord.Interaction):
 
     await interaction.response.send_message(content=f"<@&{qotd_role}>", embed=embed, allowed_mentions=discord.AllowedMentions(roles=True))
 
-@qotd_group.command(name="view", description="View the list of upcoming QOTDs", guild=GUILD_ID)
+@qotd_group.command(name="view", description="View the list of upcoming QOTDs")
 async def view_queue(interaction: discord.Interaction):
     qotd = load_qotd()
     if not qotd:
@@ -151,7 +152,7 @@ async def view_queue(interaction: discord.Interaction):
 
     await interaction.response.send_message(embed=pages[0], view=view, ephemeral=True)
 
-@qotd_group.command(name="delete", description="Deletes a QOTD in the queue by index #", guild=GUILD_ID)
+@qotd_group.command(name="delete", description="Deletes a QOTD in the queue by index #")
 async def delete_qotd(interaction: discord.Interaction, index: int):
     qotd = load_qotd()
 
