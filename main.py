@@ -187,3 +187,5 @@ async def auto_post_qotd():
         embed.set_footer(text=f"| Author: {next['author']} | {len(qotd)} QOTDs left in queue |")
 
         await qotd_channel.send(content=f"<@&{qotd_role}>", embed=embed, allowed_mentions=discord.AllowedMentions(roles=True))
+
+bot.run(os.getenv("DISCORD_TOKEN"))
