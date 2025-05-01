@@ -10,8 +10,6 @@ PIXIE_GUILD_ID = 1322072874214756375
 AD_GUILD_ID = 1322423728457384018
 GUILD_IDS = [PIXIE_GUILD_ID, AD_GUILD_ID]
 
-test = "test"
-
 # Helper functions
 def get_qotd_file(guild_id):
     return f"qotd_{guild_id}.json"
