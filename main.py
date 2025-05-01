@@ -1,45 +1,30 @@
+
 import discord
 from discord.ext import commands, tasks
 from discord import ui, app_commands
-import json
+import asyncpg
 import os
-from datetime import datetime, timezone, time
+from datetime import datetime
 from zoneinfo import ZoneInfo
 
 PIXIE_GUILD_ID = 1322072874214756375
 AD_GUILD_ID = 1322423728457384018
 GUILD_IDS = [PIXIE_GUILD_ID, AD_GUILD_ID]
 
-# Helper functions
-def get_qotd_file(guild_id):
-    return f"qotd_{guild_id}.json"
-
-def get_published_file(guild_id):
-    return f"published_qotd_{guild_id}.json"
-
-def load_json(filename):
-    if not os.path.exists(filename):
-        return []
-    with open(filename, "r") as file:
-        return json.load(file)
-
-def save_json(filename, data):
-    with open(filename, "w") as file:
-        json.dump(data, file, indent=2)
-
 class Client(commands.Bot):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.pool = None
 
     async def setup_hook(self):
-        await self.tree.sync()  # Global sync
+        self.pool = await asyncpg.create_pool(os.getenv("DATABASE_URL"))
+        await self.tree.sync()
 
     async def on_ready(self):
         print(f'Logged on as {self.user}')
         if not auto_post_qotd.is_running():
             auto_post_qotd.start()
 
-# Paginator view
 class Pages(ui.View):
     def __init__(self, embeds):
         super().__init__(timeout=None)
@@ -65,7 +50,6 @@ class Pages(ui.View):
             self.update_buttons()
             await interaction.response.edit_message(embed=self.embeds[self.current_page], view=self)
 
-# QOTD command group
 class QOTDGroup(app_commands.Group):
     def __init__(self):
         super().__init__(name="qotd", description="Manage QOTDs")
@@ -74,56 +58,52 @@ qotd_group = QOTDGroup()
 
 @qotd_group.command(name="add", description="Adds a QOTD to the queue")
 async def add_qotd(interaction: discord.Interaction, question: str):
-    guild_id = interaction.guild.id
-    qotd_file = get_qotd_file(guild_id)
-    qotd = load_json(qotd_file)
-    qotd.append({"question": question, "author": interaction.user.name})
-    save_json(qotd_file, qotd)
+    await bot.pool.execute(
+        "INSERT INTO qotds (guild_id, question, author, is_published) VALUES ($1, $2, $3, FALSE)",
+        interaction.guild.id, question, interaction.user.name
+    )
     await interaction.response.send_message(f"Submitted QOTD: {question}", ephemeral=True)
 
 @qotd_group.command(name="post", description="Manually posts the next QOTD")
 async def post_qotd(interaction: discord.Interaction):
-    guild_id = interaction.guild.id
-    qotd_file = get_qotd_file(guild_id)
-    published_file = get_published_file(guild_id)
-    qotd = load_json(qotd_file)
-    if not qotd:
+    record = await bot.pool.fetchrow(
+        "SELECT * FROM qotds WHERE guild_id = $1 AND is_published = FALSE ORDER BY id ASC LIMIT 1",
+        interaction.guild.id
+    )
+    if not record:
         await interaction.response.send_message("No QOTD in queue, slut")
         return
 
-    next_q = qotd.pop(0)
-    save_json(qotd_file, qotd)
+    await bot.pool.execute("UPDATE qotds SET is_published = TRUE WHERE id = $1", record["id"])
 
-    published = load_json(published_file)
-    published.append({
-        "question": next_q['question'],
-        "author": next_q.get("author"),
-        "timestamp": datetime.now(ZoneInfo("America/Chicago")).isoformat()
-    })
-    save_json(published_file, published)
+    count = await bot.pool.fetchval(
+        "SELECT COUNT(*) FROM qotds WHERE guild_id = $1 AND is_published = FALSE",
+        interaction.guild.id
+    )
 
-    embed = discord.Embed(title="Question of the Day", description=next_q['question'], color=discord.Color.from_str("#A0EA67"))
-    embed.set_footer(text=f"| Author: {next_q['author']} | {len(qotd)} QOTDs left in queue |")
+    embed = discord.Embed(title="Question of the Day", description=record["question"], color=discord.Color.from_str("#A0EA67"))
+    embed.set_footer(text=f"| Author: {record['author']} | {count} QOTDs left in queue |")
 
     qotd_role = 1322073121842397226
     await interaction.response.send_message(content=f"<@&{qotd_role}>", embed=embed, allowed_mentions=discord.AllowedMentions(roles=True))
 
 @qotd_group.command(name="view", description="View the list of upcoming QOTDs")
 async def view_queue(interaction: discord.Interaction):
-    guild_id = interaction.guild.id
-    qotd_file = get_qotd_file(guild_id)
-    qotd = load_json(qotd_file)
-    if not qotd:
+    records = await bot.pool.fetch(
+        "SELECT * FROM qotds WHERE guild_id = $1 AND is_published = FALSE ORDER BY id ASC",
+        interaction.guild.id
+    )
+    if not records:
         await interaction.response.send_message("QOTD queue empty, fill her up~")
         return
 
-    pages = []
     per_page = 10
-    for i in range(0, len(qotd), per_page):
-        chunk = qotd[i:i+per_page]
+    pages = []
+    for i in range(0, len(records), per_page):
+        chunk = records[i:i+per_page]
         description = "\n".join(f"**{idx}.** {entry['question']}" for idx, entry in enumerate(chunk, start=i+1))
         embed = discord.Embed(title="Question of the Day Queue", description=description)
-        embed.set_footer(text=f"Page {i//per_page + 1}/{(len(qotd)-1)//per_page + 1}")
+        embed.set_footer(text=f"Page {i//per_page + 1}/{(len(records)-1)//per_page + 1}")
         pages.append(embed)
 
     view = Pages(pages)
@@ -131,17 +111,17 @@ async def view_queue(interaction: discord.Interaction):
 
 @qotd_group.command(name="delete", description="Deletes a QOTD by index")
 async def delete_qotd(interaction: discord.Interaction, index: int):
-    guild_id = interaction.guild.id
-    qotd_file = get_qotd_file(guild_id)
-    qotd = load_json(qotd_file)
-
-    if index < 1 or index > len(qotd):
+    records = await bot.pool.fetch(
+        "SELECT id, question, author FROM qotds WHERE guild_id = $1 AND is_published = FALSE ORDER BY id ASC",
+        interaction.guild.id
+    )
+    if index < 1 or index > len(records):
         await interaction.response.send_message("Index invalid", ephemeral=True)
         return
 
-    removed = qotd.pop(index - 1)
-    save_json(qotd_file, qotd)
-    await interaction.response.send_message(f"Removed QOTD #{index}: \"{removed['question']}\" by {removed.get('author')}", ephemeral=True)
+    target = records[index - 1]
+    await bot.pool.execute("DELETE FROM qotds WHERE id = $1", target["id"])
+    await interaction.response.send_message(f"Removed QOTD #{index}: \"{target['question']}\" by {target['author']}", ephemeral=True)
 
 @tasks.loop(minutes=1)
 async def auto_post_qotd():
@@ -152,26 +132,22 @@ async def auto_post_qotd():
             if not qotd_channel:
                 continue
 
-            qotd_file = get_qotd_file(guild.id)
-            published_file = get_published_file(guild.id)
-
-            qotd = load_json(qotd_file)
-            if not qotd:
+            record = await bot.pool.fetchrow(
+                "SELECT * FROM qotds WHERE guild_id = $1 AND is_published = FALSE ORDER BY id ASC LIMIT 1",
+                guild.id
+            )
+            if not record:
                 continue
 
-            next_q = qotd.pop(0)
-            save_json(qotd_file, qotd)
+            await bot.pool.execute("UPDATE qotds SET is_published = TRUE WHERE id = $1", record["id"])
 
-            published = load_json(published_file)
-            published.append({
-                "question": next_q['question'],
-                "author": next_q.get("author"),
-                "timestamp": datetime.now(ZoneInfo("America/Chicago")).isoformat()
-            })
-            save_json(published_file, published)
+            count = await bot.pool.fetchval(
+                "SELECT COUNT(*) FROM qotds WHERE guild_id = $1 AND is_published = FALSE",
+                guild.id
+            )
 
-            embed = discord.Embed(title="Question of the Day", description=next_q['question'], color=discord.Color.from_str("#A0EA67"))
-            embed.set_footer(text=f"| Author: {next_q['author']} | {len(qotd)} QOTDs left in queue |")
+            embed = discord.Embed(title="Question of the Day", description=record["question"], color=discord.Color.from_str("#A0EA67"))
+            embed.set_footer(text=f"| Author: {record['author']} | {count} QOTDs left in queue |")
 
             qotd_role = 1322073121842397226
             await qotd_channel.send(content=f"<@&{qotd_role}>", embed=embed, allowed_mentions=discord.AllowedMentions(roles=True))
@@ -182,7 +158,3 @@ bot = Client(command_prefix="!", intents=intents)
 bot.tree.add_command(qotd_group)
 
 bot.run(os.getenv("DISCORD_TOKEN"))
-
-
-token = os.getenv("DISCORD_TOKEN")
-bot.run(token)
