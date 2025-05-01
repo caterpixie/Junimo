@@ -3,10 +3,9 @@ from discord.ext import commands, tasks
 from discord import ui, app_commands
 import json
 import os
-from datetime import datetime, timezone
+from datetime import datetime, timezone, time
 from zoneinfo import ZoneInfo
 
-# Replace these with your actual guild IDs
 PIXIE_GUILD_ID = 1322072874214756375
 AD_GUILD_ID = 1322423728457384018
 GUILD_IDS = [PIXIE_GUILD_ID, AD_GUILD_ID]
@@ -33,10 +32,7 @@ class Client(commands.Bot):
         super().__init__(**kwargs)
 
     async def setup_hook(self):
-        for guild_id in GUILD_IDS:
-            guild = discord.Object(id=guild_id)
-            self.tree.copy_global_to(guild=guild)
-            await self.tree.sync(guild=guild)
+        await self.tree.sync()  # Global sync
 
     async def on_ready(self):
         print(f'Logged on as {self.user}')
