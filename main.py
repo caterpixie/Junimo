@@ -71,7 +71,7 @@ async def post_qotd(interaction: discord.Interaction):
         interaction.guild.id
     )
     if not record:
-        await interaction.response.send_message("No QOTD in queue, slut")
+        await interaction.response.send_message("No QOTD in queue, slut", ephemeral=True)
         return
 
     await bot.pool.execute("UPDATE qotds SET is_published = TRUE WHERE id = $1", record["id"])
@@ -94,7 +94,7 @@ async def view_queue(interaction: discord.Interaction):
         interaction.guild.id
     )
     if not records:
-        await interaction.response.send_message("QOTD queue empty, fill her up~")
+        await interaction.response.send_message("QOTD queue empty, fill her up~", ephemeral=True)
         return
 
     per_page = 10
