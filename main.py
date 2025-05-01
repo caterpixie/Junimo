@@ -64,7 +64,7 @@ async def add_qotd(interaction: discord.Interaction, question: str):
     )
     await interaction.response.send_message(f"Submitted QOTD: {question}", ephemeral=True)
 
-@qotd_group.command(name="post", description="Manually posts the next QOTD", guild=discord.Object(id=1322072874214756375))
+@qotd_group.command(name="post", description="Manually posts the next QOTD")
 async def post_qotd(interaction: discord.Interaction):
     record = await bot.pool.fetchrow(
         "SELECT * FROM qotds WHERE guild_id = $1 AND is_published = FALSE ORDER BY id ASC LIMIT 1",
