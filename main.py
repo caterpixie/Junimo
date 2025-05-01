@@ -76,7 +76,7 @@ class QOTDGroup(app_commands.Group):
 
 qotd_group = QOTDGroup()
 
-@qotd_group.command(name="add", description="Adds a QOTD to the queue", guild=GUILD_IDS)
+@qotd_group.command(name="add", description="Adds a QOTD to the queue")
 async def add_qotd(interaction: discord.Interaction, question: str):
     guild_id = interaction.guild.id
     qotd_file = get_qotd_file(guild_id)
@@ -112,7 +112,7 @@ async def post_qotd(interaction: discord.Interaction):
     qotd_role = 1322073121842397226
     await interaction.response.send_message(content=f"<@&{qotd_role}>", embed=embed, allowed_mentions=discord.AllowedMentions(roles=True))
 
-@qotd_group.command(name="view", description="View the list of upcoming QOTDs", guild=GUILD_IDS)
+@qotd_group.command(name="view", description="View the list of upcoming QOTDs")
 async def view_queue(interaction: discord.Interaction):
     guild_id = interaction.guild.id
     qotd_file = get_qotd_file(guild_id)
@@ -133,7 +133,7 @@ async def view_queue(interaction: discord.Interaction):
     view = Pages(pages)
     await interaction.response.send_message(embed=pages[0], view=view, ephemeral=True)
 
-@qotd_group.command(name="delete", description="Deletes a QOTD by index", guild=GUILD_IDS)
+@qotd_group.command(name="delete", description="Deletes a QOTD by index")
 async def delete_qotd(interaction: discord.Interaction, index: int):
     guild_id = interaction.guild.id
     qotd_file = get_qotd_file(guild_id)
