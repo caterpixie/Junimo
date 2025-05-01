@@ -84,7 +84,7 @@ async def post_qotd(interaction: discord.Interaction):
     embed = discord.Embed(title="Question of the Day", description=record["question"], color=discord.Color.from_str("#A0EA67"))
     embed.set_footer(text=f"| Author: {record['author']} | {count} QOTDs left in queue |")
 
-    qotd_role = 1322073121842397226
+    qotd_role = 1322427477053669406
     await interaction.response.send_message(content=f"<@&{qotd_role}>", embed=embed, allowed_mentions=discord.AllowedMentions(roles=True))
 
 @qotd_group.command(name="view", description="View the list of upcoming QOTDs")
@@ -128,7 +128,7 @@ async def auto_post_qotd():
     now = datetime.now(ZoneInfo("America/Chicago"))
     if now.hour == 4 and now.minute == 20:
         for guild in bot.guilds:
-            qotd_channel = discord.utils.get(guild.text_channels, name="qotd")
+            qotd_channel = guild.get_channel(1322429106868191283)
             if not qotd_channel:
                 continue
 
@@ -149,7 +149,7 @@ async def auto_post_qotd():
             embed = discord.Embed(title="Question of the Day", description=record["question"], color=discord.Color.from_str("#A0EA67"))
             embed.set_footer(text=f"| Author: {record['author']} | {count} QOTDs left in queue |")
 
-            qotd_role = 1322073121842397226
+            qotd_role = 1322427477053669406
             await qotd_channel.send(content=f"<@&{qotd_role}>", embed=embed, allowed_mentions=discord.AllowedMentions(roles=True))
 
 intents = discord.Intents.default()
