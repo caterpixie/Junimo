@@ -20,6 +20,11 @@ class Client(commands.Bot):
         if not auto_post_qotd.is_running():
             auto_post_qotd.start()
 
+@app_commands.command(name="delete_chores_table", description="Deletes the chores table (dev only!)")
+async def delete_chores_table(interaction: discord.Interaction):
+    await bot.pool.execute("DROP TABLE IF EXISTS chores;")
+    await interaction.response.send_message("⚠️ Chores table deleted.", ephemeral=True)
+
 intents = discord.Intents.default()
 intents.message_content = True
 bot = Client(command_prefix="!", intents=intents)
