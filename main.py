@@ -4,7 +4,7 @@ import os
 import asyncpg
 from setup import setup_chores, set_bot as setup_set_bot, delete_chores_table
 from qotd import qotd_group, auto_post_qotd
-from chores import chore_test, set_bot as set_chores_bot
+from chores import set_bot as set_chores_bot
 from dotenv import load_dotenv
 
 load_dotenv()
