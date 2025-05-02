@@ -12,6 +12,7 @@ async def setup_chores(interaction: discord.Interaction):
         CREATE TABLE IF NOT EXISTS chores (
             id SERIAL PRIMARY KEY,
             guild_id BIGINT NOT NULL,
+            name TEXT NOT NULL,
             description TEXT NOT NULL,
             first_post_at TIMESTAMPTZ NOT NULL,
             interval_days INT CHECK (interval_days IN (7, 14, 28)) NOT NULL,
