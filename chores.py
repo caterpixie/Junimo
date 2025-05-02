@@ -1,39 +1,40 @@
-import discord
-from discord.ext import tasks
-from datetime import datetime, timedelta
-from zoneinfo import ZoneInfo
-import aiohttp
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
-bot = None
+import discord
+from discord.ext import commands
+import asyncpg
+from setup import setup_chores, set_bot as setup_set_bot, delete_chores_table
+from qotd import qotd_group, auto_post_qotd, set_bot as set_qotd_bot
+from chores import set_bot as set_chores_bot
 
-def set_bot(bot_instance):
-    global bot
-    bot = bot_instance
+class Client(commands.Bot):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.pool = None
 
-    @bot.tree.command(name="chore_test", description="Manually post chore")
-    async def chore_test(interaction: discord.Interaction):
-        chore = await bot.pool.fetchrow(
-            "SELECT * FROM chores WHERE is_active = TRUE ORDER BY first_post_at ASC LIMIT 1"
-        )
+    async def setup_hook(self):
+        self.pool = await asyncpg.create_pool(os.getenv("DATABASE_URL"))
+        self.tree.add_command(qotd_group)
+        await self.tree.sync()
 
-        webhook_url = os.getenv("WEBHOOK_URL")
-        print("DEBUG - webhook_url:", webhook_url)  # This will help confirm .env is loaded
+    async def on_ready(self):
+        print(f'Logged on as {self.user}')
+        if not auto_post_qotd.is_running():
+            auto_post_qotd.start()
 
-        if not webhook_url:
-            print("Webhook URL not configured in environment.")
-            await interaction.response.send_message("Webhook URL not configured.", ephemeral=True)
-            return
+intents = discord.Intents.default()
+intents.message_content = True
+bot = Client(command_prefix="!", intents=intents)
 
-        embed = {
-            "title": "Chore of the Day!",
-            "description": f"**{chore['description']}**",
-            "color": 0xFFA0BE,
-            "image": {
-                "url": chore['gif_url']
-            }
-        }
+# Set bot in each module and register commands
+setup_set_bot(bot)
+set_qotd_bot(bot)
+set_chores_bot(bot)
 
-        async with aiohttp.ClientSession() as session:
-            await session.post(webhook_url, json={"embeds": [embed]})
-            await interaction.response.send_message("Chore posted!", ephemeral=True)
+# Register setup and teardown commands
+bot.tree.add_command(setup_chores)
+bot.tree.add_command(delete_chores_table)
+
+bot.run(os.getenv("DISCORD_TOKEN"))
