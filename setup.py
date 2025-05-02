@@ -24,4 +24,4 @@ async def setup_chores(interaction: discord.Interaction):
 @app_commands.command(name="delete_chores_table", description="Deletes the chores table (dev only!)")
 async def delete_chores_table(interaction: discord.Interaction):
     await bot.pool.execute("DROP TABLE IF EXISTS chores;")
-    await interaction.response.send_message("⚠️ Chores table deleted.", ephemeral=True)
+    await interaction.response.send_message("Chores table deleted.", ephemeral=True)
