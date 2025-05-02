@@ -16,7 +16,7 @@ async def setup_chores(interaction: discord.Interaction):
             first_post_at TIMESTAMPTZ NOT NULL,
             interval_days INT CHECK (interval_days IN (7, 14, 28)) NOT NULL,
             gif_url TEXT,
-            last_posted TIMESTAMPZ,
+            last_posted TIMESTAMPTZ,
             is_active BOOLEAN DEFAULT TRUE
         );
     """)
