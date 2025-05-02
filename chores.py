@@ -25,7 +25,7 @@ async def chore_test(interaction: discord.Interaction):
         return
 
     embed = {
-        "title": "Chore of the Day!",
+        "title": "Chore of the Day",
         "description": f"**{chore['description']}**",
         "color": 0xFFA0BE, 
         "image": {
