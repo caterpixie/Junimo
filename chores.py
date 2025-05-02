@@ -12,7 +12,7 @@ def set_bot(bot_instance):
     bot = bot_instance
 
 # Manual command to test embed view
-@bot.tree.command(name="chore_test", description="Manually post chore")
+@bot.tree.command(name="chore_test", description="Manually post chore", guild=1322072874214756375)
 async def chore_test(interaction: discord.Interaction):
     chore = await bot.pool.fetchrow(
         "SELECT * FROM chores WHERE is_active = TRUE ORDER BY first_post_at ASC LIMIT 1"
