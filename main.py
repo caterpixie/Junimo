@@ -12,7 +12,7 @@ class Client(commands.Bot):
 
     async def setup_hook(self):
         self.pool = await asyncpg.create_pool(os.getenv("DATABASE_URL"))
-        self.tree.add_command(qotd_group)  # ⬅️ Add the QOTD command group
+        self.tree.add_command(qotd_group)
         await self.tree.sync()
 
     async def on_ready(self):
