@@ -24,6 +24,10 @@ intents = discord.Intents.default()
 intents.message_content = True
 bot = Client(command_prefix="!", intents=intents)
 
+setup_set_bot(bot)
+bot.tree.add_command(setup_chores)
+bot.tree.add_command(delete_chores_table)
+
 import qotd
 qotd.set_bot(bot)
 
