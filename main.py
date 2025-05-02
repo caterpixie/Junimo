@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 import os
 import asyncpg
-from setup import setup_chores, set_bot as setup_set_bot
+from setup import setup_chores, set_bot as setup_set_bot, delete_chores_table
 from qotd import qotd_group, auto_post_qotd
 
 class Client(commands.Bot):
@@ -20,17 +20,13 @@ class Client(commands.Bot):
         if not auto_post_qotd.is_running():
             auto_post_qotd.start()
 
-@app_commands.command(name="delete_chores_table", description="Deletes the chores table (dev only!)")
-async def delete_chores_table(interaction: discord.Interaction):
-    await bot.pool.execute("DROP TABLE IF EXISTS chores;")
-    await interaction.response.send_message("⚠️ Chores table deleted.", ephemeral=True)
-
 intents = discord.Intents.default()
 intents.message_content = True
 bot = Client(command_prefix="!", intents=intents)
 
 setup_set_bot(bot)
 bot.tree.add_command(setup_chores)
+bot.tree.add_command(delete_chores_table)
 
 import qotd
 qotd.set_bot(bot)
