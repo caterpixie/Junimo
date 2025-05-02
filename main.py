@@ -4,6 +4,7 @@ import os
 import asyncpg
 from setup import setup_chores, set_bot as setup_set_bot, delete_chores_table
 from qotd import qotd_group, auto_post_qotd
+from chores import chore_test, set_bot as set_chores_bot
 
 class Client(commands.Bot):
     def __init__(self, **kwargs):
@@ -27,6 +28,9 @@ bot = Client(command_prefix="!", intents=intents)
 setup_set_bot(bot)
 bot.tree.add_command(setup_chores)
 bot.tree.add_command(delete_chores_table)
+
+set_chores_bot(bot)
+bot.tree.add_command(chore_test)
 
 import qotd
 qotd.set_bot(bot)
