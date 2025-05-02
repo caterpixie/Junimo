@@ -1,38 +1,33 @@
 import discord
-from discord.ext import commands
+from discord.ext import tasks
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
+import aiohttp
 import os
-import asyncpg
-from setup import setup_chores, set_bot as setup_set_bot, delete_chores_table
-from qotd import qotd_group, auto_post_qotd
-from chores import chore_test, set_bot as set_chores_bot
 
-class Client(commands.Bot):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.pool = None
+bot = None
 
-    async def setup_hook(self):
-        self.pool = await asyncpg.create_pool(os.getenv("DATABASE_URL"))
-        self.tree.add_command(qotd_group)
-        await self.tree.sync()
+def set_bot(bot_instance):
+    global bot
+    bot = bot_instance
 
-    async def on_ready(self):
-        print(f'Logged on as {self.user}')
-        if not auto_post_qotd.is_running():
-            auto_post_qotd.start()
+# Manual command to test embed view
+@bot.tree.command(name="chore_test", description="Manually post chore")
+async def chore_test(interaction: discord.Interaction):
+    chore = await bot.pool.fetchrow(
+        "SELECT * FROM chores WHERE is_active = TRUE ORDER BY first_post_at ASC LIMIT 1"
+    )
 
-intents = discord.Intents.default()
-intents.message_content = True
-bot = Client(command_prefix="!", intents=intents)
+    webhook_url = os.getenv("https://discord.com/api/webhooks/1367720529292951602/bCe9LBAJS6rr6XHcUNhQevnC3QxlCRrwojo0vxAXxdgtA_J-SkxXYPwvh8D7rLpHJ9vC")
+    if not webhook_url:
+        print("Webhook URL not configured in environment.")
+        return
 
-setup_set_bot(bot)
-bot.tree.add_command(setup_chores)
-bot.tree.add_command(delete_chores_table)
-
-set_chores_bot(bot)
-bot.tree.add_command(chore_test)
-
-import qotd
-qotd.set_bot(bot)
-
-bot.run(os.getenv("DISCORD_TOKEN"))
+    embed = {
+        "title": "Chore of the Day!",
+        "description": f"**{chore['description']}**",
+        "color": 0xFFA0BE, 
+        "image": {
+            "url": chore['gif_url']
+        }
+    } 
