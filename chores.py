@@ -27,7 +27,7 @@ def set_bot(bot_instance):
 
         embed = {
             "title": "Chore of the Day!",
-            "name": f"**{chore['name']}**"
+            "name": f"**{chore['name']}**",
             "description": f"{chore['description']}",
             "color": 0xFFA4C6,
             "image": {
