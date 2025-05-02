@@ -19,7 +19,7 @@ async def chore_test(interaction: discord.Interaction):
         "SELECT * FROM chores WHERE is_active = TRUE ORDER BY first_post_at ASC LIMIT 1"
     )
 
-    webhook_url = os.getenv("https://discord.com/api/webhooks/1367720529292951602/bCe9LBAJS6rr6XHcUNhQevnC3QxlCRrwojo0vxAXxdgtA_J-SkxXYPwvh8D7rLpHJ9vC")
+    webhook_url = os.getenv("WEBHOOK_URL")
     if not webhook_url:
         print("Webhook URL not configured in environment.")
         return
