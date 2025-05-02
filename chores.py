@@ -36,4 +36,4 @@ def set_bot(bot_instance):
 
         async with aiohttp.ClientSession() as session:
             await session.post(webhook_url, json={"embeds": [embed]})
-            await interaction.response.send_message("Chore posted!", ephemeral=True
+            await interaction.response.send_message("Chore posted!", ephemeral=True)
