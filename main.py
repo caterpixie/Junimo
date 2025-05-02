@@ -2,7 +2,8 @@ import discord
 from discord.ext import commands
 import os
 import asyncpg
-from qotd import qotd_group, auto_post_qotd  # ⬅️ Import from qotd.py
+from setup import setup_chores, set_bot as setup_set_bot
+from qotd import qotd_group, auto_post_qotd
 
 class Client(commands.Bot):
     def __init__(self, **kwargs):
@@ -23,7 +24,9 @@ intents = discord.Intents.default()
 intents.message_content = True
 bot = Client(command_prefix="!", intents=intents)
 
-# Provide the bot instance to qotd.py
+setup_set_bot(bot)
+bot.tree.add_command(setup_chores)
+
 import qotd
 qotd.set_bot(bot)
 
