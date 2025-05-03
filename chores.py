@@ -35,7 +35,7 @@ def set_bot(bot_instance):
                 INSERT INTO chores (guild_id, name, description, first_post_at, interval_days, gif_url)
                 VALUES ($1, $2, $3, $4, $5, $6)
                 """,
-                interaction.guild.id, description, post_time, interval_days, gif_url
+                interaction.guild.id, name, description, post_time, interval_days, gif_url
             )
     
             await interaction.followup.send(f"Chore added: {description}")
