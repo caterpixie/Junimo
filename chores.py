@@ -1,7 +1,7 @@
 import discord
 from discord import app_commands
 from discord.ext import tasks
-from datetime import datetime
+from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 import aiohttp
 import os
@@ -54,11 +54,7 @@ async def auto_post_chores():
     chores = await bot.pool.fetch("""
         SELECT * FROM chores
         WHERE is_active = TRUE
-        AND (
-            last_posted IS NULL AND first_post_at <= $1
-            OR last_posted IS NOT NULL AND last_posted + (interval_days || ' days')::interval <= $1
-        )
-    """, now)
+    """)
 
     webhook_url = os.getenv("WEBHOOK_URL")
     if not webhook_url:
@@ -67,6 +63,20 @@ async def auto_post_chores():
 
     async with aiohttp.ClientSession() as session:
         for chore in chores:
+            first_post_at = chore["first_post_at"]
+            last_posted = chore["last_posted"]
+            interval = chore["interval_days"]
+
+            # Skip if it's not yet time for the first post
+            if last_posted is None:
+                if now < first_post_at:
+                    continue
+            else:
+                next_post = last_posted + timedelta(days=interval)
+                if now < next_post:
+                    continue
+
+            # Post the chore
             embed = {
                 "title": chore["name"],
                 "description": chore["description"],
@@ -76,7 +86,6 @@ async def auto_post_chores():
                 embed["image"] = {"url": chore["gif_url"]}
 
             await session.post(webhook_url, json={"embeds": [embed]})
-
             await bot.pool.execute(
                 "UPDATE chores SET last_posted = $1 WHERE id = $2",
                 now, chore["id"]
