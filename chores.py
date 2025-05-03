@@ -60,8 +60,8 @@ def set_bot(bot_instance):
             return
 
         embed = {
-            "title": chore["description"],
-            "description": f"Next due: {chore['first_post_at'].strftime('%Y-%m-%d')}",
+            "title": chore["name"],
+            "description": chore["description"],
             "color": 0xFFA4C6,
             "image": {"url": chore["gif_url"]} if chore["gif_url"] else {}
         }
