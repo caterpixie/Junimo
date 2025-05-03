@@ -1,5 +1,6 @@
 import discord
 from discord import app_commands
+from discord.ext import tasks
 from datetime import datetime
 from zoneinfo import ZoneInfo
 import aiohttp
@@ -46,27 +47,37 @@ def set_bot(bot_instance):
             print("ERROR in add_chore:", e)
             await interaction.followup.send("Something went wrong adding the chore.")
 
-    #bot.tree.add_command(add_chore)
+@tasks.loop(minutes=1)
+async def auto_post_chores():
+    now = datetime.now(ZoneInfo("America/Chicago"))
 
-    # Existing test command
-    #@bot.tree.command(name="chore_test", description="Manually post chore")
-    #async def chore_test(interaction: discord.Interaction):
-        #chore = await bot.pool.fetchrow(
-            #"SELECT * FROM chores WHERE is_active = TRUE ORDER BY first_post_at ASC LIMIT 1"
-        #)
+    chores = await bot.pool.fetch("""
+        SELECT * FROM chores
+        WHERE is_active = TRUE
+        AND (
+            last_posted IS NULL AND first_post_at <= $1
+            OR last_posted IS NOT NULL AND last_posted + (interval_days || ' days')::interval <= $1
+        )
+    """, now)
 
-        #webhook_url = os.getenv("WEBHOOK_URL")
-        #if not webhook_url:
-            #await interaction.response.send_message("Webhook URL not configured.", ephemeral=True)
-            #return
+    webhook_url = os.getenv("WEBHOOK_URL")
+    if not webhook_url:
+        print("Webhook URL not found.")
+        return
 
-        #embed = {
-            #"title": chore["name"],
-            #"description": chore["description"],
-            #"color": 0xFFA4C6,
-            #"image": {"url": chore["gif_url"]} if chore["gif_url"] else {}
-        #}
+    async with aiohttp.ClientSession() as session:
+        for chore in chores:
+            embed = {
+                "title": chore["name"],
+                "description": chore["description"],
+                "color": 0xFFA4C6,
+            }
+            if chore["gif_url"]:
+                embed["image"] = {"url": chore["gif_url"]}
 
-        #async with aiohttp.ClientSession() as session:
-            #await session.post(webhook_url, json={"embeds": [embed]})
-            #await interaction.response.send_message("Chore posted!", ephemeral=True)
+            await session.post(webhook_url, json={"embeds": [embed]})
+
+            await bot.pool.execute(
+                "UPDATE chores SET last_posted = $1 WHERE id = $2",
+                now, chore["id"]
+            )
