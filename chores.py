@@ -21,6 +21,7 @@ def set_bot(bot_instance):
         interval_days: int,
         gif_url: str = None,
     ):
+        description = description.replace("\\n", "\n")
         try:
             await interaction.response.defer(ephemeral=True)  # <-- this buys you more time
     
