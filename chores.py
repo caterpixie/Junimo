@@ -21,7 +21,7 @@ def set_bot(bot_instance):
         gif_url: str = None,
     ):
         try:
-            post_time = datetime.strptime(first_post_at, "%Y-%m-%d").replace(tzinfo=ZoneInfo("America/Chicago"))
+            post_time = datetime.strptime(first_post_at, "%Y-%m-%d %H:%M").replace(tzinfo=ZoneInfo("America/Chicago"))
         except ValueError:
             await interaction.response.send_message("Date format must be YYYY-MM-DD", ephemeral=True)
             return
