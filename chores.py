@@ -46,27 +46,27 @@ def set_bot(bot_instance):
             print("ERROR in add_chore:", e)
             await interaction.followup.send("Something went wrong adding the chore.")
 
-    bot.tree.add_command(add_chore)
+    #bot.tree.add_command(add_chore)
 
     # Existing test command
-    @bot.tree.command(name="chore_test", description="Manually post chore")
-    async def chore_test(interaction: discord.Interaction):
-        chore = await bot.pool.fetchrow(
-            "SELECT * FROM chores WHERE is_active = TRUE ORDER BY first_post_at ASC LIMIT 1"
-        )
+    #@bot.tree.command(name="chore_test", description="Manually post chore")
+    #async def chore_test(interaction: discord.Interaction):
+        #chore = await bot.pool.fetchrow(
+            #"SELECT * FROM chores WHERE is_active = TRUE ORDER BY first_post_at ASC LIMIT 1"
+        #)
 
-        webhook_url = os.getenv("WEBHOOK_URL")
-        if not webhook_url:
-            await interaction.response.send_message("Webhook URL not configured.", ephemeral=True)
-            return
+        #webhook_url = os.getenv("WEBHOOK_URL")
+        #if not webhook_url:
+            #await interaction.response.send_message("Webhook URL not configured.", ephemeral=True)
+            #return
 
-        embed = {
-            "title": chore["name"],
-            "description": chore["description"],
-            "color": 0xFFA4C6,
-            "image": {"url": chore["gif_url"]} if chore["gif_url"] else {}
-        }
+        #embed = {
+            #"title": chore["name"],
+            #"description": chore["description"],
+            #"color": 0xFFA4C6,
+            #"image": {"url": chore["gif_url"]} if chore["gif_url"] else {}
+        #}
 
-        async with aiohttp.ClientSession() as session:
-            await session.post(webhook_url, json={"embeds": [embed]})
-            await interaction.response.send_message("Chore posted!", ephemeral=True)
+        #async with aiohttp.ClientSession() as session:
+            #await session.post(webhook_url, json={"embeds": [embed]})
+            #await interaction.response.send_message("Chore posted!", ephemeral=True)
