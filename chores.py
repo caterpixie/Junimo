@@ -15,6 +15,7 @@ def set_bot(bot_instance):
     @app_commands.command(name="add_chore", description="Add a new chore to the table")
     async def add_chore(
         interaction: discord.Interaction,
+        name: str,
         description: str,
         first_post_at: str,
         interval_days: int,
@@ -31,8 +32,8 @@ def set_bot(bot_instance):
     
             await bot.pool.execute(
                 """
-                INSERT INTO chores (guild_id, description, first_post_at, interval_days, gif_url)
-                VALUES ($1, $2, $3, $4, $5)
+                INSERT INTO chores (guild_id, name, description, first_post_at, interval_days, gif_url)
+                VALUES ($1, $2, $3, $4, $5, $6)
                 """,
                 interaction.guild.id, description, post_time, interval_days, gif_url
             )
