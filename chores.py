@@ -85,7 +85,15 @@ async def auto_post_chores():
             if chore["gif_url"]:
                 embed["image"] = {"url": chore["gif_url"]}
 
-            await session.post(webhook_url, json={"embeds": [embed]})
+            role_id = "1332568557313200188"
+            payload = {
+                "content": f"<@&{role_id}>",
+                "embeds": [embed],
+                "allowed_mentions": {
+                    "roles": [role_id]
+                }
+            }
+            await session.post(webhook_url, json=payload)
             await bot.pool.execute(
                 "UPDATE chores SET last_posted = $1 WHERE id = $2",
                 now, chore["id"]
