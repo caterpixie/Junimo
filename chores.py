@@ -21,24 +21,28 @@ def set_bot(bot_instance):
         gif_url: str = None,
     ):
         try:
+            await interaction.response.defer(ephemeral=True)  # <-- this buys you more time
+    
             post_time = datetime.strptime(first_post_at, "%Y-%m-%d %H:%M").replace(tzinfo=ZoneInfo("America/Chicago"))
+    
+            if interval_days not in (7, 14, 28):
+                await interaction.followup.send("Interval must be 7, 14, or 28 days.")
+                return
+    
+            await bot.pool.execute(
+                """
+                INSERT INTO chores (guild_id, description, first_post_at, interval_days, gif_url)
+                VALUES ($1, $2, $3, $4, $5)
+                """,
+                interaction.guild.id, description, post_time, interval_days, gif_url
+            )
+    
+            await interaction.followup.send(f"Chore added: {description}")
         except ValueError:
-            await interaction.response.send_message("Date format must be YYYY-MM-DD", ephemeral=True)
-            return
-
-        if interval_days not in (7, 14, 28):
-            await interaction.response.send_message("Interval must be 7, 14, or 28 days.", ephemeral=True)
-            return
-
-        await bot.pool.execute(
-            """
-            INSERT INTO chores (guild_id, description, first_post_at, interval_days, gif_url)
-            VALUES ($1, $2, $3, $4, $5)
-            """,
-            interaction.guild.id, description, post_time, interval_days, gif_url
-        )
-
-        await interaction.response.send_message(f"Chore added: {description}", ephemeral=True)
+            await interaction.followup.send("Date/time format must be YYYY-MM-DD HH:MM (24-hour)")
+        except Exception as e:
+            print("ERROR in add_chore:", e)
+            await interaction.followup.send("Something went wrong adding the chore.")
 
     bot.tree.add_command(add_chore)
 
