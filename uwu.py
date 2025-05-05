@@ -17,10 +17,10 @@ async def uwu(interaction: discord.Interaction, message: str):
 
     if random.random() < 0.3:
     match = re.match(r"(\w+)", message)
-    if match:
-        first_word = match.group(1)
-        stuttered = f"{first_word[0]}-{first_word}"
-        message = message.replace(first_word, stuttered, 1)
+        if match:
+            first_word = match.group(1)
+            stuttered = f"{first_word[0]}-{first_word}"
+            message = message.replace(first_word, stuttered, 1)
 
     prefixes = ["UwU ", "H-hewwo?? ", "OWO ", "HIIII! ", "<3 ", "Huohhhh. ", "Haiiiii! ", "*blushes* ", "^-^ ", "OwO what's this? ", ">.< "]
     suffixes = [" ʕ•ᴥ•ʔ", " ( ͡° ᴥ ͡°)", " (´・ω・｀)", " ;-;", " >_<", " ._.", " ^_^", " (• o •)", " (•́︿•̀)", " ( ´•̥̥̥ω•̥̥̥` )", " :D", " ◠‿◠✿)", " (✿ ♡‿♡)", " :3", " °○°/", " UwU", " :P", " (ʘᗩʘ')", " ( ˘ ³˘)♥", " (人◕ω◕)", " (；ω；)", " :O"]
