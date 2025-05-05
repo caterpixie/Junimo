@@ -34,4 +34,24 @@ CREATE TABLE qotds (
     author TEXT,
     is_published BOOLEAN DEFAULT FALSE
 );
+```  
+`chores`
+```sql
+CREATE TABLE chores (
+    id SERIAL PRIMARY KEY,
+    guild_id BIGINT,
+    name TEXT,
+    description TEXT,
+    first_post_at TIMESTAMPTZ,
+    interval_days INT,
+    gif_url TEXT,
+    last_posted TIMESTAMPTZ,
+    is_active BOOLEAN DEFAULT TRUE
+);
 ```
+
+## Dependencies
+- `discord.py`
+- `asyncpg`
+- `python-dotenv`  
+
