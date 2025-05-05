@@ -24,4 +24,14 @@ Chores are stored in the `chore` database.
 ### Misc Commands
 - `/uwu`: Takes in text input and UwU-ifies it
 
- 
+## Databases
+`qotds`
+```sql
+CREATE TABLE qotds (
+    id SERIAL PRIMARY KEY,
+    guild_id BIGINT,
+    question TEXT,
+    author TEXT,
+    is_published BOOLEAN DEFAULT FALSE
+);
+```
