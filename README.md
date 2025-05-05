@@ -19,7 +19,7 @@ Chores are posted to the #of-the-day channel in the AD server. **This channel ID
 - `add_chore`: Adds a chore to the `chore` database. This command is not called in the `main.py` file as it was only used for the setup of the database. However it is kept in the files in the case that this feed needs to be edited or re-made.
 
 Posting is done through the Junimaid webhook for the #of-the-day server in an embed. **The webhook URL is hardcoded in the .env file**  
-Chores are stored in the `chore` database
+Chores are stored in the `chore` database.
 
 ### Misc Commands
 - `/uwu`: Takes in text input and UwU-ifies it
