@@ -12,13 +12,13 @@ As this bot is, for the moment, not expected to be used in other servers, some e
 - `/qotd view`: Lists the upcoming questions in the queue.
 - `/qotd delete`: Deletes a question in the queue. Takes the int input of "index" based on its position in `/qotd view`
 
-This bot posts chores automatically at 4:20AM CST. **This is a hardcoded element**
+This bot posts chores automatically at 4:20AM CST. **This is a hardcoded element**  
 Chores are posted to the #of-the-day channel in the AD server. **This channel ID is a hardcoded element**
 
 ### Chore of the Day System
 - `add_chore`: Adds a chore to the `chore` database. This command is not called in the `main.py` file as it was only used for the setup of the database. However it is kept in the files in the case that this feed needs to be edited or re-made.
 
-Posting is done through the Junimaid webhook for the #of-the-day server in an embed. **The webhook URL is hardcoded in the .env file**
+Posting is done through the Junimaid webhook for the #of-the-day server in an embed. **The webhook URL is hardcoded in the .env file**  
 Chores are stored in the `chore` database
 
 ### Misc Commands
