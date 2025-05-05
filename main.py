@@ -7,6 +7,7 @@ from discord.ext import commands
 import asyncpg
 from qotd import qotd_group, auto_post_qotd, set_bot as set_qotd_bot
 from chores import set_bot as set_chores_bot, auto_post_chores
+from uwu import set_bot as set_uwu_bot, uwu
 
 class Client(commands.Bot):
     def __init__(self, **kwargs):
@@ -16,6 +17,7 @@ class Client(commands.Bot):
     async def setup_hook(self):
         self.pool = await asyncpg.create_pool(os.getenv("DATABASE_URL"))
         self.tree.add_command(qotd_group)
+        self.tree.add_command(uwu, guild=1322423728457384018)
         await self.tree.sync()
 
     async def on_ready(self):
@@ -33,5 +35,6 @@ bot = Client(command_prefix="!", intents=intents)
 # Set bot instance in each module
 set_qotd_bot(bot)
 set_chores_bot(bot)
+set_uwu_bot(bot)
 
 bot.run(os.getenv("DISCORD_TOKEN"))
