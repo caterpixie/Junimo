@@ -15,4 +15,4 @@ async def uwu(interaction: discord.Interaction, message: str):
     message = re.sub(r"n(?!\b)", "ny", message)
     message = re.sub(r"N(?!\b)", "Ny", message)
     
-    await interaction.response.send_message(f"> {message}")
+    await interaction.response.send_message(f"-# {message}")
