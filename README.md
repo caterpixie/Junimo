@@ -7,4 +7,6 @@ As this bot is, for the moment, not expected to be used in other servers, some e
 ## Features
 
 ### QOTD System
+#### Commands:
+> `/qotd add`: Adds a question to the queue
 
