@@ -17,7 +17,7 @@ class Client(commands.Bot):
     async def setup_hook(self):
         self.pool = await asyncpg.create_pool(os.getenv("DATABASE_URL"))
         self.tree.add_command(qotd_group)
-        self.tree.add_command(uwu, guild=1322423728457384018)
+        self.tree.add_command(uwu)
         await self.tree.sync()
 
     async def on_ready(self):
