@@ -10,6 +10,16 @@ def set_bot(bot_instance):
 
 @app_commands.command(name="uwu", description="UwU-ifies a message")
 async def uwu(interaction: discord.Interaction, message: str):
+
+    word_map = {
+        "hi": "hai",
+        "hey": "haiii",
+        "love": "wuv",
+        "wanna": "wannya"
+    }
+    for word, uwu_word in word_map.items():
+        text = re.sub(rf"\b{word}\b", uwu_word, text, flags=re.IGNORECASE)
+    
     message = message.replace("r", "w").replace("l", "w")
     message = message.replace("R", "W").replace("L", "W")
     message = re.sub(r"n(?!\b)", "ny", message)
