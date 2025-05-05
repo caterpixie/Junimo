@@ -24,7 +24,7 @@ def set_bot(bot_instance):
     ):
         description = description.replace("\\n", "\n")
         try:
-            await interaction.response.defer(ephemeral=True)  # <-- this buys you more time
+            await interaction.response.defer(ephemeral=True)
     
             post_time = datetime.strptime(first_post_at, "%Y-%m-%d %H:%M").replace(tzinfo=ZoneInfo("America/Chicago"))
     
