@@ -15,14 +15,13 @@ async def uwu(interaction: discord.Interaction, message: str):
         "hi": "hai",
         "hey": "haiii",
         "love": "wuv",
-        "wanna": "wannya"
     }
     for word, uwu_word in word_map.items():
         message = re.sub(rf"\b{word}\b", uwu_word, message, flags=re.IGNORECASE)
     
     message = message.replace("r", "w").replace("l", "w")
     message = message.replace("R", "W").replace("L", "W")
-    message = re.sub(r"n(?!\b)", "ny", message)
+    message = re.sub(r"n(?!n|\b)", "ny", message)
     message = re.sub(r"N(?!\b)", "Ny", message)
 
     if random.random() < 0.3:
