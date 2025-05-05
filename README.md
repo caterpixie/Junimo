@@ -15,4 +15,4 @@ As this bot is, for the moment, not expected to be used in other servers, some e
 
 #### Notes
 - This bot posts chores automatically at 4:20AM CST. **This is a hardcoded element**
-- Chores are posted to the #of-the-day channel in the AD server. **This ID is a hardcoded element**
+- Chores are posted to the #of-the-day channel in the AD server. **This channel ID is a hardcoded element**
