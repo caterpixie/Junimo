@@ -16,7 +16,7 @@ async def uwu(interaction: discord.Interaction, message: str):
     message = re.sub(r"N(?!\b)", "Ny", message)
 
     if random.random() < 0.3:
-    match = re.match(r"(\w+)", message)
+        match = re.match(r"(\w+)", message)
         if match:
             first_word = match.group(1)
             stuttered = f"{first_word[0]}-{first_word}"
