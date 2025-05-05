@@ -18,7 +18,7 @@ async def uwu(interaction: discord.Interaction, message: str):
         "wanna": "wannya"
     }
     for word, uwu_word in word_map.items():
-        text = re.sub(rf"\b{word}\b", uwu_word, text, flags=re.IGNORECASE)
+        message = re.sub(rf"\b{word}\b", uwu_word, message, flags=re.IGNORECASE)
     
     message = message.replace("r", "w").replace("l", "w")
     message = message.replace("R", "W").replace("L", "W")
