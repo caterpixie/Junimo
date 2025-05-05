@@ -12,4 +12,4 @@ async def uwu(interaction: discord.Interaction, message: str):
     message = message.replace("r", "w").replace("R", "W")
     message = message.replace("l", "w").replace("L", "W")
 
-    await interaction.response.send_message("-#"message)
+    await interaction.response.send_message("-#", message)
