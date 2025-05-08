@@ -54,7 +54,3 @@ CREATE TABLE chores (
 - `discord.py`
 - `asyncpg`
 - `python-dotenv`  
-
-## Notes on Railway
-Junimo is currently being deployed by Railway, which automatically updates and deploys the bot anytime a change is committed in Github.  
-Additionally, the SQL files are stored inside Railway to ensure persistence through deployments.  
