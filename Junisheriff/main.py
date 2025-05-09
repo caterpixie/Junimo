@@ -2,8 +2,6 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-# TEST
-
 import discord
 from discord.ext import commands
 from funwarns import set_bot as set_warn_bot, piss_on, give_foot, mop, sock, gag, ungag
