@@ -42,10 +42,10 @@ CREATE TABLE chores (
     guild_id BIGINT,
     name TEXT,
     description TEXT,
-    first_post_at TIMESTAMPTZ,
+    first_post_at DATETIME,
     interval_days INT,
     gif_url TEXT,
-    last_posted TIMESTAMPTZ,
+    last_posted DATETIME,
     is_active BOOLEAN DEFAULT TRUE
 );
 ```
