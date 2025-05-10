@@ -3,6 +3,7 @@ from discord import Role, Member
 from discord import app_commands
 import asyncio
 import re
+from datetime import datetime, timedelta, timezone
 
 GUILD_ID = 123456789012345678
 
@@ -105,45 +106,39 @@ async def sock(interaction: discord.Interaction, user: Member):
     else:
         await interaction.response.send_message(f"{user.mention} doesn't have the foot role.", ephemeral=True)
 
-@app_commands.command(name="gag", description="Gags the user; scram!")
+@app_commands.command(name="gag", description="Gags the user using native timeout")
 async def gag(interaction: discord.Interaction, user: Member, duration: str, reason: str = None):
-    gag = interaction.guild.get_role(1322686350063042610)
-    reason_text = f"\nReason: {reason}" if reason else ""
-
     try:
-        await user.add_roles(gag)
+        seconds = parse_duration(duration)
+        until = datetime.now(timezone.utc) + timedelta(seconds=seconds)
+        await user.edit(timed_out_until=until, reason=reason)
+
+        reason_text = f"\nReason: {reason}" if reason else ""
+        embed = discord.Embed(
+            description=f"{interaction.user} put the gag on {user.mention}.{reason_text}",
+            color=discord.Color.from_str("#7CE4FF")
+        )
+        await interaction.response.send_message(embed=embed, allowed_mentions=discord.AllowedMentions(users=True))
+
     except discord.Forbidden:
-        await interaction.response.send_message("I don't have permission to assign that role.", ephemeral=True)
-        return
+        await interaction.response.send_message("I don't have permission to timeout this user.", ephemeral=True)
     except discord.HTTPException as e:
-        await interaction.response.send_message(f"Failed to assign role: {e}", ephemeral=True)
-        return
-
-    embed = discord.Embed(
-        description=f"{interaction.user} put the gag on {user.mention}. {reason_text}",
-        color=discord.Color.from_str("#7CE4FF")
-    )
-    await interaction.response.send_message(embed=embed, allowed_mentions=discord.AllowedMentions(roles=True))
-
-    try:
-        sleep_seconds = parse_duration(duration)
-        await asyncio.sleep(sleep_seconds)
-        await user.remove_roles(gag)
+        await interaction.response.send_message(f"Failed to timeout user: {e}", ephemeral=True)
     except ValueError as e:
-        await interaction.followup.send(str(e), ephemeral=True)
+        await interaction.response.send_message(str(e), ephemeral=True)
 
 
-@app_commands.command(name="ungag", description="Removes the gag role")
+@app_commands.command(name="ungag", description="Removes the user's timeout")
 async def ungag(interaction: discord.Interaction, user: Member):
-    gag = interaction.guild.get_role(1322686350063042610)
+    try:
+        await user.edit(timed_out_until=None)
+        embed = discord.Embed(
+            description=f"{interaction.user} took the gag off {user.mention}. They won't hesitate to gag you again <:whyioughta:1368453281419890688>",
+            color=discord.Color.from_str("#7CE4FF")
+        )
+        await interaction.response.send_message(embed=embed, allowed_mentions=discord.AllowedMentions(users=True))
 
-    embed = discord.Embed(
-        description= f"{interaction.user} took the gag off {user.mention}. They won't hesitate to gag you again <:whyioughta:1368453281419890688>",
-        color=discord.Color.from_str("#7CE4FF")
-    )
-
-    if gag in user.roles:
-        await user.remove_roles(gag)
-        await interaction.response.send_message(embed=embed, allowed_mentions=discord.AllowedMentions(roles=True))
-    else:
-        await interaction.response.send_message(f"{user.mention} doesn't have the gag role.", ephemeral=True)
+    except discord.Forbidden:
+        await interaction.response.send_message("I don't have permission to remove the timeout.", ephemeral=True)
+    except discord.HTTPException as e:
+        await interaction.response.send_message(f"Failed to remove timeout: {e}", ephemeral=True)
