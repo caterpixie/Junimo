@@ -73,6 +73,12 @@ async def auto_post_chores():
             last_posted = chore["last_posted"]
             interval = chore["interval_days"]
 
+            # Fix tz-awareness
+            if first_post_at and first_post_at.tzinfo is None:
+                first_post_at = first_post_at.replace(tzinfo=ZoneInfo("America/Chicago"))
+            if last_posted and last_posted.tzinfo is None:
+                last_posted = last_posted.replace(tzinfo=ZoneInfo("America/Chicago"))
+
             # Skip if it's not yet time for the first post
             if last_posted is None:
                 if now < first_post_at:
