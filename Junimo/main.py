@@ -2,11 +2,10 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-# test
-
 import discord
 from discord.ext import commands
-import asyncpg
+import aiomysql
+import urllib.parse
 from qotd import qotd_group, auto_post_qotd, set_bot as set_qotd_bot
 from chores import set_bot as set_chores_bot, auto_post_chores
 from uwu import set_bot as set_uwu_bot, uwu
@@ -17,7 +16,18 @@ class Client(commands.Bot):
         self.pool = None
 
     async def setup_hook(self):
-        self.pool = await asyncpg.create_pool(os.getenv("DATABASE_URL"))
+        db_url = os.getenv("DATABASE_URL")
+        parsed = urllib.parse.urlparse(db_url)
+    
+        self.pool = await aiomysql.create_pool(
+            host=parsed.hostname,
+            port=parsed.port or 3306,
+            user=parsed.username,
+            password=parsed.password,
+            db=parsed.path[1:],  # strip leading slash
+            autocommit=True,
+        )
+
         self.tree.add_command(qotd_group)
         self.tree.add_command(uwu)
         await self.tree.sync()
