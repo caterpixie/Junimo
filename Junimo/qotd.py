@@ -3,6 +3,9 @@ from discord.ext import tasks
 from discord import app_commands, ui
 from datetime import datetime
 from zoneinfo import ZoneInfo
+import aiomysql
+import os
+import urllib.parse
 
 bot = None
 def set_bot(bot_instance):
@@ -42,28 +45,34 @@ qotd_group = QOTDGroup()
 
 @qotd_group.command(name="add", description="Adds a QOTD to the queue")
 async def add_qotd(interaction: discord.Interaction, question: str):
-    await bot.pool.execute(
-        "INSERT INTO qotds (guild_id, question, author, is_published) VALUES ($1, $2, $3, FALSE)",
-        interaction.guild.id, question, interaction.user.name
-    )
+    async with bot.pool.acquire() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "INSERT INTO qotds (guild_id, question, author, is_published) VALUES (%s, %s, %s, FALSE)",
+                (interaction.guild.id, question, interaction.user.name)
+            )
     await interaction.response.send_message(f"Submitted QOTD: {question}", ephemeral=True)
 
 @qotd_group.command(name="post", description="Manually post QOTD (Only use in #of-the-day)")
 async def post_qotd(interaction: discord.Interaction):
-    record = await bot.pool.fetchrow(
-        "SELECT * FROM qotds WHERE guild_id = $1 AND is_published = FALSE ORDER BY id ASC LIMIT 1",
-        interaction.guild.id
-    )
-    if not record:
-        await interaction.response.send_message("No QOTD in queue, slut", ephemeral=True)
-        return
+    async with bot.pool.acquire() as conn:
+        async with conn.cursor(aiomysql.DictCursor) as cur:
+            await cur.execute(
+                "SELECT * FROM qotds WHERE guild_id = %s AND is_published = FALSE ORDER BY id ASC LIMIT 1",
+                (interaction.guild.id,)
+            )
+            record = await cur.fetchone()
+            if not record:
+                await interaction.response.send_message("No QOTD in queue, slut", ephemeral=True)
+                return
 
-    await bot.pool.execute("UPDATE qotds SET is_published = TRUE WHERE id = $1", record["id"])
+            await cur.execute("UPDATE qotds SET is_published = TRUE WHERE id = %s", (record["id"],))
 
-    count = await bot.pool.fetchval(
-        "SELECT COUNT(*) FROM qotds WHERE guild_id = $1 AND is_published = FALSE",
-        interaction.guild.id
-    )
+            await cur.execute(
+                "SELECT COUNT(*) AS count FROM qotds WHERE guild_id = %s AND is_published = FALSE",
+                (interaction.guild.id,)
+            )
+            count = (await cur.fetchone())["count"]
 
     embed = discord.Embed(title="Question of the Day", description=record["question"], color=discord.Color.from_str("#A0EA67"))
     embed.set_footer(text=f"| Author: {record['author']} | {count} QOTDs left in queue |")
@@ -73,10 +82,14 @@ async def post_qotd(interaction: discord.Interaction):
 
 @qotd_group.command(name="view", description="View the list of upcoming QOTDs")
 async def view_queue(interaction: discord.Interaction):
-    records = await bot.pool.fetch(
-        "SELECT * FROM qotds WHERE guild_id = $1 AND is_published = FALSE ORDER BY id ASC",
-        interaction.guild.id
-    )
+    async with bot.pool.acquire() as conn:
+        async with conn.cursor(aiomysql.DictCursor) as cur:
+            await cur.execute(
+                "SELECT * FROM qotds WHERE guild_id = %s AND is_published = FALSE ORDER BY id ASC",
+                (interaction.guild.id,)
+            )
+            records = await cur.fetchall()
+
     if not records:
         await interaction.response.send_message("QOTD queue empty, fill her up~", ephemeral=True)
         return
@@ -95,16 +108,21 @@ async def view_queue(interaction: discord.Interaction):
 
 @qotd_group.command(name="delete", description="Deletes a QOTD by index")
 async def delete_qotd(interaction: discord.Interaction, index: int):
-    records = await bot.pool.fetch(
-        "SELECT id, question, author FROM qotds WHERE guild_id = $1 AND is_published = FALSE ORDER BY id ASC",
-        interaction.guild.id
-    )
-    if index < 1 or index > len(records):
-        await interaction.response.send_message("Index invalid", ephemeral=True)
-        return
+    async with bot.pool.acquire() as conn:
+        async with conn.cursor(aiomysql.DictCursor) as cur:
+            await cur.execute(
+                "SELECT id, question, author FROM qotds WHERE guild_id = %s AND is_published = FALSE ORDER BY id ASC",
+                (interaction.guild.id,)
+            )
+            records = await cur.fetchall()
 
-    target = records[index - 1]
-    await bot.pool.execute("DELETE FROM qotds WHERE id = $1", target["id"])
+            if index < 1 or index > len(records):
+                await interaction.response.send_message("Index invalid", ephemeral=True)
+                return
+
+            target = records[index - 1]
+            await cur.execute("DELETE FROM qotds WHERE id = %s", (target["id"],))
+
     await interaction.response.send_message(f"Removed QOTD #{index}: \"{target['question']}\" by {target['author']}", ephemeral=True)
 
 @tasks.loop(minutes=1)
@@ -116,19 +134,23 @@ async def auto_post_qotd():
             if not qotd_channel:
                 continue
 
-            record = await bot.pool.fetchrow(
-                "SELECT * FROM qotds WHERE guild_id = $1 AND is_published = FALSE ORDER BY id ASC LIMIT 1",
-                guild.id
-            )
-            if not record:
-                continue
+            async with bot.pool.acquire() as conn:
+                async with conn.cursor(aiomysql.DictCursor) as cur:
+                    await cur.execute(
+                        "SELECT * FROM qotds WHERE guild_id = %s AND is_published = FALSE ORDER BY id ASC LIMIT 1",
+                        (guild.id,)
+                    )
+                    record = await cur.fetchone()
+                    if not record:
+                        continue
 
-            await bot.pool.execute("UPDATE qotds SET is_published = TRUE WHERE id = $1", record["id"])
+                    await cur.execute("UPDATE qotds SET is_published = TRUE WHERE id = %s", (record["id"],))
 
-            count = await bot.pool.fetchval(
-                "SELECT COUNT(*) FROM qotds WHERE guild_id = $1 AND is_published = FALSE",
-                guild.id
-            )
+                    await cur.execute(
+                        "SELECT COUNT(*) AS count FROM qotds WHERE guild_id = %s AND is_published = FALSE",
+                        (guild.id,)
+                    )
+                    count = (await cur.fetchone())["count"]
 
             embed = discord.Embed(title="Question of the Day", description=record["question"], color=discord.Color.from_str("#A0EA67"))
             embed.set_footer(text=f"| Author: {record['author']} | {count} QOTDs left in queue |")
