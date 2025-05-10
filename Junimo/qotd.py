@@ -112,7 +112,7 @@ async def post_qotd(interaction: discord.Interaction):
     embed.set_footer(text=f"| Author: {record['author']} | {count} QOTDs left in queue |")
 
     qotd_role = 1322427477053669406
-    forward_channel_id = 1365204628253442048
+    forward_channel_id = 1322430254534361089
     view = QOTDView(record["question"], forward_channel_id)
     await interaction.response.send_message(content=f"<@&{qotd_role}>", embed=embed, view=view, allowed_mentions=discord.AllowedMentions(roles=True))
 
