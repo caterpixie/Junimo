@@ -37,6 +37,38 @@ class Pages(ui.View):
             self.update_buttons()
             await interaction.response.edit_message(embed=self.embeds[self.current_page], view=self)
 
+class QOTDReplyModal(ui.Modal, title="Reply to QOTD"):
+    def __init__(self, qotd_text, forward_channel_id):
+        super().__init__()
+        self.qotd_text = qotd_text
+        self.forward_channel_id = forward_channel_id
+        self.response = ui.TextInput(label="Your Answer", style=discord.TextStyle.paragraph, required=True, max_length=1000)
+        self.add_item(self.response)
+
+    async def on_submit(self, interaction: discord.Interaction):
+        forward_channel = bot.get_channel(self.forward_channel_id)
+        if forward_channel:
+            embed = discord.Embed(
+                title="QOTD Response",
+                description=f"**QOTD:** {self.qotd_text}\n\n**{interaction.user.name} replied:**\n{self.response.value}",
+                color=discord.Color.blurple()
+            )
+            await forward_channel.send(embed=embed)
+            await interaction.response.send_message("Your reply has been submitted!", ephemeral=True)
+        else:
+            await interaction.response.send_message("Failed to find the response channel.", ephemeral=True)
+
+class QOTDView(ui.View):
+    def __init__(self, qotd_text, forward_channel_id):
+        super().__init__(timeout=None)
+        self.qotd_text = qotd_text
+        self.forward_channel_id = forward_channel_id
+
+    @ui.button(label="Reply", style=discord.ButtonStyle.success)
+    async def reply_button(self, interaction: discord.Interaction, button: ui.Button):
+        await interaction.response.send_modal(QOTDReplyModal(self.qotd_text, self.forward_channel_id))
+
+
 class QOTDGroup(app_commands.Group):
     def __init__(self):
         super().__init__(name="qotd", description="Manage QOTDs")
@@ -78,7 +110,9 @@ async def post_qotd(interaction: discord.Interaction):
     embed.set_footer(text=f"| Author: {record['author']} | {count} QOTDs left in queue |")
 
     qotd_role = 1322427477053669406
-    await interaction.response.send_message(content=f"<@&{qotd_role}>", embed=embed, allowed_mentions=discord.AllowedMentions(roles=True))
+    forward_channel_id = 1365204628253442048
+    view = QOTDView(record["question"], forward_channel_id)
+    await interaction.response.send_message(content=f"<@&{qotd_role}>", embed=embed, view=view, allowed_mentions=discord.AllowedMentions(roles=True))
 
 @qotd_group.command(name="view", description="View the list of upcoming QOTDs")
 async def view_queue(interaction: discord.Interaction):
