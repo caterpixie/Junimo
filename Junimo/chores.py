@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 import aiohttp
 import os
+import aiomysql
 
 bot = None
 
@@ -25,21 +26,23 @@ def set_bot(bot_instance):
         description = description.replace("\\n", "\n")
         try:
             await interaction.response.defer(ephemeral=True)
-    
+
             post_time = datetime.strptime(first_post_at, "%Y-%m-%d %H:%M").replace(tzinfo=ZoneInfo("America/Chicago"))
-    
+
             if interval_days not in (7, 14, 28):
                 await interaction.followup.send("Interval must be 7, 14, or 28 days.")
                 return
-    
-            await bot.pool.execute(
-                """
-                INSERT INTO chores (guild_id, name, description, first_post_at, interval_days, gif_url)
-                VALUES ($1, $2, $3, $4, $5, $6)
-                """,
-                interaction.guild.id, name, description, post_time, interval_days, gif_url
-            )
-    
+
+            async with bot.pool.acquire() as conn:
+                async with conn.cursor() as cur:
+                    await cur.execute(
+                        """
+                        INSERT INTO chores (guild_id, name, description, first_post_at, interval_days, gif_url)
+                        VALUES (%s, %s, %s, %s, %s, %s)
+                        """,
+                        (interaction.guild.id, name, description, post_time, interval_days, gif_url)
+                    )
+
             await interaction.followup.send(f"Chore added: {description}")
         except ValueError:
             await interaction.followup.send("Date/time format must be YYYY-MM-DD HH:MM (24-hour)")
@@ -51,10 +54,13 @@ def set_bot(bot_instance):
 async def auto_post_chores():
     now = datetime.now(ZoneInfo("America/Chicago"))
 
-    chores = await bot.pool.fetch("""
-        SELECT * FROM chores
-        WHERE is_active = TRUE
-    """)
+    async with bot.pool.acquire() as conn:
+        async with conn.cursor(aiomysql.DictCursor) as cur:
+            await cur.execute("""
+                SELECT * FROM chores
+                WHERE is_active = TRUE
+            """)
+            chores = await cur.fetchall()
 
     webhook_url = os.getenv("WEBHOOK_URL")
     if not webhook_url:
@@ -94,7 +100,10 @@ async def auto_post_chores():
                 }
             }
             await session.post(webhook_url, json=payload)
-            await bot.pool.execute(
-                "UPDATE chores SET last_posted = $1 WHERE id = $2",
-                now, chore["id"]
-            )
+
+            async with bot.pool.acquire() as conn:
+                async with conn.cursor() as cur:
+                    await cur.execute(
+                        "UPDATE chores SET last_posted = %s WHERE id = %s",
+                        (now, chore["id"])
+                    )
