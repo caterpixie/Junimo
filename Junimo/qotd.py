@@ -50,10 +50,10 @@ class QOTDReplyModal(ui.Modal, title="Reply to QOTD"):
         if forward_channel:
             embed = discord.Embed(
                 title=f"{self.qotd_text}",
-                description=f"**{interaction.user.mention}'s reply:**\n{self.response.value}",
+                description=f"{self.response.value}",
                 color=discord.Color.from_str("#A0EA67")
             )
-            embed.set_author(name=str(interaction.user), icon_url=interaction.user.avatar.url)
+            embed.set_author(name=str(interaction.user.display_name), icon_url=interaction.user.display_avatar.url)
             
             await forward_channel.send(embed=embed)
             await interaction.response.send_message("Your reply has been submitted!", ephemeral=True)
