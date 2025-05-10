@@ -13,7 +13,6 @@ def set_bot(bot_instance):
     global bot
     bot = bot_instance
 
-    # Define and register the /add_chore command
     @app_commands.command(name="add_chore", description="Add a new chore to the table")
     async def add_chore(
         interaction: discord.Interaction,
@@ -73,11 +72,11 @@ async def auto_post_chores():
             last_posted = chore["last_posted"]
             interval = chore["interval_days"]
 
-            # Convert UTC timestamps to America/Chicago
+            # Tag naive timestamps with America/Chicago timezone
             if first_post_at and first_post_at.tzinfo is None:
-                first_post_at = first_post_at.replace(tzinfo=ZoneInfo("UTC")).astimezone(ZoneInfo("America/Chicago"))
+                first_post_at = first_post_at.replace(tzinfo=ZoneInfo("America/Chicago"))
             if last_posted and last_posted.tzinfo is None:
-                last_posted = last_posted.replace(tzinfo=ZoneInfo("UTC")).astimezone(ZoneInfo("America/Chicago"))
+                last_posted = last_posted.replace(tzinfo=ZoneInfo("America/Chicago"))
 
             # Skip if it's not yet time for the first post
             if last_posted is None:
@@ -107,6 +106,7 @@ async def auto_post_chores():
             }
             await session.post(webhook_url, json=payload)
 
+            # Store now as-is (in America/Chicago)
             async with bot.pool.acquire() as conn:
                 async with conn.cursor() as cur:
                     await cur.execute(
