@@ -190,6 +190,8 @@ async def auto_post_qotd():
 
             embed = discord.Embed(title="Question of the Day", description=record["question"], color=discord.Color.from_str("#A0EA67"))
             embed.set_footer(text=f"| Author: {record['author']} | {count} QOTDs left in queue |")
-
+        
             qotd_role = 1322427477053669406
-            await qotd_channel.send(content=f"<@&{qotd_role}>", embed=embed, allowed_mentions=discord.AllowedMentions(roles=True))
+            forward_channel_id = 1365204628253442048
+            view = QOTDView(record["question"], forward_channel_id)
+            await interaction.response.send_message(content=f"<@&{qotd_role}>", embed=embed, view=view, allowed_mentions=discord.AllowedMentions(roles=True))
