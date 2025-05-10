@@ -50,7 +50,7 @@ class QOTDReplyModal(ui.Modal, title="Reply to QOTD"):
         if forward_channel:
             embed = discord.Embed(
                 title=f"{self.qotd_text}",
-                description=f"**{interaction.user.mention} replied:**\n\n{self.response.value}",
+                description=f"**{interaction.user.mention}'s reply:**\n{self.response.value}",
                 color=discord.Color.from_str("#A0EA67")
             )
             embed.set_author(name=str(interaction.user), icon_url=interaction.user.avatar.url)
