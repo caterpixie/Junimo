@@ -128,7 +128,7 @@ async def delete_qotd(interaction: discord.Interaction, index: int):
 @tasks.loop(minutes=1)
 async def auto_post_qotd():
     now = datetime.now(ZoneInfo("America/Chicago"))
-    if now.hour == 16 and now.minute == 20:
+    if now.hour == 15 and now.minute == 20:
         for guild in bot.guilds:
             qotd_channel = guild.get_channel(1322429106868191283)
             if not qotd_channel:
