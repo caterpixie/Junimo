@@ -49,10 +49,11 @@ class QOTDReplyModal(ui.Modal, title="Reply to QOTD"):
         forward_channel = bot.get_channel(self.forward_channel_id)
         if forward_channel:
             embed = discord.Embed(
-                title="QOTD Response",
-                description=f"**QOTD:** {self.qotd_text}\n\n**{interaction.user.name} replied:**\n{self.response.value}",
-                color=discord.Color.blurple()
+                title=f"{self.qotd_text}",
+                description=f"{interaction.user.mention} replied:**{self.response.value}",
+                color=discord.Color.from_str("#A0EA67")
             )
+            
             await forward_channel.send(embed=embed)
             await interaction.response.send_message("Your reply has been submitted!", ephemeral=True)
         else:
@@ -64,7 +65,7 @@ class QOTDView(ui.View):
         self.qotd_text = qotd_text
         self.forward_channel_id = forward_channel_id
 
-    @ui.button(label="Reply", style=discord.ButtonStyle.success)
+    @ui.button(label="Reply", style=discord.ButtonStyle.secondary)
     async def reply_button(self, interaction: discord.Interaction, button: ui.Button):
         await interaction.response.send_modal(QOTDReplyModal(self.qotd_text, self.forward_channel_id))
 
