@@ -50,7 +50,7 @@ class QOTDReplyModal(ui.Modal, title="Reply to QOTD"):
         if forward_channel:
             embed = discord.Embed(
                 title=f"{self.qotd_text}",
-                description=f"{interaction.user.mention} replied:**{self.response.value}",
+                description=f"**{interaction.user.mention} replied:**\n{self.response.value}",
                 color=discord.Color.from_str("#A0EA67")
             )
             embed.set_author(name=str(interaction.user), icon_url=interaction.user.avatar.url)
@@ -66,7 +66,7 @@ class QOTDView(ui.View):
         self.qotd_text = qotd_text
         self.forward_channel_id = forward_channel_id
 
-    @ui.button(label="Reply", style=discord.ButtonStyle.secondary)
+    @ui.button(label="Reply", style=discord.ButtonStyle.primary)
     async def reply_button(self, interaction: discord.Interaction, button: ui.Button):
         await interaction.response.send_modal(QOTDReplyModal(self.qotd_text, self.forward_channel_id))
 
