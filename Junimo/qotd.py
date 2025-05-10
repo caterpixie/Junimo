@@ -53,6 +53,7 @@ class QOTDReplyModal(ui.Modal, title="Reply to QOTD"):
                 description=f"{interaction.user.mention} replied:**{self.response.value}",
                 color=discord.Color.from_str("#A0EA67")
             )
+            embed.set_author(name=str(interaction.user), icon_url=interaction.user.avatar.url)
             
             await forward_channel.send(embed=embed)
             await interaction.response.send_message("Your reply has been submitted!", ephemeral=True)
