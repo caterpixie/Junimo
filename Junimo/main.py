@@ -24,7 +24,7 @@ class Client(commands.Bot):
             port=parsed.port or 3306,
             user=parsed.username,
             password=parsed.password,
-            db=parsed.path[1:],  # strip leading slash
+            db=parsed.path[1:],
             autocommit=True,
         )
 
