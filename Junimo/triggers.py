@@ -24,7 +24,7 @@ async def on_message(message: discord.Message):
                 try:
                     embed_data = json.loads(row["response_text"])
                 except json.JSONDecodeError:
-                    await message.channel.send("⚠️ Invalid embed format.")
+                    await message.channel.send("Invalid embed format.")
                     return
                     
                 embed = discord.Embed(
