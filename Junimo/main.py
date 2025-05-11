@@ -43,7 +43,7 @@ class Client(commands.Bot):
 
 intents = discord.Intents.default()
 intents.message_content = True
-bot = Client(command_prefix="!", intents=intents)
+bot = Client(command_prefix="?", intents=intents)
 
 # Set bot instance in each module
 set_qotd_bot(bot)
