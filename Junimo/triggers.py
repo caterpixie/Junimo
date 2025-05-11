@@ -1,4 +1,5 @@
 import discord
+import aiomysql
 
 bot = None
 def set_bot(bot_instance):
