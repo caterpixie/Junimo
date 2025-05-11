@@ -1,10 +1,5 @@
+import json
 import discord
-import aiosql
-
-bot = None
-def set_bot(bot_instance):
-    global bot
-    bot = bot_instance
 
 @bot.event
 async def on_message(message: discord.Message):
@@ -12,7 +7,7 @@ async def on_message(message: discord.Message):
         return
 
     async with bot.pool.acquire() as conn:
-        async with conn.cursor() as cur:
+        async with conn.cursor(aiomysql.DictCursor) as cur:
             await cur.execute("""
                 SELECT trigger_text, response_type, response_text FROM triggers
                 WHERE guild_id = %s
@@ -20,11 +15,32 @@ async def on_message(message: discord.Message):
             rows = await cur.fetchall()
 
     content = message.content.lower()
-    for trigger_text, response_type, response_text in rows:
-        if trigger_text.lower() in content:
-            if response_type == 'plain':
-                await message.channel.send(response_text)
-            elif response_type == 'embed':
-                embed = discord.Embed(description=response_text, color=discord.Color.purple())
+    for row in rows:
+        trigger_text = row["trigger_text"].lower()
+        if trigger_text in content:
+            if row["response_type"] == "plain":
+                await message.channel.send(row["response_text"])
+            elif row["response_type"] == "embed":
+                try:
+                    embed_data = json.loads(row["response_text"])
+                except json.JSONDecodeError:
+                    await message.channel.send("⚠️ Invalid embed format.")
+                    return
+
+                embed = discord.Embed(
+                    title=embed_data.get("title"),
+                    description=embed_data.get("description"),
+                    color=discord.Color(embed_data.get("color", 0x2F3136))  
+                    
+
+                if "image" in embed_data:
+                    embed.set_image(url=embed_data["image"])
+                if "footer" in embed_data:
+                    embed.set_footer(text=embed_data["footer"])
+                if "thumbnail" in embed_data:
+                    embed.set_thumbnail(url=embed_data["thumbnail"])
+                if "author" in embed_data:
+                    embed.set_author(name=embed_data["author"])
+
                 await message.channel.send(embed=embed)
             break
