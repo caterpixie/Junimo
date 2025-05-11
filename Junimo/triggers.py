@@ -26,13 +26,13 @@ async def on_message(message: discord.Message):
                 except json.JSONDecodeError:
                     await message.channel.send("⚠️ Invalid embed format.")
                     return
-
+                    
                 embed = discord.Embed(
                     title=embed_data.get("title"),
                     description=embed_data.get("description"),
-                    color=discord.Color(embed_data.get("color", 0x2F3136))  
+                    color=discord.Color(embed_data.get("color", 0x2F3136))
+                )
                     
-
                 if "image" in embed_data:
                     embed.set_image(url=embed_data["image"])
                 if "footer" in embed_data:
