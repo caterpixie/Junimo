@@ -36,7 +36,7 @@ def set_bot(bot_instance):
                     embed = discord.Embed(
                         title=embed_data.get("title"),
                         description=embed_data.get("description"),
-                        color=discord.Color(embed_data.get("color", 0x2F3136))
+                        color=discord.Color.from_str("#C8FF99")
                     )
                         
                     if "image" in embed_data:
