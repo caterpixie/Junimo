@@ -66,7 +66,7 @@ class QOTDView(ui.View):
         self.question = question
         self.forward_channel_id = forward_channel_id
 
-    @ui.button(label="Reply", style=discord.ButtonStyle.success)
+    @ui.button(label="Reply", style=discord.ButtonStyle.success, custom_id="qotd_reply")
     async def reply_button(self, interaction: discord.Interaction, button: ui.Button):
         await interaction.response.send_modal(
             QOTDReplyModal(self.question, self.forward_channel_id)
