@@ -1,6 +1,7 @@
 import json
 import discord
 import aiomysql
+from datetime import datetime
 
 bot = None
 def set_bot(bot_instance):
@@ -11,7 +12,7 @@ def set_bot(bot_instance):
     async def on_message(message: discord.Message):
         if message.author.bot or not message.guild:
             return
-    
+
         async with bot.pool.acquire() as conn:
             async with conn.cursor(aiomysql.DictCursor) as cur:
                 await cur.execute("""
@@ -19,7 +20,7 @@ def set_bot(bot_instance):
                     WHERE guild_id = %s
                 """, (message.guild.id,))
                 rows = await cur.fetchall()
-    
+
         content = message.content.lower()
         for row in rows:
             trigger_text = row["trigger_text"].lower()
@@ -32,21 +33,58 @@ def set_bot(bot_instance):
                     except json.JSONDecodeError:
                         await message.channel.send("Invalid embed format.")
                         return
-                        
+
                     embed = discord.Embed(
                         title=embed_data.get("title"),
                         description=embed_data.get("description"),
-                        color=discord.Color.from_str("#C8FF99")
+                        color=discord.Color.from_str("#C8FF99"),
+                        url=embed_data.get("url")
                     )
-                        
-                    if "image" in embed_data:
-                        embed.set_image(url=embed_data["image"])
+
+                    # Timestamp
+                    if "timestamp" in embed_data:
+                        try:
+                            embed.timestamp = datetime.fromisoformat(embed_data["timestamp"])
+                        except Exception:
+                            pass 
+
+                    # Author block
+                    if "author" in embed_data:
+                        author = embed_data["author"]
+                        if isinstance(author, dict):
+                            embed.set_author(
+                                name=author.get("name", ""),
+                                url=author.get("url"),
+                                icon_url=author.get("icon_url")
+                            )
+                        else:
+                            embed.set_author(name=str(author))
+
+                    # Footer block
                     if "footer" in embed_data:
-                        embed.set_footer(text=embed_data["footer"])
+                        footer = embed_data["footer"]
+                        if isinstance(footer, dict):
+                            embed.set_footer(
+                                text=footer.get("text", ""),
+                                icon_url=footer.get("icon_url")
+                            )
+                        else:
+                            embed.set_footer(text=str(footer))
+
+                    # Thumbnail and image
                     if "thumbnail" in embed_data:
                         embed.set_thumbnail(url=embed_data["thumbnail"])
-                    if "author" in embed_data:
-                        embed.set_author(name=embed_data["author"])
-    
+                    if "image" in embed_data:
+                        embed.set_image(url=embed_data["image"])
+
+                    # Fields
+                    if "fields" in embed_data:
+                        for field in embed_data["fields"]:
+                            embed.add_field(
+                                name=field.get("name", "—"),
+                                value=field.get("value", "—"),
+                                inline=field.get("inline", False)
+                            )
+
                     await message.channel.send(embed=embed)
                 break
