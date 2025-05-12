@@ -41,6 +41,9 @@ class Client(commands.Bot):
         if not auto_post_chores.is_running():
             auto_post_chores.start()
 
+        from qotd import QOTDView
+        self.add_view(QOTDView("placeholder", 0))
+
 intents = discord.Intents.default()
 intents.message_content = True
 bot = Client(command_prefix="?", intents=intents)
