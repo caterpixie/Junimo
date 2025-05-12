@@ -61,14 +61,16 @@ class QOTDReplyModal(ui.Modal, title="Reply to QOTD"):
             await interaction.response.send_message("Failed to find the response channel.", ephemeral=True)
 
 class QOTDView(ui.View):
-    def __init__(self, qotd_text, forward_channel_id):
+    def __init__(self, question: str, forward_channel_id: int):
         super().__init__(timeout=None)
-        self.qotd_text = qotd_text
+        self.question = question
         self.forward_channel_id = forward_channel_id
 
-    @ui.button(label="Reply", style=discord.ButtonStyle.primary)
+    @ui.button(label="Reply", style=discord.ButtonStyle.success)
     async def reply_button(self, interaction: discord.Interaction, button: ui.Button):
-        await interaction.response.send_modal(QOTDReplyModal(self.qotd_text, self.forward_channel_id))
+        await interaction.response.send_modal(
+            QOTDReplyModal(self.question, self.forward_channel_id)
+        )
 
 
 class QOTDGroup(app_commands.Group):
