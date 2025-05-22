@@ -2,6 +2,7 @@ import json
 import discord
 import aiomysql
 from datetime import datetime
+import random
 
 bot = None
 def set_bot(bot_instance):
