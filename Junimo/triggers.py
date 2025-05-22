@@ -27,6 +27,17 @@ def set_bot(bot_instance):
             if trigger_text in content:
                 if row["response_type"] == "plain":
                     await message.channel.send(row["response_text"])
+
+                elif row["response_type"] == "random":
+                    try:
+                        options = json.loads(row["response_text"])
+                        if isinstance(options, list) and options:
+                            await message.channel.send(random.choice(options))
+                        else:
+                            await message.channel.send("No valid links available.")
+                    except json.JSONDecodeError:
+                        await message.channel.send("Invalid random link list.")
+                        
                 elif row["response_type"] == "embed":
                     try:
                         embed_data = json.loads(row["response_text"])
