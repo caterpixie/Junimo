@@ -12,6 +12,15 @@ def set_bot(bot_instance):
     global bot
     bot = bot_instance
 
+def setup_funwarns(bot_instance: discord.Client):
+    set_bot(bot_instance)
+    bot_instance.tree.add_command(piss_on)
+    bot_instance.tree.add_command(give_foot)
+    bot_instance.tree.add_command(mop)
+    bot_instance.tree.add_command(sock)
+    bot_instance.tree.add_command(gag)
+    bot_instance.tree.add_command(ungag)
+
 # Parse inputs like 1m, 30d, 2h etc.
 def parse_duration(duration_str: str) -> int:
     """Parses a duration string like '1m', '2h', '3d' into total seconds."""
