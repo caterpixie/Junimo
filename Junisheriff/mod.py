@@ -161,7 +161,7 @@ async def warn(interaction: discord.Interaction, user: discord.Member, reason: s
 
     # Automatically mute after second warn
     if warn_count == 2:
-        gag = interaction.guild.get_role(1370967325217521744) # need to change to actual gag role in AD
+        gag = interaction.guild.get_role(1322686350063042610)
 
         await user.add_roles(gag)
         automute_logembed = discord.Embed(
@@ -448,7 +448,7 @@ async def kick(interaction: discord.Interaction, user: discord.Member, reason: s
 
 @mod_group.command(name="mute", description="Adds the gag role to the user (/srs modding only)")
 async def mute(interaction: discord.Interaction, user: discord.Member, reason: str, duration: str=None):
-    gag = interaction.guild.get_role(1370967325217521744) # need to change to actual gag role
+    gag = interaction.guild.get_role(1322686350063042610)
     now = datetime.datetime.now(datetime.timezone.utc)
 
     try:
@@ -505,7 +505,7 @@ async def mute(interaction: discord.Interaction, user: discord.Member, reason: s
 
 @mod_group.command(name="unmute", description="Removes the gag rule form a user")
 async def unmute(interaction: discord.Interaction, user: discord.Member):
-    gag = interaction.guild.get_role(1370967325217521744) # need to change to actual gag role
+    gag = interaction.guild.get_role(1322686350063042610)
     now = datetime.datetime.now(datetime.timezone.utc)
 
     if gag in user.roles:
