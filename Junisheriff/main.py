@@ -4,7 +4,7 @@ load_dotenv()
 
 import discord
 from discord.ext import commands
-from funwarns import set_bot as set_warn_bot, piss_on, give_foot, mop, sock, gag, ungag
+from funwarns import setup_funwarns
 
 class Client(commands.Bot):
     def __init__(self, **kwargs):
@@ -12,12 +12,7 @@ class Client(commands.Bot):
         self.pool = None
 
     async def on_ready(self):
-        self.tree.add_command(piss_on)
-        self.tree.add_command(give_foot)
-        self.tree.add_command(mop)
-        self.tree.add_command(sock)
-        self.tree.add_command(gag)
-        self.tree.add_command(ungag)
+        setup_funwarns(self)
         
         await self.tree.sync()
         print(f'Logged on as {self.user}')
@@ -25,8 +20,5 @@ class Client(commands.Bot):
 intents = discord.Intents.default()
 intents.message_content = True
 bot = Client(command_prefix="?", intents=intents)
-
-# Warn commands
-set_warn_bot(bot)
 
 bot.run(os.getenv("DISCORD_TOKEN"))
