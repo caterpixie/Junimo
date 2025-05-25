@@ -64,7 +64,8 @@ async def log_member_join(user: discord.Member):
     )
     embed.add_field(
         name="Account Created",
-        value=f"<t:{timestamp}:R>"
+        value=f"<t:{timestamp}:R>",
+        inline=False
     )
     embed.set_footer(text=f"ID: {user.id}")
     embed.timestamp = now
