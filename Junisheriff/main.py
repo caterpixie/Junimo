@@ -29,8 +29,8 @@ class Client(commands.Bot):
         )
         
         setup_funwarns(self)
-        self.tree.add_command(mod_group, guild=discord.Object(id=1322072874214756375))
-        await self.tree.sync(guild=discord.Object(id=1322072874214756375))
+        self.tree.add_command(mod_group)
+        await self.tree.sync()
 
     async def on_ready(self):
         print(f'Logged on as {self.user}')
