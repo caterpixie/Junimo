@@ -295,12 +295,6 @@ async def ban(interaction: discord.Interaction, user: discord.Member, reason: st
             await interaction.response.send_message(f"Unable to DM {user.mention}", ephemeral=True)
             return
 
-    await interaction.guild.ban(
-        user,
-        reason=reason,
-        delete_message_days=0 if preserve_messages else 7
-    )
-
     embed = discord.Embed(
         description=f"{user.mention} has been banned. || Reason: {reason}",
         color=discord.Color.from_str("#7CE4FF")
@@ -325,6 +319,11 @@ async def ban(interaction: discord.Interaction, user: discord.Member, reason: st
     if modlog_channel:
         await modlog_channel.send(embed=logembed)
 
+    await interaction.guild.ban(
+        user,
+        reason=reason,
+        delete_message_days=0 if preserve_messages else 7
+    )
 
 @mod_group.command(name="unban", description="Unbans a user (using id or username)")
 async def unban(interaction: discord.Interaction, user: str):
