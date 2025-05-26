@@ -33,7 +33,7 @@ def set_bot(bot_instance):
                     try:
                         options = json.loads(row["response_text"])
                         if isinstance(options, list) and options:
-                            await message.channel.send(random.choice(options))
+                            await message.channel.send("||",random.choice(options),"||")
                         else:
                             await message.channel.send("No valid links available.")
                     except json.JSONDecodeError:
