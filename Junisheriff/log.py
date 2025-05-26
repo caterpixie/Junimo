@@ -31,13 +31,13 @@ def setup_logging(bot_instance: discord.Client):
 
     @bot_instance.event
     async def on_message_delete(user: discord.Member):
-        if message.guild is None or user.guild.id != AD_SERVER:
+        if user.guild is None or user.guild.id != AD_SERVER:
             return
         await log_message_delete(user)
     
     @bot_instance.event
     async def on_message_edit(before: discord.Message, after: discord.Message):
-        if message.guild is None or user.guild.id != AD_SERVER:
+        if before.guild is None or before.guild.id != AD_SERVER:
             return
         await log_message_edit(before, after)
 
