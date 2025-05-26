@@ -80,7 +80,7 @@ class QOTDGroup(app_commands.Group):
 qotd_group = QOTDGroup()
 
 @qotd_group.command(name="add", description="Adds a QOTD to the queue")
-async def add_qotd(interaction: discord.Interaction, question: str):
+async def add_qotd(interaction: discord.Interaction, question: str, image: discord.Attachment = None):
     async with bot.pool.acquire() as conn:
         async with conn.cursor() as cur:
             await cur.execute(
