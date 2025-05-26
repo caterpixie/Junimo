@@ -148,7 +148,10 @@ async def warn(interaction: discord.Interaction, user: discord.Member, reason: s
     
         await user.send(embed=dm_embed)
     except discord.Forbidden:
-        await interaction.followup.send(f"Unable to DM {user.mention}", ephemeral=True)
+        if interaction.response.is_done():
+            await interaction.followup.send(f"Unable to DM {user.mention}", ephemeral=True)
+        else:
+            await interaction.response.send_message(f"Unable to DM {user.mention}", ephemeral=True)
 
     # Check previous warns
     async with bot.pool.acquire() as conn:
@@ -186,7 +189,10 @@ async def warn(interaction: discord.Interaction, user: discord.Member, reason: s
         
             await user.send(embed=dm_embed)
         except discord.Forbidden:
-            await interaction.followup.send(f"Unable to DM {user.mention}", ephemeral=True)
+            if interaction.response.is_done():
+                await interaction.followup.send(f"Unable to DM {user.mention}", ephemeral=True)
+            else:
+                await interaction.response.send_message(f"Unable to DM {user.mention}", ephemeral=True)
 
 
 @mod_group.command(name="warnings", description="Displays a user's past warns")
@@ -280,7 +286,10 @@ async def ban(interaction: discord.Interaction, user: discord.Member, reason: st
         else:
             await user.send(embed=dm_embed)
     except discord.Forbidden:
-        await interaction.followup.send(f"Unable to DM {user.mention}", ephemeral=True)
+        if interaction.response.is_done():
+            await interaction.followup.send(f"Unable to DM {user.mention}", ephemeral=True)
+        else:
+            await interaction.response.send_message(f"Unable to DM {user.mention}", ephemeral=True)
     await interaction.guild.ban(
         user,
         reason=reason,
@@ -415,9 +424,11 @@ async def kick(interaction: discord.Interaction, user: discord.Member, reason: s
         dm_embed.timestamp = now
     
         await user.send(embed=dm_embed)
-
     except discord.Forbidden:
-        await interaction.followup.send(f"Unable to DM {user.mention}", ephemeral=True)
+        if interaction.response.is_done():
+            await interaction.followup.send(f"Unable to DM {user.mention}", ephemeral=True)
+        else:
+            await interaction.response.send_message(f"Unable to DM {user.mention}", ephemeral=True)
     await interaction.guild.kick(user, reason=reason)
 
     embed = discord.Embed(
@@ -460,7 +471,10 @@ async def mute(interaction: discord.Interaction, user: discord.Member, reason: s
     
         await user.send(embed=dm_embed)
     except discord.Forbidden:
-        await interaction.followup.send(f"Unable to DM {user.mention}", ephemeral=True)
+        if interaction.response.is_done():
+            await interaction.followup.send(f"Unable to DM {user.mention}", ephemeral=True)
+        else:
+            await interaction.response.send_message(f"Unable to DM {user.mention}", ephemeral=True)
 
     try:
         await user.add_roles(gag)
@@ -541,7 +555,10 @@ async def unmute(interaction: discord.Interaction, user: discord.Member):
         
             await user.send(embed=dm_embed)
         except discord.Forbidden:
-            await interaction.followup.send(f"Unable to DM {user.mention}", ephemeral=True)
+            if interaction.response.is_done():
+                await interaction.followup.send(f"Unable to DM {user.mention}", ephemeral=True)
+            else:
+                await interaction.response.send_message(f"Unable to DM {user.mention}", ephemeral=True)
     else:
         embed = discord.Embed(
             description=f"{user.mention} is not currently muted.",
@@ -591,7 +608,10 @@ async def lockdown_channel(interaction: discord.Interaction, channel: discord.Te
             await modlog_channel.send(embed=log_embed)
 
     except discord.Forbidden:
-        await interaction.response.send_message("I don’t have permission to change channel permissions.", ephemeral=True)
+        if interaction.response.is_done():
+            await interaction.followup.send(f"Unable to DM {user.mention}", ephemeral=True)
+        else:
+            await interaction.response.send_message(f"Unable to DM {user.mention}", ephemeral=True)
 
 @mod_group.command(name="lockdown_server", description="Locks down all channels in the server, except the mod channels")
 async def lockdown_server(interaction: discord.Interaction, reason: str = "No reason provided"):
