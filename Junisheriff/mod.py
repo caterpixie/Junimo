@@ -274,56 +274,76 @@ async def delete_warn(interaction: discord.Interaction, user: discord.Member):
 ## BANNING COMMANDS
 
 @mod_group.command(name="ban", description="Bans a user")
-async def ban(interaction: discord.Interaction, user: discord.Member, reason: str, appeal: bool=False, preserve_messages: bool=False): 
+async def ban(
+    interaction: discord.Interaction,
+    user: discord.Member,
+    reason: str,
+    appeal: bool = False,
+    preserve_messages: bool = False
+):
     now = datetime.datetime.now(datetime.timezone.utc)
 
+    # Try to DM user
     try:
         dm_embed = discord.Embed(
             description=f"You have been banned from the server After Dark. || Reason: {reason}",
-            color=discord.Color.red()
+            color=discord.Color.red(),
+            timestamp=now
         )
-        dm_embed.timestamp = now
-
         if appeal:
             await user.send(embed=dm_embed, view=AppealButton())
         else:
             await user.send(embed=dm_embed)
     except discord.Forbidden:
-        if interaction.response.is_done():
-            await interaction.followup.send(f"Unable to DM {user.mention}", ephemeral=True)
-        else:
-            await interaction.response.send_message(f"Unable to DM {user.mention}", ephemeral=True)
-            return
+        try:
+            if interaction.response.is_done():
+                await interaction.followup.send(f"Unable to DM {user.mention}", ephemeral=True)
+            else:
+                await interaction.response.send_message(f"Unable to DM {user.mention}", ephemeral=True)
+        except Exception as e:
+            print(f"DM fallback failed: {e}")
 
+    # Ban user
+    try:
+        await interaction.guild.ban(
+            user,
+            reason=reason,
+            delete_message_days=0 if preserve_messages else 7
+        )
+    except Exception as e:
+        return await interaction.followup.send(f"Failed to ban user: {e}", ephemeral=True)
+
+    # Send confirmation embed
     embed = discord.Embed(
         description=f"{user.mention} has been banned. || Reason: {reason}",
         color=discord.Color.from_str("#7CE4FF")
     )
-
     if not interaction.response.is_done():
         await interaction.response.send_message(embed=embed)
     else:
         await interaction.followup.send(embed=embed)
 
+    # Logging embed
+    icon = user.avatar.url if user.avatar else None
     logembed = discord.Embed(
-        title=f"User banned",
-        color=discord.Color.red()
+        title="User banned",
+        color=discord.Color.red(),
+        timestamp=now
     )
-    logembed.set_author(name=str(user), icon_url=safe_avatar_url(user))
-    logembed.add_field(name="Moderator", value=f"{interaction.user.mention}")
-    logembed.add_field(name="User", value=f"{user.mention}")
-    logembed.add_field(name="Reason", value=f"{reason}")
-    logembed.timestamp = now
+    logembed.set_author(name=str(user), icon_url=icon)
+    logembed.add_field(name="Moderator", value=interaction.user.mention)
+    logembed.add_field(name="User", value=user.mention)
+    logembed.add_field(name="Reason", value=reason)
 
+    # Send to modlog
     modlog_channel = interaction.guild.get_channel(CASE_LOG_CHANNEL)
     if modlog_channel:
-        await modlog_channel.send(embed=logembed)
-
-    await interaction.guild.ban(
-        user,
-        reason=reason,
-        delete_message_days=0 if preserve_messages else 7
-    )
+        try:
+            await modlog_channel.send(embed=logembed)
+        except Exception as e:
+            print(f"Failed to send log to modlog channel: {e}")
+    else:
+        print("Modlog channel not found or CASE_LOG_CHANNEL ID is incorrect.")
 
 @mod_group.command(name="unban", description="Unbans a user (using id or username)")
 async def unban(interaction: discord.Interaction, user: str):
