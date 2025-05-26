@@ -102,6 +102,9 @@ def parse_duration(duration_str: str) -> int:
     
     return total_seconds
 
+def safe_avatar_url(user):
+    return user.avatar.url if user.avatar else discord.Embed.Empty
+
 
 
 
@@ -128,7 +131,7 @@ async def warn(interaction: discord.Interaction, user: discord.Member, reason: s
         title=f"User warned",
         color=discord.Color.orange()
     )
-    logembed.set_author(name=str(user), icon_url=user.avatar.url)
+    logembed.set_author(name=str(user), icon_url=safe_avatar_url(user))
     logembed.add_field(name="Moderator", value=f"{interaction.user.mention}")
     logembed.add_field(name="User", value=f"{user.mention}")
     logembed.add_field(name="Reason", value=f"{reason}")
@@ -172,7 +175,7 @@ async def warn(interaction: discord.Interaction, user: discord.Member, reason: s
             description=f"{user.mention} has been automuted after recieving 2 warnings. They will need to open a ticket in order to be unmuted.",
             color=discord.Color.orange()
         )
-        automute_logembed.set_author(name=str(user), icon_url=user.avatar.url)
+        automute_logembed.set_author(name=str(user), icon_url=safe_avatar_url(user))
         automute_logembed.timestamp = now
 
         # Log to modlog
@@ -224,7 +227,7 @@ async def warn_log(interaction: discord.Interaction, user: discord.Member):
             color=discord.Color.from_str("#7CE4FF")
         )
         embed.set_footer(text=f"Page {i//per_page + 1}/{(len(records)-1)//per_page + 1}")
-        embed.set_author(name=str(user), icon_url=user.avatar.url)
+        embed.set_author(name=str(user), icon_url=safe_avatar_url(user))
         pages.append(embed)
 
     view = Pages(pages)
@@ -306,7 +309,7 @@ async def ban(interaction: discord.Interaction, user: discord.Member, reason: st
         title=f"User banned",
         color=discord.Color.red()
     )
-    logembed.set_author(name=str(user), icon_url=user.avatar.url)
+    logembed.set_author(name=str(user), icon_url=safe_avatar_url(user))
     logembed.add_field(name="Moderator", value=f"{interaction.user.mention}")
     logembed.add_field(name="User", value=f"{user.mention}")
     logembed.add_field(name="Reason", value=f"{reason}")
@@ -441,7 +444,7 @@ async def kick(interaction: discord.Interaction, user: discord.Member, reason: s
         title=f"User kicked",
         color=discord.Color.orange()
     )
-    logembed.set_author(name=str(user), icon_url=user.avatar.url)
+    logembed.set_author(name=str(user), icon_url=safe_avatar_url(user))
     logembed.add_field(name="Moderator", value=f"{interaction.user.mention}")
     logembed.add_field(name="User", value=f"{user.mention}")
     logembed.add_field(name="Reason", value=f"{reason}")
@@ -496,7 +499,7 @@ async def mute(interaction: discord.Interaction, user: discord.Member, reason: s
         title=f"User muted",
         color=discord.Color.orange()
     )
-    logembed.set_author(name=str(user), icon_url=user.avatar.url)
+    logembed.set_author(name=str(user), icon_url=safe_avatar_url(user))
     logembed.add_field(name="Moderator", value=f"{interaction.user.mention}")
     logembed.add_field(name="User", value=f"{user.mention}")
     logembed.add_field(name="Reason", value=f"{reason}")
@@ -535,7 +538,7 @@ async def unmute(interaction: discord.Interaction, user: discord.Member):
             title=f"User unmuted",
             color=discord.Color.green()
         )
-        logembed.set_author(name=str(user), icon_url=user.avatar.url)
+        logembed.set_author(name=str(user), icon_url=safe_avatar_url(user))
         logembed.add_field(name="Moderator", value=f"{interaction.user.mention}")
         logembed.add_field(name="User", value=f"{user.mention}")
         logembed.timestamp = now
