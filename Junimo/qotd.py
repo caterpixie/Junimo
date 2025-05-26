@@ -84,8 +84,8 @@ async def add_qotd(interaction: discord.Interaction, question: str, image: disco
     async with bot.pool.acquire() as conn:
         async with conn.cursor() as cur:
             await cur.execute(
-                "INSERT INTO qotds (guild_id, question, author, is_published) VALUES (%s, %s, %s, FALSE)",
-                (interaction.guild.id, question, interaction.user.name)
+                "INSERT INTO qotds (guild_id, question, author, is_published, image_url) VALUES (%s, %s, %s, FALSE, %s)",
+                (interaction.guild.id, question, interaction.user.name, image.url if image else None)
             )
     await interaction.response.send_message(f"Submitted QOTD: {question}", ephemeral=True)
 
@@ -111,6 +111,8 @@ async def post_qotd(interaction: discord.Interaction):
             count = (await cur.fetchone())["count"]
 
     embed = discord.Embed(title="Question of the Day", description=record["question"], color=discord.Color.from_str("#A0EA67"))
+    if record.get("image_url"):
+        embed.set_image(url=record["image_url"])
     embed.set_footer(text=f"| Author: {record['author']} | {count} QOTDs left in queue |")
 
     qotd_role = 1322427477053669406
@@ -191,6 +193,8 @@ async def auto_post_qotd():
                     count = (await cur.fetchone())["count"]
 
             embed = discord.Embed(title="Question of the Day", description=record["question"], color=discord.Color.from_str("#A0EA67"))
+            if record.get("image_url"):
+                embed.set_image(url=record["image_url"])
             embed.set_footer(text=f"| Author: {record['author']} | {count} QOTDs left in queue |")
         
             qotd_role = 1322427477053669406
