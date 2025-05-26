@@ -46,7 +46,7 @@ class QOTDReplyModal(ui.Modal, title="Reply to QOTD"):
         self.add_item(self.response)
 
     async def on_submit(self, interaction: discord.Interaction):
-        forward_channel = bot.get_channel(self.forward_channel_id)
+        forward_channel = await bot.fetch_channel(self.forward_channel_id)
         if forward_channel:
             embed = discord.Embed(
                 title=f"{self.qotd_text}",
