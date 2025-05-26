@@ -33,18 +33,7 @@ def set_bot(bot_instance):
                     try:
                         options = json.loads(row["response_text"])
                         if isinstance(options, list) and options:
-                            selected = random.choice(options)
-                            if selected.startswith("http") and any(selected.endswith(ext) for ext in [".png", ".jpg", ".jpeg", ".gif", ".webp"]):
-                                async with message.channel.typing():
-                                    async with bot.session.get(selected) as resp:
-                                        if resp.status == 200:
-                                            data = await resp.read()
-                                            file = discord.File(fp=io.BytesIO(data), filename="SPOILER_image.png")  # Discord recognizes "SPOILER_" prefix
-                                            await message.channel.send(file=file)
-                                        else:
-                                            await message.channel.send("Image failed to load.")
-                            else:
-                                await message.channel.send(selected)
+                            await message.channel.send(random.choice(options))
                         else:
                             await message.channel.send("No valid links available.")
                     except json.JSONDecodeError:
