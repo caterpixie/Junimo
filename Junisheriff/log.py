@@ -43,7 +43,7 @@ def setup_logging(bot_instance: discord.Client):
 
     @bot_instance.event
     async def on_member_update(before: discord.Member, after: discord.Member):
-        if user.guild.id != AD_SERVER:
+        if before.guild.id != AD_SERVER:
             return
         await log_member_update(before, after)
 
