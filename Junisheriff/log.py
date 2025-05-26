@@ -3,6 +3,9 @@ import datetime
 from datetime import datetime, timezone
 
 bot = None
+
+AD_SERVER=1322423728457384018
+
 LOG_CHANNEL=1322430928555085824
 MESSAGE_LOG_CHANNEL=1322430962981801984
 USER_LOG_CHANNEL=1322430941993373850
@@ -16,26 +19,38 @@ def setup_logging(bot_instance: discord.Client):
 
     @bot_instance.event
     async def on_member_join(user: discord.Member):
+        if user.guild.id != AD_SERVER:
+            return
         await log_member_join(user)
     
     @bot_instance.event
     async def on_member_remove(user: discord.Member):
+        if user.guild.id != AD_SERVER:
+            return
         await log_member_remove(user)
 
     @bot_instance.event
     async def on_message_delete(user: discord.Member):
+        if message.guild is None or user.guild.id != AD_SERVER:
+            return
         await log_message_delete(user)
     
     @bot_instance.event
     async def on_message_edit(before: discord.Message, after: discord.Message):
+        if message.guild is None or user.guild.id != AD_SERVER:
+            return
         await log_message_edit(before, after)
 
     @bot_instance.event
     async def on_member_update(before: discord.Member, after: discord.Member):
+        if user.guild.id != AD_SERVER:
+            return
         await log_member_update(before, after)
 
     @bot_instance.event
     async def on_voice_state_update(user: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
+        if user.guild.id != AD_SERVER:
+            return
         await log_voice_state_update(user, before, after)
 
 async def log_event(channel_id: int, embed: discord.Embed):
