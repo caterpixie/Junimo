@@ -72,7 +72,9 @@ async def log_member_join(user: discord.Member):
         color=discord.Color.green()
     )
     embed.set_thumbnail(url=user.avatar.url if user.avatar else None)
-    embed.set_author(name=str(user), icon_url=user.avatar.url)
+    icon_url = user.avatar.url if user.avatar else user.default_avatar.url
+    
+    embed.set_author(name=str(user), icon_url=icon_url)
     embed.add_field(
         name="User",
         value=f"{user.mention}"
@@ -95,7 +97,9 @@ async def log_member_remove(user: discord.Member):
         color=discord.Color.red()
     )
     embed.set_thumbnail(url=user.avatar.url if user.avatar else None)
-    embed.set_author(name=str(user), icon_url=user.avatar.url)
+    icon_url = user.avatar.url if user.avatar else user.default_avatar.url
+    
+    embed.set_author(name=str(user), icon_url=icon_url)
     embed.set_footer(text=f"ID: {user.id}")
     embed.timestamp = now
 
@@ -141,7 +145,9 @@ async def log_message_edit(before: discord.Message, after: discord.Message):
         description=f"**Message by {before.author.mention} edited in {before.channel.mention}**\n[Jump to message]({jump_url})",
         color=discord.Color.orange()
     )
-    embed.set_author(name=str(before.author), icon_url=before.author.avatar.url)
+    icon_url = user.avatar.url if user.avatar else user.default_avatar.url
+    
+    embed.set_author(name=str(user), icon_url=icon_url)
     embed.add_field(
         name="Before",
         value=f"{before.content}"
@@ -190,7 +196,8 @@ async def log_member_update(before: discord.Member, after: discord.Member):
         title="User Updated",
         color=discord.Color.from_str("#7CE4FF")
     )
-    embed.set_author(name=str(before), icon_url=before.avatar.url)
+    icon_url = user.avatar.url if user.avatar else user.default_avatar.url
+    embed.set_author(name=str(user), icon_url=icon_url)
     embed.add_field(name="User", value=f"{before.mention} (`{before.id}`)")
     embed.add_field(name="Changes", value="\n".join(changes), inline=False)
     embed.timestamp = now
@@ -226,6 +233,8 @@ async def log_voice_state_update(user: discord.Member, before: discord.VoiceStat
                 color=discord.Color.green()
             )
             embed.timestamp = now
-            embed.set_author(name=str(user), icon_url=user.avatar.url)
+            icon_url = user.avatar.url if user.avatar else user.default_avatar.url
+    
+            embed.set_author(name=str(user), icon_url=icon_url)
 
     await log_event(USER_LOG_CHANNEL, embed)
