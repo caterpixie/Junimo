@@ -1,4 +1,4 @@
-import discord
+orimport discord
 import datetime
 from datetime import datetime, timezone
 
@@ -197,7 +197,7 @@ async def log_member_update(before: discord.Member, after: discord.Member):
         color=discord.Color.from_str("#7CE4FF")
     )
     icon_url = before.avatar.url if before.avatar else before.default_avatar.url
-    embed.set_author(name=str(user), icon_url=icon_url)
+    embed.set_author(name=str(before), icon_url=icon_url)
     embed.add_field(name="User", value=f"{before.mention} (`{before.id}`)")
     embed.add_field(name="Changes", value="\n".join(changes), inline=False)
     embed.timestamp = now
