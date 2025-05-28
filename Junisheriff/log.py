@@ -196,7 +196,7 @@ async def log_member_update(before: discord.Member, after: discord.Member):
         title="User Updated",
         color=discord.Color.from_str("#7CE4FF")
     )
-    icon_url = user.avatar.url if user.avatar else user.default_avatar.url
+    icon_url = before.avatar.url if before.avatar else before.default_avatar.url
     embed.set_author(name=str(user), icon_url=icon_url)
     embed.add_field(name="User", value=f"{before.mention} (`{before.id}`)")
     embed.add_field(name="Changes", value="\n".join(changes), inline=False)
