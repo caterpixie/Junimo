@@ -1,4 +1,4 @@
-oreorimport discord
+import discord
 import datetime
 from datetime import datetime, timezone
 
