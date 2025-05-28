@@ -1,4 +1,4 @@
-orimport discord
+oreorimport discord
 import datetime
 from datetime import datetime, timezone
 
@@ -147,7 +147,7 @@ async def log_message_edit(before: discord.Message, after: discord.Message):
     )
     icon_url = user.avatar.url if user.avatar else user.default_avatar.url
     
-    embed.set_author(name=str(user), icon_url=icon_url)
+    embed.set_author(name=str(before.author), icon_url=icon_url)
     embed.add_field(
         name="Before",
         value=f"{before.content}"
