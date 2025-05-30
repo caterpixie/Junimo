@@ -37,41 +37,6 @@ class Pages(ui.View):
             self.update_buttons()
             await interaction.response.edit_message(embed=self.embeds[self.current_page], view=self)
 
-class QOTDReplyModal(ui.Modal, title="Reply to QOTD"):
-    def __init__(self, qotd_text, forward_channel_id):
-        super().__init__()
-        self.qotd_text = qotd_text
-        self.forward_channel_id = forward_channel_id
-        self.response = ui.TextInput(label="Your Answer", style=discord.TextStyle.paragraph, required=True, max_length=1000)
-        self.add_item(self.response)
-
-    async def on_submit(self, interaction: discord.Interaction):
-        forward_channel = bot.get_channel(self.forward_channel_id)
-        if forward_channel:
-            embed = discord.Embed(
-                title=f"{self.qotd_text}",
-                description=f"{self.response.value}",
-                color=discord.Color.from_str("#A0EA67")
-            )
-            embed.set_author(name=str(interaction.user.display_name), icon_url=interaction.user.display_avatar.url)
-            
-            await forward_channel.send(embed=embed)
-            await interaction.response.send_message("Your reply has been submitted!", ephemeral=True)
-        else:
-            await interaction.response.send_message("Failed to find the response channel.", ephemeral=True)
-
-class QOTDView(ui.View):
-    def __init__(self, question: str, forward_channel_id: int):
-        super().__init__(timeout=None)
-        self.question = question
-        self.forward_channel_id = forward_channel_id
-
-    @ui.button(label="Reply", style=discord.ButtonStyle.primary, custom_id="qotd_reply")
-    async def reply_button(self, interaction: discord.Interaction, button: ui.Button):
-        await interaction.response.send_modal(
-            QOTDReplyModal(self.question, self.forward_channel_id)
-        )
-
 
 class QOTDGroup(app_commands.Group):
     def __init__(self):
@@ -91,7 +56,7 @@ async def add_qotd(interaction: discord.Interaction, question: str, image: disco
 
 @qotd_group.command(name="post", description="Manually post QOTD to the QOTD channel and create a thread")
 async def post_qotd(interaction: discord.Interaction):
-    qotd_channel_id = 1378089439821041804
+    qotd_channel_id = 1322430254534361089
     qotd_role = 1322427477053669406
 
     channel = interaction.guild.get_channel(qotd_channel_id)
@@ -189,7 +154,7 @@ async def auto_post_qotd():
     now = datetime.now(ZoneInfo("America/Chicago"))
     if now.hour == 15 and now.minute == 20:
         for guild in bot.guilds:
-            qotd_channel = guild.get_channel(1322429106868191283)
+            qotd_channel = guild.get_channel(1322430254534361089)
             if not qotd_channel:
                 continue
 
@@ -211,12 +176,21 @@ async def auto_post_qotd():
                     )
                     count = (await cur.fetchone())["count"]
 
-            embed = discord.Embed(title="Question of the Day", description=record["question"], color=discord.Color.from_str("#A0EA67"))
+            embed = discord.Embed(
+                title="Question of the Day",
+                description=record["question"],
+                color=discord.Color.from_str("#A0EA67")
+            )
             if record.get("image_url"):
                 embed.set_image(url=record["image_url"])
             embed.set_footer(text=f"| Author: {record['author']} | {count} QOTDs left in queue |")
-        
+
             qotd_role = 1322427477053669406
-            forward_channel_id = 1322430254534361089
-            view = QOTDView(record["question"], forward_channel_id)
-            await qotd_channel.send(content=f"<@&{qotd_role}>", embed=embed, view=view, allowed_mentions=discord.AllowedMentions(roles=True))
+            message = await qotd_channel.send(
+                content=f"<@&{qotd_role}>",
+                embed=embed,
+                allowed_mentions=discord.AllowedMentions(roles=True)
+            )
+
+            thread_name = "Answers"
+            await message.create_thread(name=thread_name, auto_archive_duration=1440)
