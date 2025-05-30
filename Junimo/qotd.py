@@ -89,8 +89,16 @@ async def add_qotd(interaction: discord.Interaction, question: str, image: disco
             )
     await interaction.response.send_message(f"Submitted QOTD: {question}", ephemeral=True)
 
-@qotd_group.command(name="post", description="Manually post QOTD (Only use in #of-the-day)")
+@qotd_group.command(name="post", description="Manually post QOTD to the QOTD channel and create a thread")
 async def post_qotd(interaction: discord.Interaction):
+    qotd_channel_id = 1378089439821041804
+    qotd_role = 1322427477053669406
+
+    channel = interaction.guild.get_channel(qotd_channel_id)
+    if not channel:
+        await interaction.response.send_message("QOTD channel not found.", ephemeral=True)
+        return
+
     async with bot.pool.acquire() as conn:
         async with conn.cursor(aiomysql.DictCursor) as cur:
             await cur.execute(
@@ -110,15 +118,26 @@ async def post_qotd(interaction: discord.Interaction):
             )
             count = (await cur.fetchone())["count"]
 
-    embed = discord.Embed(title="Question of the Day", description=record["question"], color=discord.Color.from_str("#A0EA67"))
+    embed = discord.Embed(
+        title="Question of the Day",
+        description=record["question"],
+        color=discord.Color.from_str("#A0EA67")
+    )
     if record.get("image_url"):
         embed.set_image(url=record["image_url"])
     embed.set_footer(text=f"| Author: {record['author']} | {count} QOTDs left in queue |")
 
-    qotd_role = 1322427477053669406
-    forward_channel_id = 1322430254534361089
-    view = QOTDView(record["question"], forward_channel_id)
-    await interaction.response.send_message(content=f"<@&{qotd_role}>", embed=embed, view=view, allowed_mentions=discord.AllowedMentions(roles=True))
+    # Send to channel and create thread
+    message = await channel.send(
+        content=f"<@&{qotd_role}>",
+        embed=embed,
+        allowed_mentions=discord.AllowedMentions(roles=True)
+    )
+    await interaction.response.send_message("QOTD posted and thread created.", ephemeral=True)
+
+    thread_name = "Answers"
+    await message.create_thread(name=thread_name, auto_archive_duration=1440)
+
 
 @qotd_group.command(name="view", description="View the list of upcoming QOTDs")
 async def view_queue(interaction: discord.Interaction):
