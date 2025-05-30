@@ -91,7 +91,7 @@ def parse_duration(duration_str: str) -> int:
     matches = re.findall(r"(\d+)([dhm])", duration_str.lower())
     
     if not matches:
-        raise ValueError("Invalid duration format. Use '30m', '2h', '1d2h30m', etc.")
+        raise ValueError("Invalid duration format. Use '30m', '2h', or 1d.")
     
     total_seconds = 0
     for value, unit in matches:
@@ -125,16 +125,16 @@ async def warn(interaction: discord.Interaction, user: discord.Member, reason: s
         description=f"{user.mention} has been warned. || Reason: {reason}",
         color=discord.Color.from_str("#7CE4FF")
     )
-    await interaction.response.send_message(embed=embed)
+    await interaction.response.send_message(embed=embed, ephemeral=True)
 
     logembed = discord.Embed(
         title=f"User warned",
         color=discord.Color.orange()
     )
     logembed.set_author(name=str(user), icon_url=safe_avatar_url(user))
-    logembed.add_field(name="Moderator", value=f"{interaction.user.mention}")
     logembed.add_field(name="User", value=f"{user.mention}")
-    logembed.add_field(name="Reason", value=f"{reason}")
+    logembed.add_field(name="Moderator", value=f"{interaction.user.mention}", inline=False)
+    logembed.add_field(name="Reason", value=f"{reason}", inline=False)
     logembed.timestamp = now
 
     # Log to modlog
@@ -319,9 +319,9 @@ async def ban(
         color=discord.Color.from_str("#7CE4FF")
     )
     if not interaction.response.is_done():
-        await interaction.response.send_message(embed=embed)
+        await interaction.response.send_message(embed=embed, ephemeral=True)
     else:
-        await interaction.followup.send(embed=embed)
+        await interaction.followup.send(embed=embed, ephemeral=True)
 
     # Logging embed
     icon = user.avatar.url if user.avatar else None
@@ -331,9 +331,9 @@ async def ban(
         timestamp=now
     )
     logembed.set_author(name=str(user), icon_url=icon)
-    logembed.add_field(name="Moderator", value=interaction.user.mention)
     logembed.add_field(name="User", value=user.mention)
-    logembed.add_field(name="Reason", value=reason)
+    logembed.add_field(name="Moderator", value=interaction.user.mention, inline=False)
+    logembed.add_field(name="Reason", value=reason, inline=False)
 
     # Send to modlog
     modlog_channel = interaction.guild.get_channel(CASE_LOG_CHANNEL)
@@ -378,8 +378,8 @@ async def unban(interaction: discord.Interaction, user: str):
         color=discord.Color.green()
     )
     logembed.set_author(name=f"{target.name}", icon_url=target.avatar.url)
-    logembed.add_field(name="Moderator", value=f"{interaction.user.mention}")
-    logembed.add_field(name="User", value=f"{target.mention}")
+    logembed.add_field(name="User", value=f"{target.mention}", inline=False)
+    logembed.add_field(name="Moderator", value=f"{interaction.user.mention}", inline=False)
     logembed.timestamp = now
 
     # Log to modlog
@@ -463,16 +463,16 @@ async def kick(interaction: discord.Interaction, user: discord.Member, reason: s
         description=f"{user.mention} has been kicked. || Reason: {reason}",
         color=discord.Color.from_str("#7CE4FF")
     )
-    await interaction.response.send_message(embed=embed)
+    await interaction.response.send_message(embed=embed, ephemeral=True)
 
     logembed = discord.Embed(
         title=f"User kicked",
         color=discord.Color.orange()
     )
     logembed.set_author(name=str(user), icon_url=safe_avatar_url(user))
-    logembed.add_field(name="Moderator", value=f"{interaction.user.mention}")
     logembed.add_field(name="User", value=f"{user.mention}")
-    logembed.add_field(name="Reason", value=f"{reason}")
+    logembed.add_field(name="Moderator", value=f"{interaction.user.mention}", inline=False)
+    logembed.add_field(name="Reason", value=f"{reason}", inline=False)
     logembed.timestamp = now
 
     # Log to modlog
@@ -518,16 +518,16 @@ async def mute(interaction: discord.Interaction, user: discord.Member, reason: s
         description=f"{user.mention} has been muted. || Reason: {reason}. {duration_text}",
         color=discord.Color.from_str("#7CE4FF")
     )
-    await interaction.response.send_message(embed=embed)
+    await interaction.response.send_message(embed=embed, ephemeral=True)
 
     logembed = discord.Embed(
         title=f"User muted",
         color=discord.Color.orange()
     )
     logembed.set_author(name=str(user), icon_url=safe_avatar_url(user))
-    logembed.add_field(name="Moderator", value=f"{interaction.user.mention}")
     logembed.add_field(name="User", value=f"{user.mention}")
-    logembed.add_field(name="Reason", value=f"{reason}")
+    logembed.add_field(name="Moderator", value=f"{interaction.user.mention}", inline=False)
+    logembed.add_field(name="Reason", value=f"{reason}", inline=False)
     logembed.timestamp = now
 
     # Log to modlog
@@ -557,15 +557,15 @@ async def unmute(interaction: discord.Interaction, user: discord.Member):
             description=f"{user.mention} has been unmuted.",
             color=discord.Color.from_str("#7CE4FF")
         )
-        await interaction.response.send_message(embed=embed)
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
         logembed = discord.Embed(
             title=f"User unmuted",
             color=discord.Color.green()
         )
         logembed.set_author(name=str(user), icon_url=safe_avatar_url(user))
-        logembed.add_field(name="Moderator", value=f"{interaction.user.mention}")
         logembed.add_field(name="User", value=f"{user.mention}")
+        logembed.add_field(name="Moderator", value=f"{interaction.user.mention}", inline=False)
         logembed.timestamp = now
 
         # Log to modlog
@@ -599,13 +599,14 @@ async def unmute(interaction: discord.Interaction, user: discord.Member):
 
 # LOCKDOWN COMMANDS
 
-@mod_group.command(name="lockdown_channel", description="Locks a channel for all users")
-async def lockdown_channel(interaction: discord.Interaction, channel: discord.TextChannel, reason: str = "No reason provided"):
+@mod_group.command(name="lockdown_channel", description="Locks the current channel for all users")
+async def lockdown_channel(interaction: discord.Interaction, reason: str = "No reason provided"):
     guild = interaction.guild
+    channel = interaction.channel  
     everyone_role = guild.default_role
 
     try:
-        await channel.set_permissions(everyone_role, send_messages=False, reason=reason)   
+        await channel.set_permissions(everyone_role, send_messages=False, reason=reason)
 
         embed = discord.Embed(
             title="Channel Locked",
@@ -619,27 +620,18 @@ async def lockdown_channel(interaction: discord.Interaction, channel: discord.Te
         log_embed = discord.Embed(
             title="Channel Lockdown",
             description=f"{channel.mention} locked.",
-            color=discord.Color.red()
+            color=discord.Color.red(),
+            timestamp=datetime.datetime.now(datetime.timezone.utc)
         )
-        log_embed.timestamp = datetime.datetime.now(datetime.timezone.utc)
-        log_embed.add_field(
-            name="Moderator",
-            value=f"{interaction.user.mention}"
-        )
-        log_embed.add_field(
-            name="Reason",
-            value=f"{reason}"
-        )
+        log_embed.add_field(name="Moderator", value=f"{interaction.user.mention}")
+        log_embed.add_field(name="Reason", value=f"{reason}", inline=False)
 
         modlog_channel = guild.get_channel(CASE_LOG_CHANNEL)
         if modlog_channel:
             await modlog_channel.send(embed=log_embed)
 
     except discord.Forbidden:
-        if interaction.response.is_done():
-            await interaction.followup.send(f"Unable to DM {user.mention}", ephemeral=True)
-        else:
-            await interaction.response.send_message(f"Unable to DM {user.mention}", ephemeral=True)
+        await interaction.response.send_message("I don’t have permission to change channel permissions.", ephemeral=True)
 
 @mod_group.command(name="lockdown_server", description="Locks down all channels in the server, except the mod channels")
 async def lockdown_server(interaction: discord.Interaction, reason: str = "No reason provided"):
@@ -676,7 +668,7 @@ async def lockdown_server(interaction: discord.Interaction, reason: str = "No re
     if general_channel:
         general_embed = discord.Embed(
             title="Server Locked",
-            description="The server has been locked down. Once the mod team has secured the situation, it will be reopened.",
+            description="The server has been locked down. Once the mod team has handled the situation, it will be reopened.",
             color=discord.Color.from_str("#7CE4FF")
         )
         await general_channel.send(embed=general_embed)
@@ -689,7 +681,7 @@ async def lockdown_server(interaction: discord.Interaction, reason: str = "No re
         timestamp=now
     )
     log_embed.add_field(name="Moderator", value=interaction.user.mention)
-    log_embed.add_field(name="Reason", value=reason)
+    log_embed.add_field(name="Reason", value=reason, inline=False)
 
     modlog_channel = guild.get_channel(CASE_LOG_CHANNEL)
     if modlog_channel:
