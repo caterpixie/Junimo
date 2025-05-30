@@ -142,21 +142,11 @@ async def log_message_edit(before: discord.Message, after: discord.Message):
         return 
 
     embed = discord.Embed(
-        description=f"**Message by {before.author.mention} edited in {before.channel.mention}**\n[Jump to message]({jump_url})",
+        description=f"**Message by {before.author.mention} edited in {before.channel.mention}**\n[Jump to message]({jump_url})\n\nBefore:\n{before.content}\n\nAfter:\n{after.content}",
         color=discord.Color.orange()
     )
     icon_url = before.author.avatar.url if before.author.avatar else user.default_avatar.url
-    
     embed.set_author(name=str(before.author), icon_url=icon_url)
-    embed.add_field(
-        name="Before",
-        value=f"{before.content}"
-    )
-    embed.add_field(
-        name="After",
-        value=f"{after.content}",
-        inline=False
-    )
     embed.timestamp = now
 
     await log_event(MESSAGE_LOG_CHANNEL, embed)
