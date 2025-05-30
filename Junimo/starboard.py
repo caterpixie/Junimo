@@ -3,7 +3,8 @@ import datetime
 from datetime import datetime, timezone
 
 STARBOARD_CHANNEL_ID = 1378101526022848522
-STAR_THRESHOLD = 1
+EXCLUDED_CHANNEL_IDS = [1348402616249487360,1322427028053561408,1348402476759515276,1322669947998048410,1322430843859370004,1322430860066295818,1341310543188721664,1322430599679447131]
+STAR_THRESHOLD = 3
 bot = None
 
 starred_messages = {}
@@ -17,11 +18,12 @@ def setup_starboard(bot_instance: discord.Client):
 
     @bot_instance.event
     async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
-
-        
         if str(payload.emoji) != "⭐":
             return
-
+    
+        if payload.channel_id in EXCLUDED_CHANNEL_IDS:
+            return
+    
         channel = bot.get_channel(payload.channel_id)
         if not channel:
             return
