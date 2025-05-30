@@ -218,6 +218,8 @@ async def log_voice_state_update(user: discord.Member, before: discord.VoiceStat
             )
             embed.timestamp = now
             embed.set_author(name=str(user), icon_url=user.avatar.url)
+            await log_event(USER_LOG_CHANNEL, embed)
+
 
         elif after.channel and not before.channel:
             embed = discord.Embed(
@@ -226,6 +228,8 @@ async def log_voice_state_update(user: discord.Member, before: discord.VoiceStat
             )
             embed.timestamp = now
             embed.set_author(name=str(user), icon_url=user.avatar.url)
+            await log_event(USER_LOG_CHANNEL, embed)
+
 
         elif before.channel and after.channel:
             embed = discord.Embed(
@@ -236,5 +240,7 @@ async def log_voice_state_update(user: discord.Member, before: discord.VoiceStat
             icon_url = user.avatar.url if user.avatar else user.default_avatar.url
     
             embed.set_author(name=str(user), icon_url=icon_url)
+            await log_event(USER_LOG_CHANNEL, embed)
 
-    await log_event(USER_LOG_CHANNEL, embed)
+
+    
