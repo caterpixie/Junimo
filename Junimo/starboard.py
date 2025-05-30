@@ -50,11 +50,11 @@ def setup_starboard(bot_instance: discord.Client):
         timestamp = int(message.created_at.timestamp())
 
         embed = discord.Embed(
-            description=message.content or "[No text]",
+            description=f"{message.content}\n" or "[No text]",
             color=discord.Color.from_str("#A0EA67")
         )
         embed.set_author(name=str(message.author), icon_url=message.author.display_avatar.url)
-        embed.add_field(name="Jump to Message", value=f"[Click here]({message.jump_url})")
+        embed.add_field(name="Jump to Message({message.jump_url})")
         embed.timestamp = now
 
         if message.attachments:
