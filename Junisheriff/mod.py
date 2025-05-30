@@ -144,7 +144,7 @@ async def warn(interaction: discord.Interaction, user: discord.Member, reason: s
 
     try:
         dm_embed = discord.Embed(
-            description=f"You have been warned in the server After Dark. || Reason: {reason}",
+            description=f"You have been warned in the server After Dark.\n\n**Reason:** {reason}",
             color=discord.Color.red()
         )
         dm_embed.timestamp = now
@@ -185,7 +185,7 @@ async def warn(interaction: discord.Interaction, user: discord.Member, reason: s
 
         try:
             dm_embed = discord.Embed(
-                description=f"You have been automuted in the After Dark server after recieving 2 warns. In order for this mute to be lifted, you will need to open a ticket in the server.",
+                description=f"You have been automuted in the After Dark server after recieving 2 warnings. In order for this mute to be lifted, you will need to open a ticket in the server.",
                 color=discord.Color.red()
             )
             dm_embed.timestamp = now
@@ -286,7 +286,7 @@ async def ban(
     # Try to DM user
     try:
         dm_embed = discord.Embed(
-            description=f"You have been banned from the server After Dark. || Reason: {reason}",
+            description=f"You have been banned from the server After Dark.\n\n**Reason:** {reason}",
             color=discord.Color.red(),
             timestamp=now
         )
@@ -446,7 +446,7 @@ async def kick(interaction: discord.Interaction, user: discord.Member, reason: s
 
     try:
         dm_embed = discord.Embed(
-            description=f"You have been kicked from the server After Dark. || Reason: {reason}",
+            description=f"You have been kicked from the server After Dark.\n\n**Reason:** {reason}",
             color=discord.Color.orange()
         )
         dm_embed.timestamp = now
@@ -494,7 +494,7 @@ async def mute(interaction: discord.Interaction, user: discord.Member, reason: s
 
     try:
         dm_embed = discord.Embed(
-            description=f"You have been muted in the server After Dark. || Reason: {reason}{duration_text}",
+            description=f"You have been muted in the server After Dark.\n\n**Reason:** {reason}{duration_text}",
             color=discord.Color.orange()
         )
         dm_embed.timestamp = now
@@ -577,7 +577,7 @@ async def unmute(interaction: discord.Interaction, user: discord.Member):
         # DM user
         try:
             dm_embed = discord.Embed(
-                description=f"You have been unmuted in the server After Dark.\n\nPlease review the server rules; note that the next moderation action will be a 30 day ban from the server.",
+                description=f"You have been unmuted in the server After Dark.\nPlease review the server rules; note that the next moderation action will be a 30 day ban from the server.",
                 color=discord.Color.green()
             )
             dm_embed.timestamp = now
