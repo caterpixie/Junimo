@@ -11,6 +11,7 @@ from qotd import qotd_group, auto_post_qotd, set_bot as set_qotd_bot
 from chores import set_bot as set_chores_bot, auto_post_chores
 from uwu import set_bot as set_uwu_bot, uwu
 from triggers import set_bot as set_trigger_bot
+from starboard import setup_starboard
 
 class Client(commands.Bot):
     def __init__(self, **kwargs):
@@ -32,6 +33,7 @@ class Client(commands.Bot):
         self.tree.add_command(qotd_group)
         self.tree.add_command(uwu)
         await self.tree.sync()
+        setup_starboard(self)
 
     async def on_ready(self):
         print(f'Logged on as {self.user}')
