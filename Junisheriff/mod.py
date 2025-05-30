@@ -315,7 +315,7 @@ async def ban(
 
     # Send confirmation embed
     embed = discord.Embed(
-        description=f"{user.mention} has been banned. || Reason: {reason}",
+        description=f"{user.name} has been banned. || Reason: {reason}",
         color=discord.Color.from_str("#7CE4FF")
     )
     if not interaction.response.is_done():
@@ -331,7 +331,7 @@ async def ban(
         timestamp=now
     )
     logembed.set_author(name=str(user), icon_url=icon)
-    logembed.add_field(name="User", value=user.mention)
+    logembed.add_field(name="User", value=user.name)
     logembed.add_field(name="Moderator", value=interaction.user.mention, inline=False)
     logembed.add_field(name="Reason", value=reason, inline=False)
 
