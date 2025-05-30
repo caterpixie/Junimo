@@ -91,9 +91,12 @@ async def log_member_join(user: discord.Member):
 
 async def log_member_remove(user: discord.Member):
     now = datetime.now(timezone.utc)
+    roles = [role.mention for role in user.roles if role.name != "@everyone"]
+    role_text = ", ".join(roles) if roles else "No roles"
 
     embed = discord.Embed(
         title="User Left",
+        description=f"**Roles:** {role_text}",
         color=discord.Color.red()
     )
     embed.set_thumbnail(url=user.avatar.url if user.avatar else None)
