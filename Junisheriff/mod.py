@@ -490,9 +490,11 @@ async def mute(interaction: discord.Interaction, user: discord.Member, reason: s
     gag = interaction.guild.get_role(1322686350063042610)
     now = datetime.datetime.now(datetime.timezone.utc)
 
+    duration_text = f" || Duration: {duration}" if reason else "|| Please open a ticket in After Dark to be unmuted."
+
     try:
         dm_embed = discord.Embed(
-            description=f"You have been muted in the server After Dark. || Reason: {reason}",
+            description=f"You have been muted in the server After Dark. || Reason: {reason}{duration_text}",
             color=discord.Color.orange()
         )
         dm_embed.timestamp = now
@@ -513,9 +515,8 @@ async def mute(interaction: discord.Interaction, user: discord.Member, reason: s
         await interaction.response.send_message(f"Failed to assign role: {e}", ephemeral=True)
         return
     
-    duration_text = f"|| Duration: {duration}" if reason else "|| Please open a ticket in After Dark to be unmuted."
     embed = discord.Embed(
-        description=f"{user.mention} has been muted. || Reason: {reason}. {duration_text}",
+        description=f"{user.mention} has been muted. || Reason: {reason}",
         color=discord.Color.from_str("#7CE4FF")
     )
     await interaction.response.send_message(embed=embed, ephemeral=True)
