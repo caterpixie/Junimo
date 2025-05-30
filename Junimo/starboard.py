@@ -49,23 +49,13 @@ def setup_starboard(bot_instance: discord.Client):
 
         if message.attachments:
             embed.set_image(url=message.attachments[0].url)
-        elif message.stickers:
-            sticker = message.stickers[0]
-            embed.description += f"\n\n[Sticker: {sticker.name}]"
-            try:
-                embed.set_image(url=sticker.url)
-            except:
-                pass
-
-        embed.set_footer(text=f"⭐ {count}")
 
         if message.id in starred_messages:
             try:
                 old_msg = await starboard.fetch_message(starred_messages[message.id])
-                await old_msg.edit(embed=embed)
+                await old_msg.edit(content=f"⭐ {count}", embed=embed)
             except discord.NotFound:
-                # Message was deleted manually — remove from mapping
                 del starred_messages[message.id]
         else:
-            starboard_msg = await starboard.send(embed=embed)
+            starboard_msg = await starboard.send(content=f"⭐ {count}", embed=embed)
             starred_messages[message.id] = starboard_msg.id
