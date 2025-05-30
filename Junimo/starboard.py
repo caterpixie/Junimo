@@ -17,8 +17,7 @@ def setup_starboard(bot_instance: discord.Client):
 
     @bot_instance.event
     async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
-        now = datetime.now(timezone.utc)
-        timestamp = int(user.created_at.timestamp())
+
         
         if str(payload.emoji) != "⭐":
             return
@@ -44,6 +43,9 @@ def setup_starboard(bot_instance: discord.Client):
         starboard = bot.get_channel(STARBOARD_CHANNEL_ID)
         if not starboard:
             return
+
+        now = datetime.now(timezone.utc)
+        timestamp = int(message.created_at.timestamp())
 
         embed = discord.Embed(
             description=message.content or "[No text]",
