@@ -133,8 +133,8 @@ async def warn(interaction: discord.Interaction, user: discord.Member, reason: s
     )
     logembed.set_author(name=str(user), icon_url=safe_avatar_url(user))
     logembed.add_field(name="User", value=f"{user.mention}")
-    logembed.add_field(name="Moderator", value=f"{interaction.user.mention}", inline=False)
-    logembed.add_field(name="Reason", value=f"{reason}", inline=False)
+    logembed.add_field(name="Moderator", value=f"{interaction.user.mention}")
+    logembed.add_field(name="Reason", value=f"{reason}")
     logembed.timestamp = now
 
     # Log to modlog
@@ -332,8 +332,8 @@ async def ban(
     )
     logembed.set_author(name=str(user), icon_url=icon)
     logembed.add_field(name="User", value=user.name)
-    logembed.add_field(name="Moderator", value=interaction.user.mention, inline=False)
-    logembed.add_field(name="Reason", value=reason, inline=False)
+    logembed.add_field(name="Moderator", value=interaction.user.mention)
+    logembed.add_field(name="Reason", value=reason)
 
     # Send to modlog
     modlog_channel = interaction.guild.get_channel(CASE_LOG_CHANNEL)
@@ -378,8 +378,8 @@ async def unban(interaction: discord.Interaction, user: str):
         color=discord.Color.green()
     )
     logembed.set_author(name=f"{target.name}", icon_url=target.avatar.url)
-    logembed.add_field(name="User", value=f"{target.mention}", inline=False)
-    logembed.add_field(name="Moderator", value=f"{interaction.user.mention}", inline=False)
+    logembed.add_field(name="User", value=f"{target.mention}")
+    logembed.add_field(name="Moderator", value=f"{interaction.user.mention}")
     logembed.timestamp = now
 
     # Log to modlog
@@ -471,8 +471,8 @@ async def kick(interaction: discord.Interaction, user: discord.Member, reason: s
     )
     logembed.set_author(name=str(user), icon_url=safe_avatar_url(user))
     logembed.add_field(name="User", value=f"{user.mention}")
-    logembed.add_field(name="Moderator", value=f"{interaction.user.mention}", inline=False)
-    logembed.add_field(name="Reason", value=f"{reason}", inline=False)
+    logembed.add_field(name="Moderator", value=f"{interaction.user.mention}")
+    logembed.add_field(name="Reason", value=f"{reason}")
     logembed.timestamp = now
 
     # Log to modlog
@@ -526,8 +526,8 @@ async def mute(interaction: discord.Interaction, user: discord.Member, reason: s
     )
     logembed.set_author(name=str(user), icon_url=safe_avatar_url(user))
     logembed.add_field(name="User", value=f"{user.mention}")
-    logembed.add_field(name="Moderator", value=f"{interaction.user.mention}", inline=False)
-    logembed.add_field(name="Reason", value=f"{reason}", inline=False)
+    logembed.add_field(name="Moderator", value=f"{interaction.user.mention}")
+    logembed.add_field(name="Reason", value=f"{reason}")
     logembed.timestamp = now
 
     # Log to modlog
@@ -565,7 +565,7 @@ async def unmute(interaction: discord.Interaction, user: discord.Member):
         )
         logembed.set_author(name=str(user), icon_url=safe_avatar_url(user))
         logembed.add_field(name="User", value=f"{user.mention}")
-        logembed.add_field(name="Moderator", value=f"{interaction.user.mention}", inline=False)
+        logembed.add_field(name="Moderator", value=f"{interaction.user.mention}")
         logembed.timestamp = now
 
         # Log to modlog
@@ -624,7 +624,7 @@ async def lockdown_channel(interaction: discord.Interaction, reason: str = "No r
             timestamp=datetime.datetime.now(datetime.timezone.utc)
         )
         log_embed.add_field(name="Moderator", value=f"{interaction.user.mention}")
-        log_embed.add_field(name="Reason", value=f"{reason}", inline=False)
+        log_embed.add_field(name="Reason", value=f"{reason}")
 
         modlog_channel = guild.get_channel(CASE_LOG_CHANNEL)
         if modlog_channel:
@@ -681,7 +681,7 @@ async def lockdown_server(interaction: discord.Interaction, reason: str = "No re
         timestamp=now
     )
     log_embed.add_field(name="Moderator", value=interaction.user.mention)
-    log_embed.add_field(name="Reason", value=reason, inline=False)
+    log_embed.add_field(name="Reason", value=reason)
 
     modlog_channel = guild.get_channel(CASE_LOG_CHANNEL)
     if modlog_channel:
