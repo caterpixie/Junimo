@@ -1,4 +1,6 @@
 import discord
+import datetime
+from datetime import datetime, timezone
 
 STARBOARD_CHANNEL_ID = 1378101526022848522
 STAR_THRESHOLD = 1
@@ -15,6 +17,9 @@ def setup_starboard(bot_instance: discord.Client):
 
     @bot_instance.event
     async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
+        now = datetime.now(timezone.utc)
+        timestamp = int(user.created_at.timestamp())
+        
         if str(payload.emoji) != "⭐":
             return
 
@@ -46,6 +51,7 @@ def setup_starboard(bot_instance: discord.Client):
         )
         embed.set_author(name=str(message.author), icon_url=message.author.display_avatar.url)
         embed.add_field(name="Jump to Message", value=f"[Click here]({message.jump_url})")
+        embed.timestamp = now
 
         if message.attachments:
             embed.set_image(url=message.attachments[0].url)
