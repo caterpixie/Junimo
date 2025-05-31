@@ -15,6 +15,30 @@ from confessions import (
 
 CONFESSION_APPROVAL_CHANNEL=1378213253146218557
 
+async def restore_pending_confessions(bot):
+    if not os.path.exists("pending_confessions.json"):
+        return
+
+    with open("pending_confessions.json", "r") as f:
+        pending = json.load(f)
+
+    for msg_id, data in pending.items():
+        try:
+            channel = bot.get_channel(CONFESSION_APPROVAL_CHANNEL)
+            message = await channel.fetch_message(int(msg_id))
+
+            view = ApprovalView(
+                confession_text=data["confession_text"],
+                submitter=await bot.fetch_user(data["submitter_id"]),
+                confession_number=data["confession_number"],
+                type=data["type"],
+                reply_to_message_id=data.get("reply_to_message_id")
+            )
+
+            await message.edit(view=view)
+        except Exception as e:
+            print(f"[RESTORE ERROR] Could not restore view for message {msg_id}: {e}")
+
 class Client(commands.Bot):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -24,6 +48,8 @@ class Client(commands.Bot):
 
         set_confessions_bot(self)
         self.add_view(ConfessionInteractionView(self)) 
+
+        await restore_pending_confessions(self)
 
         guild_id = discord.Object(id=1322072874214756375)
         self.tree.add_command(confession_group, guild=guild_id)
