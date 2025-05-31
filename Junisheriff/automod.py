@@ -58,6 +58,8 @@ async def check_no_links_in_general(message):
     return False
 
 async def check_slurs(message):
+    SLURS = load_slurs()
+    
     content = message.content.lower()
     now = datetime.datetime.now(datetime.timezone.utc)
 
@@ -105,5 +107,4 @@ async def check_phishing(message):
 SERVER=1322072874214756375
 GENERAL_CHANNEL=1378137773478772797
 LOG_CHANNEL=1378137722958647419
-SLURS=load_slurs()
 
