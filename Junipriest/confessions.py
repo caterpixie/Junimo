@@ -253,7 +253,7 @@ async def submit_confession(interaction: discord.Interaction, confession: str):
     await interaction.response.send_message("Confession submitted!", ephemeral=True)
 
 @confession_group.command(name="reply", description="Reply to a confession")
-async def submit_confession(interaction: discord.Interaction, message_link: str):
+async def reply_to_confession(interaction: discord.Interaction, message_link: str):
     try:
         parts = message_link.strip().split("/")
         if len(parts) < 3:
