@@ -17,7 +17,7 @@ class Client(commands.Bot):
     async def setup_hook(self):
         set_confessions_bot(self)
         self.add_view(ConfessionInteractionView(self))
-        self.add_view(ApprovalView(bot=None))
+        self.add_view(ApprovalView(confession_text=None, submitter=None, confession_number=None))
 
         db_url = os.getenv("DATABASE_URL")
         parsed = urllib.parse.urlparse(db_url)
