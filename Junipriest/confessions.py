@@ -119,7 +119,7 @@ class ApprovalView(View):
         self.type = type
         self.reply_to_message_id = reply_to_message_id
 
-    @discord.ui.button(label="✅ Approve", style=discord.ButtonStyle.success)
+    @discord.ui.button(label="✅ Approve", style=discord.ButtonStyle.success, custom_id="approval_approve")
     async def approve(self, interaction: discord.Interaction, button: Button):
         channel = interaction.guild.get_channel(CONFESSION_CHANNEL)
         logchannel = interaction.guild.get_channel(CONFESSION_LOGS)
@@ -165,7 +165,7 @@ class ApprovalView(View):
 
         await logchannel.send(embed=logembed)
 
-    @discord.ui.button(label="❌ Deny", style=discord.ButtonStyle.danger)
+    @discord.ui.button(label="❌ Deny", style=discord.ButtonStyle.danger, custom_id="approval_deny")
     async def deny(self, interaction: discord.Interaction, button: Button):
         logchannel = interaction.guild.get_channel(CONFESSION_LOGS)
         await interaction.response.send_message("Confession denied.", ephemeral=True)
@@ -181,7 +181,7 @@ class ApprovalView(View):
 
         await logchannel.send(embed=logembed)
 
-    @discord.ui.button(label="💬 Deny with Reason", style=discord.ButtonStyle.danger)
+    @discord.ui.button(label="💬 Deny with Reason", style=discord.ButtonStyle.danger, custom_id="approval_denyreason")
     async def deny_with_reason(self, interaction: discord.Interaction, button: Button):
         await interaction.response.send_modal(DenyReasonModal(self.submitter, self.confession_text, interaction.guild, self.confession_number))
 
