@@ -86,7 +86,6 @@ class ConfessionSubmitModal(Modal, title="Submit a Confession"):
         embed.add_field(name="User", value=f"||{interaction.user.name} (`{interaction.user.id}`)||")
 
         view = ApprovalView(self.confession.value, interaction.user, confession_number)
-
         approval_message = await approval_channel.send(embed=embed, view=view)
         log_pending_confession(approval_message.id, {
             "confession_text": self.confession.value,
@@ -149,15 +148,14 @@ class ConfessionReplyModal(Modal, title="Reply to a Confession"):
             type="reply",
             reply_to_message_id=self.original_message_id
         )
-
         approval_message = await approval_channel.send(embed=embed, view=view)
         log_pending_confession(approval_message.id, {
-            "confession_text": self.reply.value,
+            "confession_text": self.confession.value,
             "submitter_id": interaction.user.id,
             "submitter_name": interaction.user.name,
             "confession_number": confession_number,
-            "type": "reply",
-            "reply_to_message_id": self.original_message_id
+            "type": "confession",
+            "reply_to_message_id": None
         })
         await interaction.response.send_message("Your reply has been submitted!", ephemeral=True)
 
