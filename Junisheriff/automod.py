@@ -58,7 +58,7 @@ async def check_no_links_in_general(message):
         return False
 
     # Allow if user has a bypass role
-    if any(role.id in BYPASS_ROLES for role in message.author.roles):
+    if any(role.id in ADMIN_ROLES for role in message.author.roles):
         return False
 
     # Check for links
