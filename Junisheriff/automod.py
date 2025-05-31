@@ -3,6 +3,11 @@ import re
 import datetime
 from safebrowsing import is_phishing_link
 
+SERVER=1322423728457384018
+GENERAL_CHANNEL=1322423730982490185
+LOG_CHANNEL=1322430975480692789
+ALLOWED_GIF_DOMAINS = ["tenor.com", "giphy.com", "discord.com", ".gif", "ezgif.com"]
+
 def set_bot(bot_instance):
     global bot
     bot = bot_instance
@@ -103,10 +108,4 @@ async def check_phishing(message):
             return True
 
     return False
-
-    
-SERVER=1322423728457384018
-GENERAL_CHANNEL=1322423730982490185
-LOG_CHANNEL=1322430975480692789
-ALLOWED_GIF_DOMAINS = ["tenor.com", "giphy.com", "discord.com", ".gif", "ezgif.com"]
 
