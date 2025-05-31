@@ -45,4 +45,4 @@ gyppie
 gyppy
 gipp
 kyke
-slur_test
+slurtest
