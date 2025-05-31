@@ -75,6 +75,7 @@ class ConfessionSubmitModal(Modal, title="Submit a Confession"):
     confession = TextInput(label="Your Confession", style=discord.TextStyle.paragraph, required=True)
     
     async def on_submit(self, interaction: discord.Interaction):
+        print("[DEBUG] on_submit() fired")
         confession_number = get_next_confession_number()
         approval_channel = interaction.guild.get_channel(CONFESSION_APPROVAL_CHANNEL)
     
