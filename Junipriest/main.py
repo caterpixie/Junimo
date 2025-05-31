@@ -23,11 +23,9 @@ class Client(commands.Bot):
         self.pool = None
 
     async def setup_hook(self):
-        set_confessions_bot(self)
-        self.add_view(ConfessionInteractionView(self))  # ApprovalView removed
-
         db_url = os.getenv("DATABASE_URL")
         parsed = urllib.parse.urlparse(db_url)
+    
         self.pool = await aiomysql.create_pool(
             host=parsed.hostname,
             port=parsed.port or 3306,
@@ -36,6 +34,9 @@ class Client(commands.Bot):
             db=parsed.path[1:],
             autocommit=True,
         )
+
+        set_confessions_bot(self)
+        self.add_view(ConfessionInteractionView(self)) 
 
         guild_id = discord.Object(id=1322072874214756375)
         self.tree.add_command(confession_group, guild=guild_id)
