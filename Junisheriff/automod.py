@@ -48,13 +48,16 @@ async def log_event(channel_id: int, embed: discord.Embed):
         await channel.send(embed=embed)
         
 async def check_no_links_in_general(message):
-    if message.channel.id == GENERAL_CHANNEL and "http" in message.content:
-        try:
-            await message.delete()
-        except discord.NotFound:
-            pass
-    
-        return True
+    if message.channel.id == GENERAL_CHANNEL:
+        urls = re.findall(r'https?://\S+', message.content)
+        for url in urls:
+            if any(domain in url for domain in ALLOWED_GIF_DOMAINS):
+                continue
+            try:
+                await message.delete()
+            except discord.NotFound:
+                pass
+            return True
     return False
 
 async def check_slurs(message):
@@ -105,4 +108,5 @@ async def check_phishing(message):
 SERVER=1322423728457384018
 GENERAL_CHANNEL=1322423730982490185
 LOG_CHANNEL=1322430975480692789
+ALLOWED_GIF_DOMAINS = ["tenor.com", "giphy.com", "discord.com", ".gif", "ezgif.com"]
 
