@@ -25,11 +25,11 @@ def setup_automod(bot_instance: discord.Client):
         if message.guild.id != SERVER:
             return
 
+        if await check_phishing(message):
+            return
         if await check_no_links_in_general(message):
             return
         if await check_slurs(message):
-            return
-        if await check_phishing(message):
             return
         
         await bot.process_commands(message)
