@@ -58,12 +58,10 @@ async def check_no_links_in_general(message):
     return False
 
 async def check_slurs(message):
-    SLURS = load_slurs()
-    
     content = message.content.lower()
     now = datetime.datetime.now(datetime.timezone.utc)
 
-    for slur in SLURS:
+    for slur in load_slurs():  # Dynamically reload the list
         if is_slur_in_text(content, slur):
             embed = discord.Embed(
                 title="Message Auto-deleted",
