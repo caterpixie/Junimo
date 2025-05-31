@@ -73,20 +73,22 @@ class ConfessionSubmitModal(Modal, title="Submit a Confession"):
         sent_message = await approval_channel.send(embed=embed, view=view)
         
         # Store pending confession in the database
-        async with bot.pool.acquire() as conn:
-            async with conn.cursor() as cur:
-                await cur.execute(
-                    "INSERT INTO pending_confessions (message_id, confession_text, submitter_id, type, reply_to_message_id) VALUES (%s, %s, %s, %s, %s)",
-                    (
-                        sent_message.id,
-                        self.confession.value,
-                        interaction.user.id,
-                        "confession",
-                        None
+        try:
+            async with bot.pool.acquire() as conn:
+                async with conn.cursor() as cur:
+                    await cur.execute(
+                        "INSERT INTO pending_confessions (message_id, confession_text, submitter_id, type, reply_to_message_id) VALUES (%s, %s, %s, %s, %s)",
+                        (
+                            sent_message.id,
+                            self.confession.value,  # or self.reply.value
+                            interaction.user.id,
+                            "confession",  # or "reply"
+                            None  # or self.original_message_id
+                        )
                     )
-                )
-        
-        await interaction.response.send_message("Your confession has been submitted!", ephemeral=True)
+            print(f"[DB] Inserted pending {sent_message.id}")
+        except Exception as e:
+            print(f"[DB ERROR] Failed to insert pending confession: {e}")
 
 
 class ConfessionReplyModal(Modal, title="Reply to a Confession"):
@@ -128,20 +130,22 @@ class ConfessionReplyModal(Modal, title="Reply to a Confession"):
         sent_message = await approval_channel.send(embed=embed, view=view)
         
         # Store pending reply in the database
-        async with bot.pool.acquire() as conn:
-            async with conn.cursor() as cur:
-                await cur.execute(
-                    "INSERT INTO pending_confessions (message_id, confession_text, submitter_id, type, reply_to_message_id) VALUES (%s, %s, %s, %s, %s)",
-                    (
-                        sent_message.id,
-                        self.reply.value,
-                        interaction.user.id,
-                        "reply",
-                        self.original_message_id
+        try:
+            async with bot.pool.acquire() as conn:
+                async with conn.cursor() as cur:
+                    await cur.execute(
+                        "INSERT INTO pending_confessions (message_id, confession_text, submitter_id, type, reply_to_message_id) VALUES (%s, %s, %s, %s, %s)",
+                        (
+                            sent_message.id,
+                            self.confession.value,  # or self.reply.value
+                            interaction.user.id,
+                            "confession",  # or "reply"
+                            None  # or self.original_message_id
+                        )
                     )
-                )
-        
-        await interaction.response.send_message("Your reply has been submitted for review.", ephemeral=True)
+            print(f"[DB] Inserted pending {sent_message.id}")
+        except Exception as e:
+            print(f"[DB ERROR] Failed to insert pending confession: {e}")
 
 class ApprovalView(View):
     def __init__(self, confession_text, submitter, confession_number, type="confession", reply_to_message_id=None):
