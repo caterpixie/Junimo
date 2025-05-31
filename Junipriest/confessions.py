@@ -74,6 +74,21 @@ class ConfessionSubmitModal(Modal, title="Submit a Confession"):
         await approval_channel.send(embed=embed, view=view)
         await interaction.response.send_message("Your confession has been submitted!", ephemeral=True)
 
+        def log_pending_confession(message_id, data):
+            try:
+                if os.path.exists("pending_confessions.json"):
+                    with open("pending_confessions.json", "r") as f:
+                        pending = json.load(f)
+                else:
+                    pending = {}
+        
+                pending[str(message_id)] = data
+        
+                with open("pending_confessions.json", "w") as f:
+                    json.dump(pending, f, indent=4)
+            except Exception as e:
+                print(f"[ERROR] Logging pending confession: {e}")
+
 
 class ConfessionReplyModal(Modal, title="Reply to a Confession"):
     reply = TextInput(label="Your Reply", style=discord.TextStyle.paragraph, required=True)
@@ -113,6 +128,22 @@ class ConfessionReplyModal(Modal, title="Reply to a Confession"):
 
         await approval_channel.send(embed=embed, view=view)
         await interaction.response.send_message("Your reply has been submitted!", ephemeral=True)
+
+        
+        def log_pending_confession(message_id, data):
+            try:
+                if os.path.exists("pending_confessions.json"):
+                    with open("pending_confessions.json", "r") as f:
+                        pending = json.load(f)
+                else:
+                    pending = {}
+        
+                pending[str(message_id)] = data
+        
+                with open("pending_confessions.json", "w") as f:
+                    json.dump(pending, f, indent=4)
+            except Exception as e:
+                print(f"[ERROR] Logging pending confession: {e}")
 
 class ApprovalView(View):
     def __init__(self, confession_text, submitter, confession_number, type="confession", reply_to_message_id=None):
@@ -169,6 +200,19 @@ class ApprovalView(View):
         logembed.add_field(name="Approved By", value=f"{interaction.user.mention}", inline=False)
 
         await logchannel.send(embed=logembed)
+        
+        # Remove from JSON
+        def remove_pending_confession(message_id):
+        try:
+            if os.path.exists("pending_confessions.json"):
+                with open("pending_confessions.json", "r") as f:
+                    pending = json.load(f)
+                if str(message_id) in pending:
+                    del pending[str(message_id)]
+                    with open("pending_confessions.json", "w") as f:
+                        json.dump(pending, f, indent=4)
+        except Exception as e:
+            print(f"[ERROR] Removing pending confession: {e}")
 
     @discord.ui.button(label="❌ Deny", style=discord.ButtonStyle.danger, custom_id="approval_deny")
     async def deny(self, interaction: discord.Interaction, button: Button):
@@ -189,6 +233,19 @@ class ApprovalView(View):
     @discord.ui.button(label="💬 Deny with Reason", style=discord.ButtonStyle.danger, custom_id="approval_denyreason")
     async def deny_with_reason(self, interaction: discord.Interaction, button: Button):
         await interaction.response.send_modal(DenyReasonModal(self.submitter, self.confession_text, interaction.guild, self.confession_number))
+
+        # Remove from JSON
+        def remove_pending_confession(message_id):
+        try:
+            if os.path.exists("pending_confessions.json"):
+                with open("pending_confessions.json", "r") as f:
+                    pending = json.load(f)
+                if str(message_id) in pending:
+                    del pending[str(message_id)]
+                    with open("pending_confessions.json", "w") as f:
+                        json.dump(pending, f, indent=4)
+        except Exception as e:
+            print(f"[ERROR] Removing pending confession: {e}")
 
 
 class DenyReasonModal(Modal, title="Deny Confession with Reason"):
@@ -229,6 +286,19 @@ class DenyReasonModal(Modal, title="Deny Confession with Reason"):
         logembed.add_field(name="Reason", value=f"{self.reason.value}", inline=False)
 
         await logchannel.send(embed=logembed)
+
+        # Remove from JSON
+        def remove_pending_confession(message_id):
+        try:
+            if os.path.exists("pending_confessions.json"):
+                with open("pending_confessions.json", "r") as f:
+                    pending = json.load(f)
+                if str(message_id) in pending:
+                    del pending[str(message_id)]
+                    with open("pending_confessions.json", "w") as f:
+                        json.dump(pending, f, indent=4)
+        except Exception as e:
+            print(f"[ERROR] Removing pending confession: {e}")
 
 
 class ConfessionGroup(app_commands.Group):
