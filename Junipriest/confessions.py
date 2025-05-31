@@ -46,11 +46,11 @@ class ConfessionInteractionView(View):
         super().__init__(timeout=None)
         self.bot = bot_instance
 
-    @discord.ui.button(label="Submit a Confession!", style=discord.ButtonStyle.primary)
+    @discord.ui.button(label="Submit a Confession!", style=discord.ButtonStyle.primary, custom_id="confession_submit")
     async def submit_button(self, interaction: discord.Interaction, button: Button):
         await interaction.response.send_modal(ConfessionSubmitModal())
 
-    @discord.ui.button(label="Reply", style=discord.ButtonStyle.secondary)
+    @discord.ui.button(label="Reply", style=discord.ButtonStyle.secondary, custom_id="confession_reply")
     async def reply_button(self, interaction: discord.Interaction, button: Button):
         await interaction.response.send_modal(ConfessionReplyModal(interaction.message.id))
 
