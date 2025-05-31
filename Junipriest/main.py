@@ -14,6 +14,8 @@ from confessions import (
     ConfessionInteractionView
 )
 
+CONFESSION_APPROVAL_CHANNEL=1378213253146218557
+
 class Client(commands.Bot):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
