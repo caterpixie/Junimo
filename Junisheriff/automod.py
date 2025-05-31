@@ -86,8 +86,14 @@ async def check_phishing(message):
             embed.timestamp = now
 
             await log_event(LOG_CHANNEL, embed)
-            await message.delete()
+
+            try:
+                await message.delete()
+            except discord.NotFound:
+                print(f"[automod] Message {message.id} already deleted.")
+
             return True
+
     return False
 
     
