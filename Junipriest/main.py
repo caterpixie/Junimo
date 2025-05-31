@@ -51,10 +51,9 @@ class Client(commands.Bot):
 
         await restore_pending_confessions(self)
 
-        guild_id = discord.Object(id=1322072874214756375)
-        self.tree.add_command(confession_group, guild=guild_id)
-        self.tree.add_command(reply_to_confession_context, guild=guild_id)
-        await self.tree.sync(guild=guild_id)
+        self.tree.add_command(confession_group)
+        self.tree.add_command(reply_to_confession_context)
+        await self.tree.sync()
 
     async def on_ready(self):
         print(f'Logged on as {self.user}')
