@@ -41,10 +41,14 @@ async def log_event(channel_id: int, embed: discord.Embed):
     channel = bot.get_channel(channel_id)
     if channel:
         await channel.send(embed=embed)
-
+        
 async def check_no_links_in_general(message):
     if message.channel.id == GENERAL_CHANNEL and "http" in message.content:
-        await message.delete()
+        try:
+            await message.delete()
+        except discord.NotFound:
+            pass
+    
         return True
     return False
 
