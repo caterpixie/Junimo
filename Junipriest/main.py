@@ -35,6 +35,8 @@ class Client(commands.Bot):
             autocommit=True,
         )
 
+        print("[DB CONNECTED TO]", parsed.hostname, parsed.path[1:])
+
         set_confessions_bot(self)
         self.add_view(ConfessionInteractionView(self)) 
 
