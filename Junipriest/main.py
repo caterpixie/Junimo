@@ -5,13 +5,7 @@ load_dotenv()
 import discord
 from discord.ext import commands
 
-from confessions import (
-    confession_group,
-    reply_to_confession_context,
-    set_bot as set_confessions_bot,
-    ConfessionInteractionView,
-    ApprovalView
-)
+from confessions import confession_group, reply_to_confession_context, set_bot as set_confessions_bot, ConfessionInteractionView, ApprovalView
 
 CONFESSION_APPROVAL_CHANNEL=1378213253146218557
 
