@@ -73,20 +73,22 @@ class ConfessionInteractionView(View):
 
 class ConfessionSubmitModal(Modal, title="Submit a Confession"):
     confession = TextInput(label="Your Confession", style=discord.TextStyle.paragraph, required=True)
-
+    
     async def on_submit(self, interaction: discord.Interaction):
         confession_number = get_next_confession_number()
         approval_channel = interaction.guild.get_channel(CONFESSION_APPROVAL_CHANNEL)
-
+    
         embed = discord.Embed(
             title=f"Confession Awaiting Review (#{confession_number})",
             description=f"\"{self.confession.value}\"",
             colour=discord.Color.from_str("#CD98E7")
         )
         embed.add_field(name="User", value=f"||{interaction.user.name} (`{interaction.user.id}`)||")
-
+    
         view = ApprovalView(self.confession.value, interaction.user, confession_number)
+        print("[DEBUG] Sending to approval channel...")
         approval_message = await approval_channel.send(embed=embed, view=view)
+        print("[DEBUG] Logging pending confession...")
         log_pending_confession(approval_message.id, {
             "confession_text": self.confession.value,
             "submitter_id": interaction.user.id,
@@ -95,23 +97,8 @@ class ConfessionSubmitModal(Modal, title="Submit a Confession"):
             "type": "confession",
             "reply_to_message_id": None
         })
+    
         await interaction.response.send_message("Your confession has been submitted!", ephemeral=True)
-
-        def log_pending_confession(message_id, data):
-            try:
-                if os.path.exists("pending_confessions.json"):
-                    with open("pending_confessions.json", "r") as f:
-                        pending = json.load(f)
-                else:
-                    pending = {}
-        
-                pending[str(message_id)] = data
-        
-                with open("pending_confessions.json", "w") as f:
-                    json.dump(pending, f, indent=4)
-            except Exception as e:
-                print(f"[ERROR] Logging pending confession: {e}")
-
 
 class ConfessionReplyModal(Modal, title="Reply to a Confession"):
     reply = TextInput(label="Your Reply", style=discord.TextStyle.paragraph, required=True)
