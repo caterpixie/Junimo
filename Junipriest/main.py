@@ -8,7 +8,7 @@ import json
 
 from confessions import confession_group, reply_to_confession_context, set_bot as set_confessions_bot, ConfessionInteractionView, ApprovalView
 
-CONFESSION_APPROVAL_CHANNEL = 1378213253146218557
+CONFESSION_APPROVAL_CHANNEL=1322431042501738550
 
 async def restore_pending_confessions(bot):
     import json
