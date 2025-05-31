@@ -150,6 +150,7 @@ class ConfessionReplyModal(Modal, title="Reply to a Confession"):
             reply_to_message_id=self.original_message_id
         )
         approval_message = await approval_channel.send(embed=embed, view=view)
+        
         log_pending_confession(approval_message.id, {
             "confession_text": self.confession.value,
             "submitter_id": interaction.user.id,
@@ -159,22 +160,6 @@ class ConfessionReplyModal(Modal, title="Reply to a Confession"):
             "reply_to_message_id": None
         })
         await interaction.response.send_message("Your reply has been submitted!", ephemeral=True)
-
-        
-        def log_pending_confession(message_id, data):
-            try:
-                if os.path.exists("pending_confessions.json"):
-                    with open("pending_confessions.json", "r") as f:
-                        pending = json.load(f)
-                else:
-                    pending = {}
-        
-                pending[str(message_id)] = data
-        
-                with open("pending_confessions.json", "w") as f:
-                    json.dump(pending, f, indent=4)
-            except Exception as e:
-                print(f"[ERROR] Logging pending confession: {e}")
 
 class ApprovalView(View):
     def __init__(self, confession_text, submitter, confession_number, type="confession", reply_to_message_id=None):
