@@ -68,7 +68,7 @@ def remove_pending_confession(message_id):
                 del pending[str(message_id)]
                 with open("pending_confessions.json", "w") as f:
                     json.dump(pending, f, indent=4)
-     except Exception as e:
+    except Exception as e:
         print(f"[ERROR] Removing pending confession: {e}")
 
 class ConfessionInteractionView(View):
