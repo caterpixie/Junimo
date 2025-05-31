@@ -3,14 +3,6 @@ import re
 import datetime
 from safebrowsing import is_phishing_link
 
-def load_slurs(filename="slurs.txt"):
-    try:
-        with open(filename, "r", encoding="utf-8") as f:
-            return [line.strip().lower() for line in f if line.strip() and not line.startswith("#")]
-    except FileNotFoundError:
-        print(f"[automod] Could not find {filename}")
-        return []
-    
 def set_bot(bot_instance):
     global bot
     bot = bot_instance
@@ -34,6 +26,19 @@ def setup_automod(bot_instance: discord.Client):
         
         await bot.process_commands(message)
 
+
+def load_slurs(filename="slurs.txt"):
+    try:
+        with open(filename, "r", encoding="utf-8") as f:
+            return [line.strip().lower() for line in f if line.strip() and not line.startswith("#")]
+    except FileNotFoundError:
+        print(f"[automod] Could not find {filename}")
+        return []
+
+def is_slur_in_text(text, slur):
+    pattern = r'\b' + re.escape(slur) + r'\b'
+    return re.search(pattern, text, re.IGNORECASE)
+    
 def safe_avatar_url(user):
     return user.avatar.url if user.avatar else discord.Embed.Empty
 
@@ -57,7 +62,7 @@ async def check_slurs(message):
     now = datetime.datetime.now(datetime.timezone.utc)
 
     for slur in SLURS:
-        if slur in content:
+        if is_slur_in_text(content, slur):
             embed = discord.Embed(
                 title="Message Auto-deleted",
                 description=f"**Message by {message.author.mention} deleted in {message.channel.mention} due to bad word detected**\n\n{message.content}",
