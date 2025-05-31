@@ -4,6 +4,7 @@ load_dotenv()
 
 import discord
 from discord.ext import commands
+import json
 
 from confessions import confession_group, reply_to_confession_context, set_bot as set_confessions_bot, ConfessionInteractionView, ApprovalView
 
