@@ -152,12 +152,12 @@ class ConfessionReplyModal(Modal, title="Reply to a Confession"):
         approval_message = await approval_channel.send(embed=embed, view=view)
         
         log_pending_confession(approval_message.id, {
-            "confession_text": self.confession.value,
+            "confession_text": self.reply.value,
             "submitter_id": interaction.user.id,
             "submitter_name": interaction.user.name,
             "confession_number": confession_number,
-            "type": "confession",
-            "reply_to_message_id": None
+            "type": "reply",
+            "reply_to_message_id": self.original_message_id
         })
         await interaction.response.send_message("Your reply has been submitted!", ephemeral=True)
 
