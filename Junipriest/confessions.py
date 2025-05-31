@@ -42,6 +42,22 @@ def set_latest_confession_id(message_id):
     with open(LATEST_CONFESSION_FILE, "w") as f:
         f.write(str(message_id))
 
+def log_pending_confession(message_id, data):
+    try:
+        if os.path.exists("pending_confessions.json"):
+            with open("pending_confessions.json", "r") as f:
+                pending = json.load(f)
+        else:
+            pending = {}
+
+        pending[str(message_id)] = data
+
+        with open("pending_confessions.json", "w") as f:
+            json.dump(pending, f, indent=4)
+        print(f"[LOG] Saved pending confession {message_id}")
+    except Exception as e:
+        print(f"[ERROR] Logging pending confession: {e}")
+
 class ConfessionInteractionView(View):
     def __init__(self, bot_instance):
         super().__init__(timeout=None)
