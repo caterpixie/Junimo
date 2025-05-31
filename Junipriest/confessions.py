@@ -80,10 +80,10 @@ class ConfessionSubmitModal(Modal, title="Submit a Confession"):
                         "INSERT INTO pending_confessions (message_id, confession_text, submitter_id, type, reply_to_message_id) VALUES (%s, %s, %s, %s, %s)",
                         (
                             sent_message.id,
-                            self.confession.value,  # or self.reply.value
+                            self.confession.value,
                             interaction.user.id,
-                            "confession",  # or "reply"
-                            None  # or self.original_message_id
+                            "confession", 
+                            None  
                         )
                     )
             print(f"[DB] Inserted pending {sent_message.id}")
@@ -137,10 +137,10 @@ class ConfessionReplyModal(Modal, title="Reply to a Confession"):
                         "INSERT INTO pending_confessions (message_id, confession_text, submitter_id, type, reply_to_message_id) VALUES (%s, %s, %s, %s, %s)",
                         (
                             sent_message.id,
-                            self.confession.value,  # or self.reply.value
+                            self.reply.value
                             interaction.user.id,
-                            "confession",  # or "reply"
-                            None  # or self.original_message_id
+                            "reply"
+                            self.original_message_id
                         )
                     )
             print(f"[DB] Inserted pending {sent_message.id}")
