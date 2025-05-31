@@ -304,7 +304,15 @@ async def submit_confession(interaction: discord.Interaction, confession: str):
     embed.add_field(name="User", value=f"||{interaction.user.name} (`{interaction.user.id}`)||")
 
     view = ApprovalView(confession, interaction.user, confession_number)
-    await approval_channel.send(embed=embed, view=view)
+    approval_message = await approval_channel.send(embed=embed, view=view)
+    log_pending_confession(approval_message.id, {
+        "confession_text": confession,
+        "submitter_id": interaction.user.id,
+        "submitter_name": interaction.user.name,
+        "confession_number": confession_number,
+        "type": "confession",
+        "reply_to_message_id": None
+    })
     await interaction.response.send_message("Confession submitted!", ephemeral=True)
 
 @confession_group.command(name="reply", description="Reply to a confession")
