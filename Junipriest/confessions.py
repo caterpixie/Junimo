@@ -71,29 +71,7 @@ class ConfessionSubmitModal(Modal, title="Submit a Confession"):
 
         view = ApprovalView(self.confession.value, interaction.user, confession_number)
 
-        sent_message = await approval_channel.send(embed=embed, view=view)
-
-        print("[DB DEBUG] Preparing to insert:", sent_message.id, self.confession.value, interaction.user.id)
-
-        # Store pending confession in the database
-        try:
-            async with bot.pool.acquire() as conn:
-                async with conn.cursor() as cur:
-                    await cur.execute(
-                        "INSERT INTO pending_confessions (message_id, confession_text, submitter_id, type, reply_to_message_id) VALUES (%s, %s, %s, %s, %s)",
-                        (
-                            sent_message.id,
-                            self.confession.value,
-                            interaction.user.id,
-                            "confession",
-                            None
-                        )
-                    )
-            print(f"[DB] Inserted pending {sent_message.id}")
-        except Exception as e:
-            print(f"[DB ERROR] Failed to insert pending confession: {e}")
-            traceback.print_exc()
-
+        await approval_channel.send(embed=embed, view=view)
         await interaction.response.send_message("Your confession has been submitted!", ephemeral=True)
 
 
@@ -133,25 +111,8 @@ class ConfessionReplyModal(Modal, title="Reply to a Confession"):
             reply_to_message_id=self.original_message_id
         )
 
-        sent_message = await approval_channel.send(embed=embed, view=view)
-        
-        # Store pending reply in the database
-        try:
-            async with bot.pool.acquire() as conn:
-                async with conn.cursor() as cur:
-                    await cur.execute(
-                        "INSERT INTO pending_confessions (message_id, confession_text, submitter_id, type, reply_to_message_id) VALUES (%s, %s, %s, %s, %s)",
-                        (
-                            sent_message.id,
-                            self.reply.value,
-                            interaction.user.id,
-                            "reply",
-                            self.original_message_id
-                        )
-                    )
-            print(f"[DB] Inserted pending {sent_message.id}")
-        except Exception as e:
-            print(f"[DB ERROR] Failed to insert pending confession: {e}")
+        await approval_channel.send(embed=embed, view=view)
+        await interaction.response.send_message("Your reply has been submitted!", ephemeral=True)
 
 class ApprovalView(View):
     def __init__(self, confession_text, submitter, confession_number, type="confession", reply_to_message_id=None):
@@ -209,10 +170,6 @@ class ApprovalView(View):
 
         await logchannel.send(embed=logembed)
 
-        async with bot.pool.acquire() as conn:
-            async with conn.cursor() as cur:
-                await cur.execute("DELETE FROM pending_confessions WHERE message_id = %s", (interaction.message.id,))
-
     @discord.ui.button(label="❌ Deny", style=discord.ButtonStyle.danger, custom_id="approval_deny")
     async def deny(self, interaction: discord.Interaction, button: Button):
         logchannel = interaction.guild.get_channel(CONFESSION_LOGS)
@@ -232,10 +189,6 @@ class ApprovalView(View):
     @discord.ui.button(label="💬 Deny with Reason", style=discord.ButtonStyle.danger, custom_id="approval_denyreason")
     async def deny_with_reason(self, interaction: discord.Interaction, button: Button):
         await interaction.response.send_modal(DenyReasonModal(self.submitter, self.confession_text, interaction.guild, self.confession_number))
-
-        async with bot.pool.acquire() as conn:
-            async with conn.cursor() as cur:
-                await cur.execute("DELETE FROM pending_confessions WHERE message_id = %s", (interaction.message.id,))
 
 
 class DenyReasonModal(Modal, title="Deny Confession with Reason"):
@@ -276,10 +229,6 @@ class DenyReasonModal(Modal, title="Deny Confession with Reason"):
         logembed.add_field(name="Reason", value=f"{self.reason.value}", inline=False)
 
         await logchannel.send(embed=logembed)
-
-        async with bot.pool.acquire() as conn:
-            async with conn.cursor() as cur:
-                await cur.execute("DELETE FROM pending_confessions WHERE message_id = %s", (interaction.message.id,))
 
 
 class ConfessionGroup(app_commands.Group):
