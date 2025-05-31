@@ -71,7 +71,15 @@ class ConfessionSubmitModal(Modal, title="Submit a Confession"):
 
         view = ApprovalView(self.confession.value, interaction.user, confession_number)
 
-        await approval_channel.send(embed=embed, view=view)
+        approval_message = await approval_channel.send(embed=embed, view=view)
+        log_pending_confession(approval_message.id, {
+            "confession_text": self.confession.value,
+            "submitter_id": interaction.user.id,
+            "submitter_name": interaction.user.name,
+            "confession_number": confession_number,
+            "type": "confession",
+            "reply_to_message_id": None
+        })
         await interaction.response.send_message("Your confession has been submitted!", ephemeral=True)
 
         def log_pending_confession(message_id, data):
@@ -126,7 +134,15 @@ class ConfessionReplyModal(Modal, title="Reply to a Confession"):
             reply_to_message_id=self.original_message_id
         )
 
-        await approval_channel.send(embed=embed, view=view)
+        approval_message = await approval_channel.send(embed=embed, view=view)
+        log_pending_confession(approval_message.id, {
+            "confession_text": self.reply.value,
+            "submitter_id": interaction.user.id,
+            "submitter_name": interaction.user.name,
+            "confession_number": confession_number,
+            "type": "reply",
+            "reply_to_message_id": self.original_message_id
+        })
         await interaction.response.send_message("Your reply has been submitted!", ephemeral=True)
 
         
@@ -189,6 +205,7 @@ class ApprovalView(View):
         set_latest_confession_id(new_message.id)
 
         await interaction.response.send_message("Approved and posted!", ephemeral=True)
+        remove_pending_confession(interaction.message.id)
         await interaction.message.delete()
 
         logembed = discord.Embed(
@@ -218,6 +235,7 @@ class ApprovalView(View):
     async def deny(self, interaction: discord.Interaction, button: Button):
         logchannel = interaction.guild.get_channel(CONFESSION_LOGS)
         await interaction.response.send_message("Confession denied.", ephemeral=True)
+        remove_pending_confession(interaction.message.id)
         await interaction.message.delete()
 
         logembed = discord.Embed(
@@ -274,6 +292,7 @@ class DenyReasonModal(Modal, title="Deny Confession with Reason"):
             pass  # DMs are closed
 
         await interaction.response.send_message("Confession has been denied with reason.", ephemeral=True)
+        remove_pending_confession(interaction.message.id)
         await interaction.message.delete()
 
         logembed = discord.Embed(
