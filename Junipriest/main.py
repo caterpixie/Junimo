@@ -7,7 +7,13 @@ from discord.ext import commands
 import aiomysql
 import urllib.parse
 
-from confessions import confession_group, reply_to_confession_context, set_bot as set_confessions_bot, ConfessionInteractionView
+from confessions import (
+confession_group,
+reply_to_confession_context,
+set_bot as set_confessions_bot,
+ConfessionInteractionView,
+ApprovalView
+)
 
 class Client(commands.Bot):
     def __init__(self, **kwargs):
