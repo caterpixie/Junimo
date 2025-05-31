@@ -9,6 +9,15 @@ import urllib.parse
 
 from confessions import confession_group, reply_to_confession_context, set_bot as set_confessions_bot, ConfessionInteractionView, ApprovalView
 
+class PersistentApprovalView(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+        self.add_item(Button(style=discord.ButtonStyle.success, label="✅ Approve", custom_id="approval_approve"))
+        self.add_item(Button(style=discord.ButtonStyle.danger, label="❌ Deny", custom_id="approval_deny"))
+        self.add_item(Button(style=discord.ButtonStyle.danger, label="💬 Deny with Reason", custom_id="approval_deny_reason"))
+
+await bot.add_view(PersistentApprovalView())
+
 class Client(commands.Bot):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -17,7 +26,7 @@ class Client(commands.Bot):
     async def setup_hook(self):
         set_confessions_bot(self)
         self.add_view(ConfessionInteractionView(self))
-        self.add_view(ApprovalView(confession_text=None, submitter=None, confession_number=None))
+        self.add_view(ApprovalView())
 
         db_url = os.getenv("DATABASE_URL")
         parsed = urllib.parse.urlparse(db_url)
