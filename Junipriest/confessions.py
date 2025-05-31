@@ -3,6 +3,7 @@ from discord import app_commands
 from discord.ui import View, Button, Modal, TextInput
 import os
 import traceback
+import json
 
 CONFESSION_CHANNEL=1378213216479477890
 CONFESSION_APPROVAL_CHANNEL=1378213253146218557
