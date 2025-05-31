@@ -6,6 +6,7 @@ from safebrowsing import is_phishing_link
 SERVER=1322423728457384018
 GENERAL_CHANNEL=1322423730982490185
 LOG_CHANNEL=1322430975480692789
+ADMIN_ROLES=[1322423969361432616,1322425878931705857]
 ALLOWED_GIF_DOMAINS = ["tenor.com", "giphy.com", "discord.com", ".gif", "ezgif.com"]
 
 def set_bot(bot_instance):
@@ -53,16 +54,24 @@ async def log_event(channel_id: int, embed: discord.Embed):
         await channel.send(embed=embed)
         
 async def check_no_links_in_general(message):
-    if message.channel.id == GENERAL_CHANNEL:
-        urls = re.findall(r'https?://\S+', message.content)
-        for url in urls:
-            if any(domain in url for domain in ALLOWED_GIF_DOMAINS):
-                continue
-            try:
-                await message.delete()
-            except discord.NotFound:
-                pass
-            return True
+    if message.channel.id != GENERAL_CHANNEL:
+        return False
+
+    # Allow if user has a bypass role
+    if any(role.id in BYPASS_ROLES for role in message.author.roles):
+        return False
+
+    # Check for links
+    urls = re.findall(r'https?://\S+', message.content)
+    for url in urls:
+        if any(domain in url for domain in ALLOWED_GIF_DOMAINS):
+            continue
+        try:
+            await message.delete()
+        except discord.NotFound:
+            pass
+        return True
+
     return False
 
 async def check_slurs(message):
