@@ -2,6 +2,7 @@ import discord
 from discord import app_commands
 from discord.ui import View, Button, Modal, TextInput
 import os
+import traceback
 
 CONFESSION_CHANNEL=1378213216479477890
 CONFESSION_APPROVAL_CHANNEL=1378213253146218557
@@ -72,6 +73,8 @@ class ConfessionSubmitModal(Modal, title="Submit a Confession"):
 
         sent_message = await approval_channel.send(embed=embed, view=view)
 
+        print("[DB DEBUG] Preparing to insert:", sent_message.id, self.confession.value, interaction.user.id)
+
         # Store pending confession in the database
         try:
             async with bot.pool.acquire() as conn:
@@ -89,6 +92,7 @@ class ConfessionSubmitModal(Modal, title="Submit a Confession"):
             print(f"[DB] Inserted pending {sent_message.id}")
         except Exception as e:
             print(f"[DB ERROR] Failed to insert pending confession: {e}")
+            traceback.print_exc()
 
         await interaction.response.send_message("Your confession has been submitted!", ephemeral=True)
 
