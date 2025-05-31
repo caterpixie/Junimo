@@ -9,6 +9,7 @@ import urllib.parse
 from mod import set_bot as set_warn_bot, mod_group
 from log import setup_logging
 from funwarns import setup_funwarns
+from automod import setup_automod
 
 class Client(commands.Bot):
     def __init__(self, **kwargs):
@@ -43,5 +44,6 @@ bot = Client(command_prefix="?", intents=intents)
 
 set_warn_bot(bot)
 setup_logging(bot)
+setup_automod(bot)
 
 bot.run(os.getenv("DISCORD_TOKEN"))
