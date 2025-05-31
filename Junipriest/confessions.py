@@ -141,15 +141,18 @@ class ApprovalView(View):
 
         new_message = await channel.send(embed=embed, view=ConfessionInteractionView(bot))
 
-        # Remove old buttons
+        # Remove only the "Submit a Confession" button from the old message
         last_message_id = get_latest_confession_id()
         if last_message_id:
             try:
                 old_message = await channel.fetch_message(last_message_id)
-                await old_message.edit(view=None)
+                old_view = ConfessionInteractionView(bot)
+                for item in old_view.children:
+                    if item.custom_id == "confession_submit":
+                        old_view.remove_item(item)
+                await old_message.edit(view=old_view)
             except discord.NotFound:
                 pass
-
         set_latest_confession_id(new_message.id)
 
         await interaction.response.send_message("Approved and posted!", ephemeral=True)
