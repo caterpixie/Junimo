@@ -82,8 +82,8 @@ class ConfessionSubmitModal(Modal, title="Submit a Confession"):
                             sent_message.id,
                             self.confession.value,
                             interaction.user.id,
-                            "confession", 
-                            None  
+                            "confession",
+                            None
                         )
                     )
             print(f"[DB] Inserted pending {sent_message.id}")
