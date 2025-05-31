@@ -254,16 +254,16 @@ class ApprovalView(View):
 
         # Remove from JSON
         def remove_pending_confession(message_id):
-        try:
-            if os.path.exists("pending_confessions.json"):
-                with open("pending_confessions.json", "r") as f:
-                    pending = json.load(f)
-                if str(message_id) in pending:
-                    del pending[str(message_id)]
-                    with open("pending_confessions.json", "w") as f:
-                        json.dump(pending, f, indent=4)
-        except Exception as e:
-            print(f"[ERROR] Removing pending confession: {e}")
+            try:
+                if os.path.exists("pending_confessions.json"):
+                    with open("pending_confessions.json", "r") as f:
+                        pending = json.load(f)
+                    if str(message_id) in pending:
+                        del pending[str(message_id)]
+                        with open("pending_confessions.json", "w") as f:
+                            json.dump(pending, f, indent=4)
+            except Exception as e:
+                print(f"[ERROR] Removing pending confession: {e}")
 
 
 class DenyReasonModal(Modal, title="Deny Confession with Reason"):
@@ -308,16 +308,16 @@ class DenyReasonModal(Modal, title="Deny Confession with Reason"):
 
         # Remove from JSON
         def remove_pending_confession(message_id):
-        try:
-            if os.path.exists("pending_confessions.json"):
-                with open("pending_confessions.json", "r") as f:
-                    pending = json.load(f)
-                if str(message_id) in pending:
-                    del pending[str(message_id)]
-                    with open("pending_confessions.json", "w") as f:
-                        json.dump(pending, f, indent=4)
-        except Exception as e:
-            print(f"[ERROR] Removing pending confession: {e}")
+            try:
+                if os.path.exists("pending_confessions.json"):
+                    with open("pending_confessions.json", "r") as f:
+                        pending = json.load(f)
+                    if str(message_id) in pending:
+                        del pending[str(message_id)]
+                        with open("pending_confessions.json", "w") as f:
+                            json.dump(pending, f, indent=4)
+            except Exception as e:
+                print(f"[ERROR] Removing pending confession: {e}")
 
 
 class ConfessionGroup(app_commands.Group):
