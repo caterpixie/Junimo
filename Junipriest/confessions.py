@@ -71,7 +71,7 @@ class ConfessionSubmitModal(Modal, title="Submit a Confession"):
         view = ApprovalView(self.confession.value, interaction.user, confession_number)
 
         sent_message = await approval_channel.send(embed=embed, view=view)
-        
+
         # Store pending confession in the database
         try:
             async with bot.pool.acquire() as conn:
@@ -89,6 +89,8 @@ class ConfessionSubmitModal(Modal, title="Submit a Confession"):
             print(f"[DB] Inserted pending {sent_message.id}")
         except Exception as e:
             print(f"[DB ERROR] Failed to insert pending confession: {e}")
+
+        await interaction.response.send_message("Your confession has been submitted!", ephemeral=True)
 
 
 class ConfessionReplyModal(Modal, title="Reply to a Confession"):
