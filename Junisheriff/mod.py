@@ -103,7 +103,7 @@ def parse_duration(duration_str: str) -> int:
     return total_seconds
 
 def safe_avatar_url(user):
-    return user.avatar.url if user.avatar else discord.Embed.Empty
+    return user.avatar.url if user.avatar else None
 
 
 
