@@ -187,7 +187,7 @@ async def log_member_update(before: discord.Member, after: discord.Member):
     
     embed = discord.Embed(
         title="User Updated",
-        color=discord.Color.from_str("#7CE4FF")
+        color=discord.Color.from_str("#FDB574")
     )
     icon_url = before.avatar.url if before.avatar else before.default_avatar.url
     embed.set_author(name=str(before), icon_url=icon_url)
