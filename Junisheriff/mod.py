@@ -123,7 +123,7 @@ async def warn(interaction: discord.Interaction, user: discord.Member, reason: s
 
     embed = discord.Embed(
         description=f"{user.mention} has been warned. || Reason: {reason}",
-        color=discord.Color.from_str("#7CE4FF")
+        color=discord.Color.from_str("#FDB574")
     )
     await interaction.response.send_message(embed=embed, ephemeral=True)
 
@@ -224,7 +224,7 @@ async def warn_log(interaction: discord.Interaction, user: discord.Member):
         embed = discord.Embed(
             title=f"{len(records)} warnings for {user}:", 
             description=description, 
-            color=discord.Color.from_str("#7CE4FF")
+            color=discord.Color.from_str("#FDB574")
         )
         embed.set_footer(text=f"Page {i//per_page + 1}/{(len(records)-1)//per_page + 1}")
         embed.set_author(name=str(user), icon_url=safe_avatar_url(user))
@@ -316,7 +316,7 @@ async def ban(
     # Send confirmation embed
     embed = discord.Embed(
         description=f"{user.name} has been banned. || Reason: {reason}",
-        color=discord.Color.from_str("#7CE4FF")
+        color=discord.Color.from_str("#FDB574")
     )
     if not interaction.response.is_done():
         await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -369,7 +369,7 @@ async def unban(interaction: discord.Interaction, user: str):
 
     embed = discord.Embed(
         description=f"{target} has been unbanned.",
-        color=discord.Color.from_str("#7CE4FF")
+        color=discord.Color.from_str("#FDB574")
     )
     await interaction.response.send_message(embed=embed)
 
@@ -417,7 +417,7 @@ async def massban(interaction: discord.Interaction, users: str):
     embed = discord.Embed(
         title="Mass Ban Executed",
         description=f"Banned {len(targets)} users.",
-        color=discord.Color.from_str("#7CE4FF"),
+        color=discord.Color.from_str("#FDB574"),
         timestamp=now
     )
     await interaction.followup.send(embed=embed)
@@ -461,7 +461,7 @@ async def kick(interaction: discord.Interaction, user: discord.Member, reason: s
 
     embed = discord.Embed(
         description=f"{user.mention} has been kicked. || Reason: {reason}",
-        color=discord.Color.from_str("#7CE4FF")
+        color=discord.Color.from_str("#FDB574")
     )
     await interaction.response.send_message(embed=embed, ephemeral=True)
 
@@ -517,7 +517,7 @@ async def mute(interaction: discord.Interaction, user: discord.Member, reason: s
     
     embed = discord.Embed(
         description=f"{user.mention} has been muted. || Reason: {reason}",
-        color=discord.Color.from_str("#7CE4FF")
+        color=discord.Color.from_str("#FDB574")
     )
     await interaction.response.send_message(embed=embed, ephemeral=True)
 
@@ -556,7 +556,7 @@ async def unmute(interaction: discord.Interaction, user: discord.Member):
     
         embed = discord.Embed(
             description=f"{user.mention} has been unmuted.",
-            color=discord.Color.from_str("#7CE4FF")
+            color=discord.Color.from_str("#FDB574")
         )
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
@@ -591,7 +591,7 @@ async def unmute(interaction: discord.Interaction, user: discord.Member):
     else:
         embed = discord.Embed(
             description=f"{user.mention} is not currently muted.",
-            color=discord.Color.from_str("#7CE4FF")
+            color=discord.Color.from_str("#FDB574")
         )
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
@@ -612,7 +612,7 @@ async def lockdown_channel(interaction: discord.Interaction, reason: str = "No r
         embed = discord.Embed(
             title="Channel Locked",
             description=f"{channel.mention} has been locked down",
-            color=discord.Color.from_str("#7CE4FF")
+            color=discord.Color.from_str("#FDB574")
         )
         await interaction.response.send_message(embed=embed)
         await channel.send(embed=embed)
@@ -660,7 +660,7 @@ async def lockdown_server(interaction: discord.Interaction, reason: str = "No re
     embed = discord.Embed(
         title="Server Locked",
         description="Server has been locked down. Mods can still talk in mod channels.",
-        color=discord.Color.from_str("#7CE4FF")
+        color=discord.Color.from_str("#FDB574")
     )
     await interaction.followup.send(embed=embed)
 
@@ -670,7 +670,7 @@ async def lockdown_server(interaction: discord.Interaction, reason: str = "No re
         general_embed = discord.Embed(
             title="Server Locked",
             description="The server has been locked down. Once the mod team has handled the situation, it will be reopened.",
-            color=discord.Color.from_str("#7CE4FF")
+            color=discord.Color.from_str("#FDB574")
         )
         await general_channel.send(embed=general_embed)
 
