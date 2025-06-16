@@ -10,6 +10,9 @@ LOG_CHANNEL=1322430928555085824
 MESSAGE_LOG_CHANNEL=1322430962981801984
 USER_LOG_CHANNEL=1322430941993373850
 
+SKYLAR_ID = 772218973080518676
+SCRIPTURE_CHANNEL = 1323794218539548682
+
 def set_bot(bot_instance):
     global bot
     bot = bot_instance
@@ -133,6 +136,13 @@ async def log_message_delete(message: discord.Message):
             embed.set_image(url=image_url[0])
     await log_event(MESSAGE_LOG_CHANNEL, embed)
 
+    if message.author.id == SKYLAR_ID:
+        await message.channel.send(embed=embed)
+        
+        scripture = bot.get_channel(SCRIPTURE_CHANNEL)
+        if scripture:
+            await sensitive_channel.send(embed=embed)
+
 async def log_message_edit(before: discord.Message, after: discord.Message):
     now = datetime.now(timezone.utc)
     jump_url = f"https://discord.com/channels/{before.guild.id}/{before.channel.id}/{before.id}"
@@ -153,6 +163,9 @@ async def log_message_edit(before: discord.Message, after: discord.Message):
     embed.timestamp = now
 
     await log_event(MESSAGE_LOG_CHANNEL, embed)
+
+            
+
 
 
 
