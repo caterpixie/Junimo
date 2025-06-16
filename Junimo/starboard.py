@@ -51,7 +51,7 @@ def setup_starboard(bot_instance: discord.Client):
 
         embed = discord.Embed(
             description=f"{message.content}\n\n[Jump to Message!]({message.jump_url})" or "[No text]",
-            color=discord.Color.from_str("#A0EA67")
+            color=discord.Color.from_str("#9CEC61")
         )
         embed.set_author(name=str(message.author), icon_url=message.author.display_avatar.url)
         embed.timestamp = now
