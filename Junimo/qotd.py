@@ -86,7 +86,7 @@ async def post_qotd(interaction: discord.Interaction):
     embed = discord.Embed(
         title="Question of the Day",
         description=record["question"],
-        color=discord.Color.from_str("#A0EA67")
+        color=discord.Color.from_str("#9CEC61")
     )
     if record.get("image_url"):
         embed.set_image(url=record["image_url"])
@@ -179,7 +179,7 @@ async def auto_post_qotd():
             embed = discord.Embed(
                 title="Question of the Day",
                 description=record["question"],
-                color=discord.Color.from_str("#A0EA67")
+                color=discord.Color.from_str("#9CEC61")
             )
             if record.get("image_url"):
                 embed.set_image(url=record["image_url"])
