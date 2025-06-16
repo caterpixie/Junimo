@@ -141,7 +141,7 @@ async def log_message_delete(message: discord.Message):
         
         scripture = bot.get_channel(SCRIPTURE_CHANNEL)
         if scripture:
-            await sensitive_channel.send(embed=embed)
+            await scripture.send(embed=embed)
 
 async def log_message_edit(before: discord.Message, after: discord.Message):
     now = datetime.now(timezone.utc)
