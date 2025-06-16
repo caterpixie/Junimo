@@ -95,7 +95,7 @@ class ConfessionSubmitModal(Modal, title="Submit a Confession"):
         embed = discord.Embed(
             title=f"Confession Awaiting Review (#{confession_number})",
             description=f"\"{self.confession.value}\"",
-            colour=discord.Color.from_str("#CD98E7")
+            colour=discord.Color.from_str("#DCA8FF")
         )
         embed.add_field(name="User", value=f"||{interaction.user.name} (`{interaction.user.id}`)||")
     
@@ -137,7 +137,7 @@ class ConfessionReplyModal(Modal, title="Reply to a Confession"):
         embed = discord.Embed(
             title=f"Reply Awaiting Review (#{confession_number})",
             description=f"\"{self.reply.value}\"",
-            color=discord.Color.blurple()
+            color=discord.Color.from_str("#ECD0FF")
         )
         embed.add_field(name="User", value=f"||{interaction.user.name} (`{interaction.user.id}`)||")
         embed.add_field(name="Original Message", value=f"[Jump to message](https://discord.com/channels/{interaction.guild.id}/{channel.id}/{self.original_message_id})", inline=False)
@@ -180,14 +180,14 @@ class ApprovalView(View):
             embed = discord.Embed(
                 title=f"Anonymous Reply (#{self.confession_number})",
                 description=f"\"{self.confession_text}\"\n",
-                color=discord.Color.from_str("#E9CAF8")
+                color=discord.Color.from_str("#ECD0FF")
             )
             embed.add_field(name="Original Confession", value=f"[Jump to confession]({jump_url})", inline=False)
         else:
             embed = discord.Embed(
                 title=f"Anonymous Confession (#{self.confession_number})",
                 description=f"\"{self.confession_text}\"",
-                color=discord.Color.from_str("#CD98E7")
+                color=discord.Color.from_str("#DCA8FF")
             )
 
         new_message = await channel.send(embed=embed, view=ConfessionInteractionView(bot))
@@ -299,7 +299,7 @@ async def submit_confession(interaction: discord.Interaction, confession: str):
     embed = discord.Embed(
         title=f"Confession Awaiting Review (#{confession_number})",
         description=f"\"{confession}\"",
-        colour=discord.Color.from_str("#CD98E7")
+        colour=discord.Color.from_str("#DCA8FF")
     )
     embed.add_field(name="User", value=f"||{interaction.user.name} (`{interaction.user.id}`)||")
 
