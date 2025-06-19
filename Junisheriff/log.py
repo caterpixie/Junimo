@@ -9,9 +9,12 @@ AD_SERVER=1322423728457384018
 LOG_CHANNEL=1322430928555085824
 MESSAGE_LOG_CHANNEL=1322430962981801984
 USER_LOG_CHANNEL=1322430941993373850
+OFFICIAL_MOD_CHANNEL=1348402476759515276
 
 SKYLAR_ID = 772218973080518676
 SCRIPTURE_CHANNEL = 1323794218539548682
+
+MINOR_ROLE = 1364393285900042251
 
 def set_bot(bot_instance):
     global bot
@@ -178,6 +181,7 @@ async def log_member_update(before: discord.Member, after: discord.Member):
     
     now = datetime.now(timezone.utc)
     changes = []
+    minor = False
 
     # Nickname change
     if before.nick != after.nick:
@@ -192,6 +196,8 @@ async def log_member_update(before: discord.Member, after: discord.Member):
 
     if added_roles:
         changes.append(f"Roles Added: {', '.join(role.mention for role in added_roles)}")
+        if any(role.id == MINOR_ROLE for role in added_roles):
+            minor = True
     if removed_roles:
         changes.append(f"Roles Removed {', '.join(role.mention for role in removed_roles)}")
 
@@ -210,6 +216,14 @@ async def log_member_update(before: discord.Member, after: discord.Member):
 
     await log_event(USER_LOG_CHANNEL, embed)
 
+    if minor:
+        minor_embed = discord.Embed(
+            title = "Stinky Minor Alert",
+            description = f"User {before.mention} has selected the -17 role. SIC 'EM",
+            color=discord.Color.red(),
+        )
+        await log_event(OFFICIAL_MOD_CHANNEL, minor_embed)
+    
 async def log_voice_state_update(user: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
     if user.bot:
         return
