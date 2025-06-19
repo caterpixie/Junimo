@@ -222,7 +222,11 @@ async def log_member_update(before: discord.Member, after: discord.Member):
             description = f"User {before.mention} has selected the -17 role. SIC 'EM",
             color=discord.Color.red(),
         )
-        await log_event(OFFICIAL_MOD_CHANNEL, minor_embed)
+        mod_channel = bot.get_channel(OFFICIAL_MOD_CHANNEL)
+        if mod_channel:
+            role_mention = f"<@&{1322426196033536010}>"
+            await mod_channel.send(content=role_mention, embed=alert_embed)
+        
     
 async def log_voice_state_update(user: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
     if user.bot:
