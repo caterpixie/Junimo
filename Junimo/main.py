@@ -12,6 +12,7 @@ from chores import set_bot as set_chores_bot, auto_post_chores
 from uwu import set_bot as set_uwu_bot, uwu
 from triggers import set_bot as set_trigger_bot
 from starboard import setup_starboard
+from counting import set_bot as set_count_bot
 
 class Client(commands.Bot):
     def __init__(self, **kwargs):
@@ -53,5 +54,6 @@ set_qotd_bot(bot)
 set_chores_bot(bot)
 set_uwu_bot(bot)
 set_trigger_bot(bot)
+set_count_bot(bot)
 
 bot.run(os.getenv("DISCORD_TOKEN"))
