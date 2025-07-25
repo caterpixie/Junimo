@@ -54,7 +54,7 @@ async def piss_on(interaction: discord.Interaction, user: Member):
     
     embed = discord.Embed(
         description= f"<:piss:1368444697638600715> {user.mention} has been pissed on",
-        color=discord.Color.from_str("#FDB574")
+        color=discord.Color.from_str("#99FCFF")
     )
     
     await interaction.response.send_message(embed=embed, allowed_mentions=discord.AllowedMentions(roles=True))
@@ -77,7 +77,7 @@ async def give_foot(interaction: discord.Interaction, user: Member):
     
     embed = discord.Embed(
         description= f"<:whyioughta:1368453281419890688> getting pissed on isn't bad enough. {user.mention} gets Seb's right foot...",
-        color=discord.Color.from_str("#FDB574")
+        color=discord.Color.from_str("#99FCFF")
     )
     
     await interaction.response.send_message(embed=embed, allowed_mentions=discord.AllowedMentions(roles=True))
@@ -91,7 +91,7 @@ async def mop(interaction: discord.Interaction, user: Member):
 
     embed = discord.Embed(
         description= f"<:mop:1368480159602049075> {interaction.user} wiped the piss from {user.mention}. Say thank you~",
-        color=discord.Color.from_str("#FDB574")
+        color=discord.Color.from_str("#99FCFF")
     )
 
     if piss in user.roles:
@@ -106,7 +106,7 @@ async def sock(interaction: discord.Interaction, user: Member):
 
     embed = discord.Embed(
         description= f"<:sock:1368478716199698502> {interaction.user} put a sock on Seb's dogs. {user.mention}, you better be good or else it's coming back off.",
-        color=discord.Color.from_str("#FDB574")
+        color=discord.Color.from_str("#99FCFF")
     )
 
     if foot in user.roles:
@@ -125,7 +125,7 @@ async def gag(interaction: discord.Interaction, user: Member, duration: str, rea
         reason_text = f"\nReason: {reason}" if reason else ""
         embed = discord.Embed(
             description=f"{interaction.user} put the gag on {user.mention}.{reason_text}",
-            color=discord.Color.from_str("#FDB574")
+            color=discord.Color.from_str("#99FCFF")
         )
         await interaction.response.send_message(embed=embed, allowed_mentions=discord.AllowedMentions(users=True))
 
@@ -143,7 +143,7 @@ async def ungag(interaction: discord.Interaction, user: Member):
         await user.edit(timed_out_until=None)
         embed = discord.Embed(
             description=f"{interaction.user} took the gag off {user.mention}. They won't hesitate to gag you again <:whyioughta:1368453281419890688>",
-            color=discord.Color.from_str("#FDB574")
+            color=discord.Color.from_str("#99FCFF")
         )
         await interaction.response.send_message(embed=embed, allowed_mentions=discord.AllowedMentions(users=True))
 
