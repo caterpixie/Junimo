@@ -9,9 +9,10 @@ bot = None
 def set_bot(bot_instance):
     global bot
     bot = bot_instance
+    bot.add_listener(trigger_on_message, "on_message")
 
     @bot.event
-    async def on_message(message: discord.Message):
+    async def trigger_on_message(message: discord.Message):
         if message.author.bot or not message.guild:
             return
 
