@@ -348,10 +348,10 @@ async def ban(
             
     else:
         except discord.app_commands.TransformerError:
-        await interaction.response.send_message(
-            "User has already left the server.",
-            ephemeral=True
-        )
+            await interaction.response.send_message(
+                "User has already left the server.",
+                ephemeral=True
+            )
 
 @mod_group.command(name="unban", description="Unbans a user (using id or username)")
 async def unban(interaction: discord.Interaction, user: str):
