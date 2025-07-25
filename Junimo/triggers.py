@@ -8,6 +8,9 @@ import random
 bot = None
 
 async def trigger_on_message(message: discord.Message):
+    if message.author.bot and message.content != "!zliwpj":
+        return
+
     if not message.guild:
         return
 
