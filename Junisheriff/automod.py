@@ -83,7 +83,7 @@ async def check_slurs(message):
             embed = discord.Embed(
                 title="Message Auto-deleted",
                 description=f"**Message by {message.author.mention} deleted in {message.channel.mention} due to bad word detected**\n\n{message.content}",
-                color=discord.Color.from_str("#FDB574")
+                color=discord.Color.from_str("#99FCFF")
             )
             embed.set_author(name=str(message.author), icon_url=safe_avatar_url(message.author))
             embed.timestamp = now
@@ -102,7 +102,7 @@ async def check_phishing(message):
             embed = discord.Embed(
                 title="Message Auto-deleted",
                 description=f"**Message by {message.author.mention} deleted in {message.channel.mention} due to phishing or dangerous link detected**\n\n{message.content}",
-                color=discord.Color.from_str("#FDB574")
+                color=discord.Color.from_str("#99FCFF")
             )
             embed.set_author(name=str(message.author), icon_url=safe_avatar_url(message.author))
             embed.timestamp = now
