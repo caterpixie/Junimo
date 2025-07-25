@@ -45,4 +45,6 @@ gyppie
 gyppy
 gipp
 kyke
-slurtest
+p3do
+p*do
+
