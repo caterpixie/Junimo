@@ -345,104 +345,12 @@ async def ban(
                 print(f"Failed to send log to modlog channel: {e}")
         else:
             print("Modlog channel not found or CASE_LOG_CHANNEL ID is incorrect.")
-            
-    else:
-        except discord.app_commands.TransformerError:
-            await interaction.response.send_message(
-                "User has already left the server.",
-                ephemeral=True
-            )
 
-@mod_group.command(name="unban", description="Unbans a user (using id or username)")
-async def unban(interaction: discord.Interaction, user: str):
-    guild = interaction.guild
-    now = datetime.datetime.now(datetime.timezone.utc)
-
-    banned_users = banned_users = [ban async for ban in guild.bans()]
-    target = None
-    for ban_entry in banned_users:
-        if (
-            str(ban_entry.user.id) == user
-            or str(ban_entry.user) == user
-            or ban_entry.user.name == user
-        ):
-            target = ban_entry.user
-            break
-
-    if not target:
-        await interaction.response.send_message("User not found in ban list.", ephemeral=True)
-        return
-    
-    await guild.unban(target)
-
-    embed = discord.Embed(
-        description=f"{target} has been unbanned.",
-        color=discord.Color.from_str("#FDB574")
-    )
-    await interaction.response.send_message(embed=embed)
-
-    logembed = discord.Embed(
-        title=f"User unbanned",
-        color=discord.Color.green()
-    )
-    logembed.set_author(name=f"{target.name}", icon_url=target.avatar.url)
-    logembed.add_field(name="User", value=f"{target.mention}")
-    logembed.add_field(name="Moderator", value=f"{interaction.user.mention}")
-    logembed.timestamp = now
-
-    # Log to modlog
-    modlog_channel = interaction.guild.get_channel(CASE_LOG_CHANNEL)
-    if modlog_channel:
-        await modlog_channel.send(embed=logembed)
-
-@mod_group.command(name="mass_ban", description="Bans several users. To be used after raids")
-async def massban(interaction: discord.Interaction, users: str):
-    await interaction.response.defer()  
-
-    now = datetime.datetime.now(datetime.timezone.utc)
-    guild = interaction.guild   
-
-    # Parse IDs  
-    raw_ids = [item.strip() for item in users.split(",")]
-    user_ids = set()
-
-    for raw in raw_ids:
-        try:
-            if raw.startswith("<@") and raw.endswith(">"):
-                raw = raw.strip("<@!>")
-            user_ids.add(int(raw))
-        except ValueError:
-            return await interaction.followup.send(f"Invalid ID or mention: `{raw}`", ephemeral=True)
-        
-    if not user_ids:
-        return await interaction.followup.send("No valid user IDs found.", ephemeral=True)
-
-    targets = [discord.Object(id=user_id) for user_id in user_ids]
-
-    for target in targets:
-        await guild.ban(target, delete_message_days=7)
-    
-    embed = discord.Embed(
-        title="Mass Ban Executed",
-        description=f"Banned {len(targets)} users.",
-        color=discord.Color.from_str("#FDB574"),
-        timestamp=now
-    )
-    await interaction.followup.send(embed=embed)
-    
-    # Log to modlog
-    log_embed = discord.Embed(
-        title="Users Mass Banned",
-        color=discord.Color.red(),
-        timestamp=now
-    )
-    log_embed.add_field(name="Moderator", value=interaction.user.mention)
-    log_embed.add_field(name="Banned Users", value="\n".join(f"<@{uid}>" for uid in user_ids), inline=False)
-
-    modlog_channel = interaction.guild.get_channel(CASE_LOG_CHANNEL)
-    if modlog_channel:
-        await modlog_channel.send(embed=log_embed)
-
+    except discord.app_commands.TransformerError:
+        await interaction.response.send_message(
+            "User has already left the server.",
+            ephemeral=True
+        )
 
 
 
