@@ -16,12 +16,12 @@ last_user_id = None
 
 def load_count_data():
     global current_count, last_user_id
-    if os.path.exists(FILE):
+    if os.path.exists(DATA_FILE):
         try:
-            with open(FILE, "r") as f:
+            with open(DATA_FILE, "r") as f:
                 content = f.read().strip()
                 if not content:
-                    raise ValueError("Empty file")
+                    raise ValueError("Empty DATA_FILE")
                 data = json.loads(content)
                 current_count = data.get("current_count", 0)
                 last_user_id = data.get("last_user_id", None)
@@ -29,11 +29,11 @@ def load_count_data():
             print("Warning: current_count.json is empty or invalid. Resetting count.")
             current_count = 0
             last_user_id = None
-            save_count_data()  # Create a fresh file
+            save_count_data()  # Create a fresh DATA_FILE
     else:
         current_count = 0
         last_user_id = None
-        save_count_data()  # Create a fresh file
+        save_count_data()  # Create a fresh DATA_FILE
 
 def save_count_data():
     with open(DATA_FILE, "w") as f:
