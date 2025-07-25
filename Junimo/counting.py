@@ -58,7 +58,7 @@ async def counting_on_message(message: discord.Message):
         return
 
     # Check validity (increment of one, no double entries)
-    if number == current_count + 1:
+    if number == current_count + 1 and message.author.id != last_user_id:
         current_count = number
         last_user_id = message.author.id
         save_count_data()
