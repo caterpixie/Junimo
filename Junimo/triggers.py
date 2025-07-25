@@ -8,7 +8,7 @@ import random
 bot = None
 
 async def trigger_on_message(message: discord.Message):
-    if message.author.bot or not message.guild:
+    if not message.guild:
         return
 
     async with bot.pool.acquire() as conn:
