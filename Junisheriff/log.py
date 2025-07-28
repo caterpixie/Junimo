@@ -10,6 +10,7 @@ LOG_CHANNEL=1322430928555085824
 MESSAGE_LOG_CHANNEL=1322430962981801984
 USER_LOG_CHANNEL=1322430941993373850
 OFFICIAL_MOD_CHANNEL=1348402476759515276
+POLL_CHANNEL=1322429938636423240
 
 SKYLAR_ID = 772218973080518676
 SCRIPTURE_CHANNEL = 1323794218539548682
@@ -120,6 +121,9 @@ async def log_member_remove(user: discord.Member):
 # MESSAGE LOGS
 
 async def log_message_delete(message: discord.Message):
+    if message.channel.id == POLL_CHANNEL:
+        return  # Ignore messages from the poll channel
+    
     now = datetime.now(timezone.utc)
     
     if message.author.bot:
@@ -147,6 +151,9 @@ async def log_message_delete(message: discord.Message):
             await scripture.send(embed=embed)
 
 async def log_message_edit(before: discord.Message, after: discord.Message):
+    if before.channel.id == POLL_CHANNEL:
+        return  # Ignore edits from the poll channel
+    
     now = datetime.now(timezone.utc)
     jump_url = f"https://discord.com/channels/{before.guild.id}/{before.channel.id}/{before.id}"
 
@@ -161,12 +168,11 @@ async def log_message_edit(before: discord.Message, after: discord.Message):
         description=f"**Message by {before.author.mention} edited in {before.channel.mention}**\n[Jump to message]({jump_url})\n\n**Before:**\n{before.content}\n\n**After:**\n{after.content}",
         color=discord.Color.orange()
     )
-    icon_url = before.author.avatar.url if before.author.avatar else user.default_avatar.url
+    icon_url = before.author.avatar.url if before.author.avatar else before.default_avatar.url
     embed.set_author(name=str(before.author), icon_url=icon_url)
     embed.timestamp = now
 
     await log_event(MESSAGE_LOG_CHANNEL, embed)
-
             
 
 
