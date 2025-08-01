@@ -220,25 +220,41 @@ class ApprovalView(View):
 
 
     @discord.ui.button(label="❌ Deny", style=discord.ButtonStyle.danger, custom_id="approval_deny")
-    async def deny(self, interaction: discord.Interaction, button: Button):
-        logchannel = interaction.guild.get_channel(CONFESSION_LOGS)
-        await interaction.response.send_message("Confession denied.", ephemeral=True)
-        remove_pending_confession(interaction.message.id)
-        await interaction.message.delete()
-
-        logembed = discord.Embed(
-            title=f"Confession Denied (#{self.confession_number})",
-            description=f"\"{self.confession_text}\"",
-            color=discord.Color.red()
-        )
-        logembed.add_field(name="User", value=f"||{self.submitter.name} (`{self.submitter.id}`)||")
-        logembed.add_field(name="Denied By", value=f"{interaction.user.mention}", inline=False)
-
-        await logchannel.send(embed=logembed)
-
-    @discord.ui.button(label="💬 Deny with Reason", style=discord.ButtonStyle.danger, custom_id="approval_denyreason")
-    async def deny_with_reason(self, interaction: discord.Interaction, button: Button):
-        await interaction.response.send_modal(DenyReasonModal(self.submitter, self.confession_text, interaction.guild, self.confession_number))
+        async def deny(self, interaction: discord.Interaction, button: Button):
+            logchannel = interaction.guild.get_channel(CONFESSION_LOGS)
+        
+            # Attempt to DM the submitter
+            try:
+                embed = discord.Embed(
+                    title="Your Denied Confession",
+                    description=f"\"{self.confession_text}\"",
+                    color=discord.Color.red()
+                )
+                await self.submitter.send(
+                    "Your confession in After Dark has been denied.",
+                    embed=embed
+                )
+            except discord.Forbidden:
+                pass  # User has DMs closed
+        
+            await interaction.response.send_message("Confession denied.", ephemeral=True)
+            remove_pending_confession(interaction.message.id)
+            await interaction.message.delete()
+        
+            logembed = discord.Embed(
+                title=f"Confession Denied (#{self.confession_number})",
+                description=f"\"{self.confession_text}\"",
+                color=discord.Color.red()
+            )
+            logembed.add_field(name="User", value=f"||{self.submitter.name} (`{self.submitter.id}`)||")
+            logembed.add_field(name="Denied By", value=f"{interaction.user.mention}", inline=False)
+        
+            await logchannel.send(embed=logembed)
+        
+            @discord.ui.button(label="💬 Deny with Reason", style=discord.ButtonStyle.danger, custom_id="approval_denyreason")
+            async def deny_with_reason(self, interaction: discord.Interaction, button: Button):
+                
+            await interaction.response.send_modal(DenyReasonModal(self.submitter, self.confession_text, interaction.guild, self.confession_number))
 
 
 class DenyReasonModal(Modal, title="Deny Confession with Reason"):
@@ -344,3 +360,4 @@ async def reply_to_confession(interaction: discord.Interaction, message_link: st
 @app_commands.context_menu(name="Reply to Confession")
 async def reply_to_confession_context(interaction: discord.Interaction, message: discord.Message):
     await interaction.response.send_modal(ConfessionReplyModal(message.id))
+
