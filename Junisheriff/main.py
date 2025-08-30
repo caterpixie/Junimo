@@ -12,9 +12,10 @@ from funwarns import setup_funwarns
 from automod import setup_automod
 
 class Client(commands.Bot):
-    def __init__(self, **kwargs):
+    def __init__(self, guild_id: int, **kwargs):
         super().__init__(**kwargs)
         self.pool = None
+        self.guild_id = guild_id 
 
     async def setup_hook(self):
         db_url = os.getenv("DATABASE_URL")
@@ -31,7 +32,9 @@ class Client(commands.Bot):
         
         setup_funwarns(self)
         self.tree.add_command(mod_group)
-        await self.tree.sync()
+
+        guild = discord.Object(id=self.guild_id)
+        await self.tree.sync(guild=guild)
 
     async def on_ready(self):
         print(f'Logged on as {self.user}')
@@ -40,10 +43,11 @@ intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
 intents.voice_states = True
-bot = Client(command_prefix="?", intents=intents)
+bot = Client(command_prefix="?", intents=intents, guild_id=1322423728457384018)
 
 set_warn_bot(bot)
 setup_logging(bot)
 setup_automod(bot)
 
 bot.run(os.getenv("DISCORD_TOKEN"))
+
