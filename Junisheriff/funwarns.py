@@ -99,7 +99,7 @@ async def snatch(interaction: discord.Interaction, user: Member):
         return
     
     embed = discord.Embed(
-        description= f"Dale",
+        description= f"{interaction.user} snatchs {user.mention}'s wig. Dale.",
         color=discord.Color.from_str("#99FCFF")
     )
     
@@ -188,5 +188,6 @@ async def ungag(interaction: discord.Interaction, user: Member):
         await interaction.response.send_message("I don't have permission to remove the timeout.", ephemeral=True)
     except discord.HTTPException as e:
         await interaction.response.send_message(f"Failed to remove timeout: {e}", ephemeral=True)
+
 
 
