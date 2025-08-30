@@ -85,6 +85,43 @@ async def give_foot(interaction: discord.Interaction, user: Member):
     await asyncio.sleep(1800)
     await user.remove_roles(foot)
 
+@app_commands.command(name="snatchwig", description="Make someone bald")
+async def piss_on(interaction: discord.Interaction, user: Member):
+    dale = interaction.guild.get_role(1411215127255973938)
+
+    try:
+        await user.add_roles(dale)
+    except discord.Forbidden:
+        await interaction.response.send_message("I don't have permission to assign that role (check role hierarchy or permissions).", ephemeral=True)
+        return
+    except discord.HTTPException as e:
+        await interaction.response.send_message(f"Failed to assign role: {e}", ephemeral=True)
+        return
+    
+    embed = discord.Embed(
+        description= f"Dale",
+        color=discord.Color.from_str("#99FCFF")
+    )
+    
+    await interaction.response.send_message(embed=embed, allowed_mentions=discord.AllowedMentions(roles=True))
+
+
+@app_commands.command(name="wig", description="Hides baldness")
+async def mop(interaction: discord.Interaction, user: Member):
+    dale = interaction.guild.get_role(1411215127255973938)
+
+    embed = discord.Embed(
+        description= f"{interaction.user} put a wig on {user.mention}.",
+        color=discord.Color.from_str("#99FCFF")
+    )
+
+    if dale in user.roles:
+        await user.remove_roles(dale)
+        await interaction.response.send_message(embed=embed, allowed_mentions=discord.AllowedMentions(roles=True))
+    else:
+        await interaction.response.send_message(f"{user.mention} doesn't have the bald role.", ephemeral=True)
+
+
 @app_commands.command(name="mop", description="Removes the piss role")
 async def mop(interaction: discord.Interaction, user: Member):
     piss = interaction.guild.get_role(1332969280165384254)
@@ -151,3 +188,4 @@ async def ungag(interaction: discord.Interaction, user: Member):
         await interaction.response.send_message("I don't have permission to remove the timeout.", ephemeral=True)
     except discord.HTTPException as e:
         await interaction.response.send_message(f"Failed to remove timeout: {e}", ephemeral=True)
+
