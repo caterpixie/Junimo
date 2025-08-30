@@ -20,6 +20,9 @@ def setup_funwarns(bot_instance: discord.Client):
     bot_instance.tree.add_command(sock)
     bot_instance.tree.add_command(gag)
     bot_instance.tree.add_command(ungag)
+    bot_instance.tree.add_command(snatch)
+    bot_instance.tree.add_command(wig)
+
 
 # Parse inputs like 1m, 30d, 2h etc.
 def parse_duration(duration_str: str) -> int:
@@ -85,7 +88,7 @@ async def give_foot(interaction: discord.Interaction, user: Member):
     await asyncio.sleep(1800)
     await user.remove_roles(foot)
 
-@app_commands.command(name="snatchwig", description="Make someone bald")
+@app_commands.command(name="snatch", description="Make someone bald")
 async def snatch(interaction: discord.Interaction, user: Member):
     dale = interaction.guild.get_role(1411215127255973938)
 
@@ -188,6 +191,7 @@ async def ungag(interaction: discord.Interaction, user: Member):
         await interaction.response.send_message("I don't have permission to remove the timeout.", ephemeral=True)
     except discord.HTTPException as e:
         await interaction.response.send_message(f"Failed to remove timeout: {e}", ephemeral=True)
+
 
 
 
