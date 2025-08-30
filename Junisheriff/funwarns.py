@@ -86,7 +86,7 @@ async def give_foot(interaction: discord.Interaction, user: Member):
     await user.remove_roles(foot)
 
 @app_commands.command(name="snatchwig", description="Make someone bald")
-async def piss_on(interaction: discord.Interaction, user: Member):
+async def snatch(interaction: discord.Interaction, user: Member):
     dale = interaction.guild.get_role(1411215127255973938)
 
     try:
@@ -107,7 +107,7 @@ async def piss_on(interaction: discord.Interaction, user: Member):
 
 
 @app_commands.command(name="wig", description="Hides baldness")
-async def mop(interaction: discord.Interaction, user: Member):
+async def wig(interaction: discord.Interaction, user: Member):
     dale = interaction.guild.get_role(1411215127255973938)
 
     embed = discord.Embed(
@@ -188,4 +188,5 @@ async def ungag(interaction: discord.Interaction, user: Member):
         await interaction.response.send_message("I don't have permission to remove the timeout.", ephemeral=True)
     except discord.HTTPException as e:
         await interaction.response.send_message(f"Failed to remove timeout: {e}", ephemeral=True)
+
 
