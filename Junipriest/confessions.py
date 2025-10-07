@@ -4,6 +4,7 @@ from discord.ui import View, Button, Modal, TextInput
 import os
 import traceback
 import json
+import 
 
 CONFESSION_CHANNEL=1322430350575669320
 CONFESSION_APPROVAL_CHANNEL=1322431042501738550
@@ -70,6 +71,40 @@ def remove_pending_confession(message_id):
                     json.dump(pending, f, indent=4)
     except Exception as e:
         print(f"[ERROR] Removing pending confession: {e}")
+
+async def increment_denial(
+    guild_id: int,
+    user_id: int,
+    confession_text: str,
+    denied_by_name: str,
+    reason: str | None
+) -> int:
+    """
+    Upserts a row in confession_denials, increments denial_count, updates metadata,
+    and returns the new denial_count.
+    """
+    async with bot.pool.acquire() as conn:
+        async with conn.cursor() as cur:
+            # Upsert & increment denial_count
+            await cur.execute(
+                """
+                INSERT INTO confession_denials (guild_id, user_id, denial_count, confession_text, reason, denied_by_name)
+                VALUES (%s, %s, 1, %s, %s, %s)
+                ON DUPLICATE KEY UPDATE
+                  denial_count = denial_count + 1,
+                  last_denied_at = CURRENT_TIMESTAMP,
+                  confession_text = VALUES(confession_text),
+                  reason = VALUES(reason),
+                  denied_by_name = VALUES(denied_by_name)
+                """,
+                (guild_id, user_id, confession_text, reason, denied_by_name)
+            )
+            await cur.execute(
+                "SELECT denial_count FROM confession_denials WHERE guild_id = %s AND user_id = %s",
+                (guild_id, user_id)
+            )
+            row = await cur.fetchone()
+            return int(row[0]) if row else 1
 
 class ConfessionInteractionView(View):
     def __init__(self, bot_instance):
@@ -284,10 +319,25 @@ class DenyReasonModal(Modal, title="Deny Confession with Reason"):
         except discord.Forbidden:
             pass  # DMs are closed
 
-        await interaction.response.send_message("Confession has been denied with reason.", ephemeral=True)
+        total_denials = await increment_denial_and_get_count(
+            guild_id=interaction.guild.id,
+            user_id=self.submitter.id,
+            confession_text=self.confession_text,
+            denied_by_name=interaction.user.name,
+            reason=self.reason.value
+        )
+    
+        await interaction.response.send_message(
+            "Confession has been denied with reason.\n"
+            f"This user now has **{total_denials}** denied confession(s).",
+            ephemeral=True
+        )
+
+        # Clean up the pending approval message
         remove_pending_confession(interaction.message.id)
         await interaction.message.delete()
 
+        # Log embed (unchanged)
         logembed = discord.Embed(
             title=f"Confession Denied (#{self.confession_number})",
             description=f"\"{self.confession_text}\"",
@@ -296,7 +346,6 @@ class DenyReasonModal(Modal, title="Deny Confession with Reason"):
         logembed.add_field(name="User", value=f"||{self.submitter.name} (`{self.submitter.id}`)||")
         logembed.add_field(name="Denied By", value=f"{interaction.user.mention}", inline=False)
         logembed.add_field(name="Reason", value=f"{self.reason.value}", inline=False)
-
         await logchannel.send(embed=logembed)
 
 class ConfessionGroup(app_commands.Group):
@@ -362,5 +411,6 @@ async def reply_to_confession(interaction: discord.Interaction, message_link: st
 @app_commands.context_menu(name="Reply to Confession")
 async def reply_to_confession_context(interaction: discord.Interaction, message: discord.Message):
     await interaction.response.send_modal(ConfessionReplyModal(message.id))
+
 
 
