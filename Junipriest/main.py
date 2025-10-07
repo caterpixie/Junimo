@@ -54,17 +54,18 @@ class Client(commands.Bot):
         super().__init__(**kwargs)
         self.pool = None
 
-    async def setup_hook(self):
-
+    async def setup_hook(self) -> None:
+        await self.setup_db_pool()
         set_confessions_bot(self)
-        self.add_view(ConfessionInteractionView(self)) 
 
+        self.add_view(ConfessionInteractionView(self))
         await restore_pending_confessions(self)
 
         self.tree.add_command(confession_group)
         self.tree.add_command(reply_to_confession_context)
         await self.tree.sync()
-
+        logging.info("[SYNC] App commands synced.")
+        
     async def on_ready(self):
         print(f'Logged on as {self.user}')
 
@@ -74,4 +75,5 @@ bot = Client(command_prefix="?", intents=intents)
 
 set_confessions_bot(bot)
 bot.run(os.getenv("DISCORD_TOKEN"))
+
 
