@@ -7,8 +7,6 @@ import aiomysql
 from datetime import timezone
 from zoneinfo import ZoneInfo
 
-from mod import Pages, safe_avatar_url  
-
 CONFESSION_CHANNEL = 1322430350575669320
 CONFESSION_APPROVAL_CHANNEL = 1322431042501738550
 CONFESSION_LOGS = 1322431064777429124
@@ -20,6 +18,32 @@ bot = None
 def set_bot(bot_instance):
     global bot
     bot = bot_instance
+
+class Pages(ui.View):
+    def __init__(self, embeds):
+        super().__init__(timeout=None)
+        self.embeds = embeds
+        self.current_page = 0
+        self.update_buttons()
+
+    def update_buttons(self):
+        self.children[0].disabled = self.current_page == 0
+        self.children[1].disabled = self.current_page == len(self.embeds) - 1
+
+    @ui.button(label="Previous", style=discord.ButtonStyle.primary)
+    async def previous_page(self, interaction: discord.Interaction, button: ui.Button):
+        if self.current_page > 0:
+            self.current_page -= 1
+            self.update_buttons()
+            await interaction.response.edit_message(embed=self.embeds[self.current_page], view=self)
+
+    @ui.button(label="Next", style=discord.ButtonStyle.primary)
+    async def next_page(self, interaction: discord.Interaction, button: ui.Button):
+        if self.current_page < len(self.embeds) - 1:
+            self.current_page += 1
+            self.update_buttons()
+            await interaction.response.edit_message(embed=self.embeds[self.current_page], view=self)
+
 
 def get_next_confession_number():
     if not os.path.exists(COUNTER_FILE):
@@ -74,6 +98,9 @@ def remove_pending_confession(message_id):
                     json.dump(pending, f, indent=4)
     except Exception as e:
         print(f"[ERROR] Removing pending confession: {e}")
+
+def safe_avatar_url(user):
+    return user.avatar.url if user.avatar else None
 
 async def record_denial_event(
     guild_id: int,
@@ -461,6 +488,7 @@ async def denial_log(interaction: discord.Interaction, user: discord.Member):
 @app_commands.context_menu(name="Reply to Confession")
 async def reply_to_confession_context(interaction: discord.Interaction, message: discord.Message):
     await interaction.response.send_modal(ConfessionReplyModal(message.id))
+
 
 
 
