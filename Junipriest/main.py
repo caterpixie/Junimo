@@ -87,9 +87,6 @@ class Client(commands.Bot):
         self.tree.add_command(reply_to_confession_context, guild=guild_obj)
         await self.tree.sync(guild=guild_obj)
         
-        self.tree.add_command(confession_group.copy())
-        self.tree.add_command(reply_to_confession_context.copy())
-        await self.tree.sync()
 
     async def on_ready(self):
         print(f"Logged on as {self.user} (ID: {self.user.id})")
@@ -101,3 +98,4 @@ intents.message_content = True
 bot = Client(command_prefix="?", intents=intents)
 
 bot.run(os.getenv("DISCORD_TOKEN"))
+
