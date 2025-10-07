@@ -408,9 +408,45 @@ async def reply_to_confession(interaction: discord.Interaction, message_link: st
 
     await interaction.response.send_modal(ConfessionReplyModal(message_id))
 
+@confession_group.command(name="denials", description="Displays a user's past dinied confessions")
+async def warn_log(interaction: discord.Interaction, user: discord.Member):
+    async with bot.pool.acquire() as conn:
+        async with conn.cursor(aiomysql.DictCursor) as cur:
+            await cur.execute("""
+                SELECT denied_by_name, confession_text, reason, timestamp FROM confession_denials
+                WHERE guild_id = %s AND user_id = %s
+                ORDER BY timestamp DESC
+            """, (interaction.guild.id, user.id))
+            records = await cur.fetchall()
+    
+    if not records:
+        await interaction.response.send_message(f"{user.name} has no warns logged.")
+        return
+
+    per_page = 10
+    pages = []
+    for i in range(0, len(records), per_page):
+        chunk = records[i:i+per_page]
+        cst = ZoneInfo("America/Chicago")
+        description = "\n".join(
+            f"**Moderator: {entry['denied_by_name']}**\nConfession:{entry['confession_text']}\nReason for Denial:{entry['reason']}*(<t:{int(entry['timestamp'].replace(tzinfo=timezone.utc).astimezone(cst).timestamp())}:f> CST)*\n"
+            for idx, entry in enumerate(chunk, start=i+1))
+        embed = discord.Embed(
+            title=f"{len(records)} confession denials for {user}:", 
+            description=description, 
+            color=discord.Color.from_str("#99FCFF")
+        )
+        embed.set_footer(text=f"Page {i//per_page + 1}/{(len(records)-1)//per_page + 1}")
+        embed.set_author(name=str(user), icon_url=safe_avatar_url(user))
+        pages.append(embed)
+
+    view = Pages(pages)
+    await interaction.response.send_message(embed=pages[0], view=view)
+        
 @app_commands.context_menu(name="Reply to Confession")
 async def reply_to_confession_context(interaction: discord.Interaction, message: discord.Message):
     await interaction.response.send_modal(ConfessionReplyModal(message.id))
+
 
 
 
