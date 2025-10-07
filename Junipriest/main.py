@@ -6,6 +6,9 @@ import discord
 from discord.ext import commands
 import json
 
+import aiomysql
+import urllib.parse
+
 from confessions import confession_group, reply_to_confession_context, set_bot as set_confessions_bot, ConfessionInteractionView, ApprovalView
 
 CONFESSION_APPROVAL_CHANNEL=1322431042501738550
@@ -46,6 +49,17 @@ class Client(commands.Bot):
         self.pool = None
 
     async def setup_hook(self):
+        db_url = os.getenv("DATABASE_URL")
+        parsed = urllib.parse.urlparse(db_url)
+    
+        self.pool = await aiomysql.create_pool(
+            host=parsed.hostname,
+            port=parsed.port or 3306,
+            user=parsed.username,
+            password=parsed.password,
+            db=parsed.path[1:],
+            autocommit=True,
+        )
         set_confessions_bot(self)
         self.add_view(ConfessionInteractionView(self)) 
         await restore_pending_confessions(self)
@@ -71,3 +85,4 @@ bot = Client(command_prefix="?", intents=intents)
 set_confessions_bot(bot)
 
 bot.run(os.getenv("DISCORD_TOKEN"))
+
