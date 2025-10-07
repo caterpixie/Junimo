@@ -85,7 +85,7 @@ async def increment_denial(
     """
     async with bot.pool.acquire() as conn:
         async with conn.cursor() as cur:
-            # Upsert & increment denial_count
+            # Upsert &  denial_count
             await cur.execute(
                 """
                 INSERT INTO confession_denials (guild_id, user_id, denial_count, confession_text, reason, denied_by_name)
@@ -319,7 +319,7 @@ class DenyReasonModal(Modal, title="Deny Confession with Reason"):
         except discord.Forbidden:
             pass  # DMs are closed
 
-        total_denials = await increment_denial_and_get_count(
+        total_denials = await increment_denial(
             guild_id=interaction.guild.id,
             user_id=self.submitter.id,
             confession_text=self.confession_text,
@@ -411,6 +411,7 @@ async def reply_to_confession(interaction: discord.Interaction, message_link: st
 @app_commands.context_menu(name="Reply to Confession")
 async def reply_to_confession_context(interaction: discord.Interaction, message: discord.Message):
     await interaction.response.send_modal(ConfessionReplyModal(message.id))
+
 
 
 
