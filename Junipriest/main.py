@@ -18,7 +18,7 @@ from confessions import (
 )
 
 CONFESSION_APPROVAL_CHANNEL = 1322431042501738550
-GUILD_ID = 1322072874214756375 
+GUILD_ID = 1322423728457384018
 
 async def restore_pending_confessions(bot: commands.Bot):
     if not os.path.exists("pending_confessions.json"):
@@ -98,5 +98,6 @@ intents.message_content = True
 bot = Client(command_prefix="?", intents=intents)
 
 bot.run(os.getenv("DISCORD_TOKEN"))
+
 
 
