@@ -1,12 +1,22 @@
 import os
+import asyncio
+import logging
 from dotenv import load_dotenv
-load_dotenv()
 
 import discord
 from discord.ext import commands
-import json
 
-from confessions import confession_group, reply_to_confession_context, set_bot as set_confessions_bot, ConfessionInteractionView, ApprovalView
+import aiomysql
+
+from confessions import (
+    confession_group,
+    reply_to_confession_context,
+    set_bot as set_confessions_bot,
+    ConfessionInteractionView,
+    ApprovalView,
+)
+
+load_dotenv()
 
 CONFESSION_APPROVAL_CHANNEL=1322431042501738550
 
@@ -64,3 +74,4 @@ bot = Client(command_prefix="?", intents=intents)
 
 set_confessions_bot(bot)
 bot.run(os.getenv("DISCORD_TOKEN"))
+
