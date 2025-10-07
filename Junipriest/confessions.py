@@ -1,5 +1,5 @@
 import discord
-from discord import app_commands
+from discord import app_commands, ui
 from discord.ui import View, Button, Modal, TextInput
 import os
 import json
@@ -488,6 +488,7 @@ async def denial_log(interaction: discord.Interaction, user: discord.Member):
 @app_commands.context_menu(name="Reply to Confession")
 async def reply_to_confession_context(interaction: discord.Interaction, message: discord.Message):
     await interaction.response.send_modal(ConfessionReplyModal(message.id))
+
 
 
 
