@@ -89,7 +89,7 @@ class Client(commands.Bot):
         
 
     async def on_ready(self):
-        print(f"Logged on as {self.user} (ID: {self.user.id})")
+        print(f"Logged on as {self.user}")
 
 
 intents = discord.Intents.default()
@@ -98,4 +98,5 @@ intents.message_content = True
 bot = Client(command_prefix="?", intents=intents)
 
 bot.run(os.getenv("DISCORD_TOKEN"))
+
 
