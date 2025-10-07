@@ -4,7 +4,7 @@ from discord.ui import View, Button, Modal, TextInput
 import os
 import traceback
 import json
-import 
+import aiomysql
 
 CONFESSION_CHANNEL=1322430350575669320
 CONFESSION_APPROVAL_CHANNEL=1322431042501738550
@@ -411,6 +411,7 @@ async def reply_to_confession(interaction: discord.Interaction, message_link: st
 @app_commands.context_menu(name="Reply to Confession")
 async def reply_to_confession_context(interaction: discord.Interaction, message: discord.Message):
     await interaction.response.send_modal(ConfessionReplyModal(message.id))
+
 
 
 
