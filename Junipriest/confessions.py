@@ -467,8 +467,8 @@ async def denial_log(interaction: discord.Interaction, user: discord.Member):
             (
                 f"**Moderator:** {entry['denied_by_name']}\n"
                 f"**Confession:** {entry['confession_text']}\n"
-                f"**Reason:** {entry['reason'] or '—'} "
-                f"*(<t:{int(entry['timestamp'].replace(tzinfo=timezone.utc).astimezone(cst).timestamp())}:f> CST)*\n"
+                f"**Reason:** {entry['reason'] or '—'}\n"
+                f"*<t:{int(entry['timestamp'].replace(tzinfo=timezone.utc).astimezone(cst).timestamp())}:f> CST*\n"
             )
             for entry in chunk
         )
@@ -488,6 +488,7 @@ async def denial_log(interaction: discord.Interaction, user: discord.Member):
 @app_commands.context_menu(name="Reply to Confession")
 async def reply_to_confession_context(interaction: discord.Interaction, message: discord.Message):
     await interaction.response.send_modal(ConfessionReplyModal(message.id))
+
 
 
 
