@@ -180,15 +180,12 @@ async def warn(interaction: discord.Interaction, user: discord.Member, reason: s
         # Auto-kick after 1st warn: DM -> kick -> log
         try:
             dm_kick = discord.Embed(
-                description=(
-                    "You have been automatically kicked from the **After Dark** server "
-                    "after receiving a warning.\n\n"
-                    f"**Reason:** {reason}"
-                ),
+                description=("You have been automatically kicked from the After Dark server after receiving a warning."),
                 color=discord.Color.red(),
             )
             dm_kick.timestamp = now
             await user.send(embed=dm_kick)
+            
         except discord.Forbidden:
             # Can't DM them; just let the mod know
             if interaction.response.is_done():
@@ -658,6 +655,7 @@ async def lockdown_server(interaction: discord.Interaction, reason: str = "No re
     modlog_channel = guild.get_channel(CASE_LOG_CHANNEL)
     if modlog_channel:
         await modlog_channel.send(embed=log_embed)
+
 
 
 
