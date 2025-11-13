@@ -165,6 +165,8 @@ async def warn(interaction: discord.Interaction, user: discord.Member, reason: s
         warn_count = await cur.fetchone()
         warn_count = warn_count[0] if warn_count else 0
 
+
+
     # Automatically mute after second warn
     if warn_count == 2:
         gag = interaction.guild.get_role(1322686350063042610)
@@ -281,7 +283,6 @@ async def ban(
     appeal: bool = False,
     preserve_messages: bool = False
 ):
-    # ✅ Defer immediately so Discord knows you're working on it
     await interaction.response.defer(ephemeral=True)
 
     now = datetime.datetime.now(datetime.timezone.utc)
@@ -588,4 +589,5 @@ async def lockdown_server(interaction: discord.Interaction, reason: str = "No re
     modlog_channel = guild.get_channel(CASE_LOG_CHANNEL)
     if modlog_channel:
         await modlog_channel.send(embed=log_embed)
+
 
