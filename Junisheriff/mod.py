@@ -112,43 +112,48 @@ def safe_avatar_url(user):
 
 @mod_group.command(name="warn", description="Warn a user")
 async def warn(interaction: discord.Interaction, user: discord.Member, reason: str):
+    # Insert warn into DB
     async with bot.pool.acquire() as conn:
         async with conn.cursor() as cur:
-            await cur.execute("""
+            await cur.execute(
+                """
                 INSERT INTO warns (guild_id, user_id, mod_name, reason)
                 VALUES (%s, %s, %s, %s)
-            """, (interaction.guild.id, user.id, interaction.user.name, reason))
+                """,
+                (interaction.guild.id, user.id, interaction.user.name, reason),
+            )
 
     now = datetime.datetime.now(datetime.timezone.utc)
 
+    # Acknowledge to moderator
     embed = discord.Embed(
         description=f"{user.mention} has been warned. || Reason: {reason}",
         color=discord.Color.from_str("#99FCFF")
     )
     await interaction.response.send_message(embed=embed, ephemeral=True)
 
+    # Log warn
     logembed = discord.Embed(
-        title=f"User warned",
+        title="User warned",
         color=discord.Color.orange()
     )
     logembed.set_author(name=str(user), icon_url=safe_avatar_url(user))
-    logembed.add_field(name="User", value=f"{user.mention}")
-    logembed.add_field(name="Moderator", value=f"{interaction.user.mention}")
-    logembed.add_field(name="Reason", value=f"{reason}")
+    logembed.add_field(name="User", value=user.mention)
+    logembed.add_field(name="Moderator", value=interaction.user.mention)
+    logembed.add_field(name="Reason", value=reason)
     logembed.timestamp = now
 
-    # Log to modlog
     modlog_channel = interaction.guild.get_channel(CASE_LOG_CHANNEL)
     if modlog_channel:
         await modlog_channel.send(embed=logembed)
 
+    # Try to DM about the warn itself
     try:
         dm_embed = discord.Embed(
             description=f"You have been warned in the server After Dark.\n\n**Reason:** {reason}",
             color=discord.Color.red()
         )
         dm_embed.timestamp = now
-    
         await user.send(embed=dm_embed)
     except discord.Forbidden:
         if interaction.response.is_done():
@@ -156,68 +161,77 @@ async def warn(interaction: discord.Interaction, user: discord.Member, reason: s
         else:
             await interaction.response.send_message(f"Unable to DM {user.mention}", ephemeral=True)
 
-    # Check previous warns
+    # Check previous warns (including this one)
     async with bot.pool.acquire() as conn:
         async with conn.cursor() as cur:
-            await cur.execute("""
-                SELECT COUNT(*) FROM warns WHERE guild_id = %s AND user_id = %s             
-            """, (interaction.guild.id, user.id))
-        warn_count = await cur.fetchone()
-        warn_count = warn_count[0] if warn_count else 0
-
+            await cur.execute(
+                """
+                SELECT COUNT(*)
+                FROM warns
+                WHERE guild_id = %s AND user_id = %s
+                """,
+                (interaction.guild.id, user.id),
+            )
+            row = await cur.fetchone()
+            warn_count = row[0] if row else 0
 
     # Take action based on warn count
-if warn_count == 1:
-    # Kick user after 1st warn
-    try:
-        dm_kick = discord.Embed(
-            description=(
-                f"You have been automatically kicked from the After Dark Server after receiving a warning.\n\n**Reason:** {reason}"
-            ),
-            color=discord.Color.red(),
+    if warn_count == 1:
+        # Auto-kick after 1st warn: DM -> kick -> log
+        try:
+            dm_kick = discord.Embed(
+                description=(
+                    "You have been automatically kicked from the **After Dark** server "
+                    "after receiving a warning.\n\n"
+                    f"**Reason:** {reason}"
+                ),
+                color=discord.Color.red(),
+            )
+            dm_kick.timestamp = now
+            await user.send(embed=dm_kick)
+        except discord.Forbidden:
+            # Can't DM them; just let the mod know
+            if interaction.response.is_done():
+                await interaction.followup.send(
+                    f"Unable to DM {user.mention} before kicking them.",
+                    ephemeral=True,
+                )
+            else:
+                await interaction.response.send_message(
+                    f"Unable to DM {user.mention} before kicking them.",
+                    ephemeral=True,
+                )
+
+        # Kick the user
+        try:
+            await user.kick(
+                reason=f"Automatically kicked after first warning. Reason: {reason}"
+            )
+        except discord.Forbidden:
+            if interaction.response.is_done():
+                await interaction.followup.send(
+                    f"Unable to kick {user.mention} (missing permissions or hierarchy).",
+                    ephemeral=True,
+                )
+            else:
+                await interaction.response.send_message(
+                    f"Unable to kick {user.mention} (missing permissions or hierarchy).",
+                    ephemeral=True,
+                )
+            return  # stop if kick failed
+
+        # Log the kick
+        kick_log = discord.Embed(
+            title="User auto-kicked",
+            description=f"{user.mention} has been kicked after receiving their first warning.",
+            color=discord.Color.orange(),
         )
-        dm_kick.timestamp = now
-        await user.send(embed=dm_kick)
-        
-    except discord.Forbidden:
-        # User has DMs closed or blocked the bot
-        if interaction.response.is_done():
-            await interaction.followup.send(
-                f"Unable to DM {user.mention} before kicking them.",
-                ephemeral=True,
-            )
-        else:
-            await interaction.response.send_message(
-                f"Unable to DM {user.mention} before kicking them.",
-                ephemeral=True,
-            )
-            
-    try:
-        await user.kick(reason=f"Automatically kicked after first warning. Reason: {reason}", ephemeral=True)
-    except discord.Forbidden:
-        if interaction.response.is_done():
-            await interaction.followup.send(
-                f"Unable to kick {user.mention} (missing permissions or hierarchy).",
-                ephemeral=True,
-            )
-        else:
-            await interaction.response.send_message(
-                f"Unable to kick {user.mention} (missing permissions or hierarchy).",
-                ephemeral=True,
-            )
-        return 
+        kick_log.set_author(name=str(user), icon_url=safe_avatar_url(user))
+        kick_log.add_field(name="Reason", value=reason, inline=False)
+        kick_log.timestamp = now
 
-    kick_log = discord.Embed(
-        title="User auto-kicked",
-        description=f"{user.mention} has been kicked after receiving their first warning.",
-        color=discord.Color.orange(),
-    )
-    kick_log.set_author(name=str(user), icon_url=safe_avatar_url(user))
-    kick_log.add_field(name="Reason", value=reason, inline=False)
-    kick_log.timestamp = now
-
-    if modlog_channel:
-        await modlog_channel.send(embed=kick_log)
+        if modlog_channel:
+            await modlog_channel.send(embed=kick_log)
 
     elif warn_count == 2:
         # Automatically mute after second warn
@@ -644,6 +658,7 @@ async def lockdown_server(interaction: discord.Interaction, reason: str = "No re
     modlog_channel = guild.get_channel(CASE_LOG_CHANNEL)
     if modlog_channel:
         await modlog_channel.send(embed=log_embed)
+
 
 
 
