@@ -7,7 +7,7 @@ SERVER=1322423728457384018
 GENERAL_CHANNEL=1322423730982490185
 LOG_CHANNEL=1322430975480692789
 ADMIN_ROLES=[1322423969361432616,1322425878931705857]
-ALLOWED_GIF_DOMAINS = ["tenor.com", "giphy.com", "discord.com", ".gif", "ezgif.com"]
+ALLOWED_GIF_DOMAINS = ["tenor.com", "giphy.com", "discord.com", ".gif", "ezgif.com", "klipy.com"]
 
 def set_bot(bot_instance):
     global bot
@@ -117,4 +117,5 @@ async def check_phishing(message):
             return True
 
     return False
+
 
