@@ -15,7 +15,7 @@ Many features of this bot are hardcoded as it is only meant for use within the A
 - `/qotd add <question> [image]`: Adds a question to the queue.
 - `/qotd post`: Manually posts the next question in queue. Note that this is posted in the channel in which it is called, and must therefore be called in the #of-the-day channel
 - `/qotd view`: Lists the upcoming questions in the queue, indexed.
-- `/qotd delete <index>`: Deletes a question in the queue. Takes the int input of "index" based on its position in `/qotd view`
+- `/qotd delete <index>`: Deletes a question in the queue. Takes the int input of "index" based on its position in `/qotd view`  
 
 ### Updating QOTD
 All code for this portion of the bot is found in the `qotd.py` file. All configuration can be done in the top portion of the file, labeled "CONFIGURATION"
@@ -29,11 +29,12 @@ Explanation of variables that can be changed:
 - `EMBED_COLOR`: Color of the embed. Default is #9CEC61.
 - `QUEUE_PAGE_SIZE`: How many entries will be shown in a single page when displaying the queue.  
 
+
 ## Chore of the Day System  
 ### Commands  
 - `add_chore <name> <description> <first post time> <interval in days> <gif direct url>`: Adds a chore to the `chore` database. This command is not called in the `main.py` file as it was only used for the setup of the database. However it is kept in the files in the case that this feed needs to be edited or re-made.
 
-Valid date format is: Y-m-d H:M. Must be in America/Chicago timezone (one hour earlier than CST)
+Valid date format is: Y-m-d H:M. Must be in America/Chicago timezone (one hour earlier than CST)  
 
 ### Updating Chore of the Day  
 I'm gonna be real, chore of the day is a mess that is difficult to edit and add chores into because the chore rotation is complex. If we choose to edit it it would need to be restarted from scratch. To do this: 
@@ -43,12 +44,12 @@ I'm gonna be real, chore of the day is a mess that is difficult to edit and add 
 3. Restart the PebbleHost server. This will add the `add_chore` command into the commands list so it will show up in Discord.
 4. Manually add the chores using the command (necessary variables in order detailed above).
 
-All code for this portion of the bot is found in the `chores.py` file. All configuration can be done in the top portion of the file, labeled "CONFIGURATION"
+All code for this portion of the bot is found in the `chores.py` file. All configuration can be done in the top portion of the file, labeled "CONFIGURATION"  
 
 Explanation of variables that can be changed:
 - `ALLOWED_INTERVAL_DAYS`: Accepted intervals, in days, for the `/add_chore` command. Example: if you want to post a specific chore every 3 days, you would need to add "3" to this list.
 - `CHORE_PING_ROLE_ID`: Role ID for the chore of the day ping role.
-- `CHORE_EMBED_COLOR`: Color of the embed. Default is 0xFFA4C6.
+- `CHORE_EMBED_COLOR`: Color of the embed. Default is 0xFFA4C6.  
 
 Posting is done through the Junimaid webhook for the #of-the-day server in an embed. **The webhook URL can be updated in the .env file**    
 
