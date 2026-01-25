@@ -26,14 +26,33 @@ Explanation of variables that can be changed:
 - `AUTO_POST_HOUR`,`AUTO_POST_MINUTE`: Hour and minute at which QOTD embed is posted. This must be in the America/Chicago timezone to work with the PebbleHost server.
 - `THREAD_NAME`: Name of the thread that is created under the QOTD embed where users can post their answers.
 - `THREAD_AUTO_ARCHIVE_MINUTES`: How many minutes of inactivity in a thread before the thread is archived automatically.
-- `EMBED_COLOR`: Color of the embed. Must be a Hex code **with** the #. Default is #9CEC61.
-- `QUEUE_PAGE_SIZE`: How many entried will be shown in a single page when displaying the queue. Default is 10.
+- `EMBED_COLOR`: Color of the embed. Default is #9CEC61.
+- `QUEUE_PAGE_SIZE`: How many entries will be shown in a single page when displaying the queue.
 
-### Chore of the Day System
+## Chore of the Day System
+### Commands
 - `add_chore`: Adds a chore to the `chore` database. This command is not called in the `main.py` file as it was only used for the setup of the database. However it is kept in the files in the case that this feed needs to be edited or re-made.
 
-Posting is done through the Junimaid webhook for the #of-the-day server in an embed. **The webhook URL is hardcoded in the .env file**  
-Chores are stored in the `chore` database.
+### Updating Chore of the Day
+I'm gonna be real, chore of the day is a mess that is difficult to edit and add chores into because the chore rotation is complex. If we choose to edit it it would need to be restarted from scratch. To do this: 
+    1. From the SQL database, delete all the entries in the "chores" table. This will give us a blank slate to put chores into.
+    2. Uncomment this line in `chores.py`: #bot.tree.add_command(add_chore).
+    3. Restart the PebbleHost server. This will add the `add_chore` command into the commands list so it will show up in Discord.
+    4. Manually add the chores using the command (necessary variables in order detailed above).
+
+All code for this portion of the bot is found in the `chores.py` file. All configuration can be done in the top portion of the file, labeled "CONFIGURATION"
+
+Explanation of variables that can be changed:
+- `ALLOWED_INTERVAL_DAYS`: Accepted intervals, in days, for the `/add_chore` command. Example: if you want to post a specific chore every 3 days, you would need to add "3" to this list.
+- `CHORE_PING_ROLE_ID`: Role ID for the chore of the day ping role.
+- `CHORE_EMBED_COLOR`: Color of the embed. Default is 0xFFA4C6.
+
+Posting is done through the Junimaid webhook for the #of-the-day server in an embed. **The webhook URL can be updated in the .env file**  
+
+## Starboard
+
+
+
 
 ### Misc Commands
 - `/uwu`: Takes in text input and UwU-ifies it
