@@ -17,8 +17,17 @@ Many features of this bot are hardcoded as it is only meant for use within the A
 - `/qotd view`: Lists the upcoming questions in the queue, indexed.
 - `/qotd delete <index>`: Deletes a question in the queue. Takes the int input of "index" based on its position in `/qotd view`
 
-This bot posts chores automatically at 4:20AM CST. **This is a hardcoded element**  
-Chores are posted to the #of-the-day channel in the AD server. **This channel ID is a hardcoded element**
+### Updating QOTD
+All code for this portion of the bot is found in the `qotd.py` file. All configuration can be done in the top portion of the file, labeled "CONFIGURATION"
+
+Explanation of variables that can be changed:
+- `QOTD_CHANNEL_ID`: The channel ID where the bot will automatically post the question embed.
+- `QOTD_ROLE_ID`: The role ID for the QOTD ping role.
+- `AUTO_POST_HOUR`,`AUTO_POST_MINUTE`: Hour and minute at which QOTD embed is posted. This must be in the America/Chicago timezone to work with the PebbleHost server.
+- `THREAD_NAME`: Name of the thread that is created under the QOTD embed where users can post their answers.
+- `THREAD_AUTO_ARCHIVE_MINUTES`: How many minutes of inactivity in a thread before the thread is archived automatically.
+- `EMBED_COLOR`: Color of the embed. Must be a Hex code **with** the #. Default is #9CEC61.
+- `QUEUE_PAGE_SIZE`: How many entried will be shown in a single page when displaying the queue. Default is 10.
 
 ### Chore of the Day System
 - `add_chore`: Adds a chore to the `chore` database. This command is not called in the `main.py` file as it was only used for the setup of the database. However it is kept in the files in the case that this feed needs to be edited or re-made.
