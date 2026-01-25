@@ -3,11 +3,32 @@ import asyncio
 import json
 import os
 
+# =========================
+# CONFIGURATION
+# =========================
+
 COUNTING_CHANNEL_ID = 1322430337132789851
-LOSER_ROLE_ID = 1332969280165384254    
-MILESTONES = [10, 50, 100, 150, 200, 250, 300, 350, 400, 500, 600, 700, 800, 900, 1000, 1500, 2000, 2500]
-FUNNY_NUMBERS = [69, 420, 666, 8008]
+
+LOSER_ROLE_ID = 1332969280165384254
+LOSER_ROLE_DURATION = 300 
+
 DATA_FILE = "counting_data.json"
+
+MILESTONES = [
+    10, 50, 100, 150, 200, 250, 300, 350, 400, 500,
+    600, 700, 800, 900, 1000, 1500, 2000, 2500
+]
+FINAL_MILESTONE = 3000
+FUNNY_NUMBERS = [69, 420, 666, 8008]
+
+EMBED_COLOR = "#99FCFF"
+
+# Secret trigger for the hot men pics. Is deleted immediately after being posted to avoid user abuse
+TRIGGER_BYPASS_MESSAGE = "!zliwpj"
+
+# =========================
+# BOT HOOKUP
+# =========================
 
 bot = None
 current_count = 0
@@ -26,14 +47,15 @@ def load_count_data():
                 current_count = data.get("current_count", 0)
                 last_user_id = data.get("last_user_id", None)
         except (json.JSONDecodeError, ValueError):
-            print("Warning: current_count.json is empty or invalid. Resetting count.")
+            print(f"Warning: {DATA_FILE} is empty or invalid. Resetting count.")
             current_count = 0
             last_user_id = None
-            save_count_data()  # Create a fresh DATA_FILE
+            save_count_data()
     else:
         current_count = 0
         last_user_id = None
-        save_count_data()  # Create a fresh DATA_FILE
+        save_count_data()
+
 
 def save_count_data():
     with open(DATA_FILE, "w") as f:
@@ -53,11 +75,10 @@ async def counting_on_message(message: discord.Message):
     try:
         number = int(message.content.strip())
     except ValueError:
-        if not message.author.bot:
-            await message.delete()
+        await message.delete()
         return
 
-    # Check validity (increment of one, no double entries)
+    # Correct count
     if number == current_count + 1 and message.author.id != last_user_id:
         current_count = number
         last_user_id = message.author.id
@@ -67,53 +88,64 @@ async def counting_on_message(message: discord.Message):
             embed = discord.Embed(
                 title=f"Funny Number: {number}",
                 description="Nice.",
-                color=discord.Color.from_str("#99FCFF")
+                color=discord.Color.from_str(EMBED_COLOR),
             )
-            await message.channel.send(embed=embed, allowed_mentions=discord.AllowedMentions(roles=True))
-            triggermsg = await message.channel.send("!zliwpj")
-            await triggermsg.delete()
+            await message.channel.send(embed=embed)
+            msg = await message.channel.send(TRIGGER_BYPASS_MESSAGE)
+            await msg.delete()
 
-        elif number == 3000:
+        elif number == FINAL_MILESTONE:
             embed = discord.Embed(
                 title=f"Milestone Reached: {number}",
-                description=f"{message.author.mention} reached a milestone! This is your last milestone — this counting channel has gotten out of hand you nerds.",
-                color=discord.Color.from_str("#99FCFF")
+                description=(
+                    f"{message.author.mention} reached a milestone! "
+                    "This is your last milestone — this counting channel has gotten out of hand you nerds."
+                ),
+                color=discord.Color.from_str(EMBED_COLOR),
             )
-            await message.channel.send(embed=embed, allowed_mentions=discord.AllowedMentions(roles=True))
-            triggermsg = await message.channel.send("!zliwpj")
-            await triggermsg.delete()
+            await message.channel.send(embed=embed)
+            msg = await message.channel.send(TRIGGER_BYPASS_MESSAGE)
+            await msg.delete()
 
         elif number in MILESTONES:
             embed = discord.Embed(
                 title=f"Milestone Reached: {number}",
-                description=f"{message.author.mention} reached a milestone! Here's a dopamine hit for knowing how to count I guess.",
-                color=discord.Color.from_str("#99FCFF")
+                description=(
+                    f"{message.author.mention} reached a milestone! "
+                    "Here's a dopamine hit for knowing how to count I guess."
+                ),
+                color=discord.Color.from_str(EMBED_COLOR),
             )
-            await message.channel.send(embed=embed, allowed_mentions=discord.AllowedMentions(roles=True))
-            triggermsg = await message.channel.send("!zliwpj")
-            await triggermsg.delete()
-        
+            await message.channel.send(embed=embed)
+            msg = await message.channel.send(TRIGGER_BYPASS_MESSAGE)
+            await msg.delete()
+
+    # Wrong count → reset
     else:
-        # Wrong number
         await message.delete()
+
         embed = discord.Embed(
             title="Counting Reset",
-            description=f"{message.author.mention} messed up the count at **{current_count}** and has been given the {loser_role.mention} role! The count has been reset to **0**.",
-            color=discord.Color.from_str("#99FCFF")
+            description=(
+                f"{message.author.mention} messed up the count at **{current_count}** and has been given the "
+                f"{loser_role.mention} role! The count has been reset to **0**."
+            ),
+            color=discord.Color.from_str(EMBED_COLOR),
         )
-        await message.channel.send(embed=embed, allowed_mentions=discord.AllowedMentions(roles=True))
+        await message.channel.send(embed=embed)
+
         current_count = 0
         last_user_id = None
         save_count_data()
 
-        # Add loser role
         if loser_role:
             await message.author.add_roles(loser_role)
-            await asyncio.sleep(300)  # 5 minutes
+            await asyncio.sleep(LOSER_ROLE_DURATION)
             await message.author.remove_roles(loser_role)
+
 
 def set_bot(bot_instance):
     global bot
     bot = bot_instance
-    load_count_data()  # Load data on startup
+    load_count_data()
     bot.add_listener(counting_on_message, "on_message")
