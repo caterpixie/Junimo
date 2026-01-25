@@ -10,13 +10,11 @@ Junimo is a Discord bot created for the AD server. Its current features include:
 
 Many features of this bot are hardcoded as it is only meant for use within the AD server. This README will detail what all the features do as well as the basics on how to edit these hardcoded features.
 
-## Features
-
-### QOTD System
-- `/qotd add`: Adds a question to the queue.
+## QOTD System
+- `/qotd add <question> [image]`: Adds a question to the queue.
 - `/qotd post`: Manually posts the next question in queue. Note that this is posted in the channel in which it is called, and must therefore be called in the #of-the-day channel
-- `/qotd view`: Lists the upcoming questions in the queue.
-- `/qotd delete`: Deletes a question in the queue. Takes the int input of "index" based on its position in `/qotd view`
+- `/qotd view`: Lists the upcoming questions in the queue, indexed.
+- `/qotd delete <index>`: Deletes a question in the queue. Takes the int input of "index" based on its position in `/qotd view`
 
 This bot posts chores automatically at 4:20AM CST. **This is a hardcoded element**  
 Chores are posted to the #of-the-day channel in the AD server. **This channel ID is a hardcoded element**
