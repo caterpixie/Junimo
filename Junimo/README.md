@@ -1,6 +1,12 @@
 # Junimo
 
-Junimo is a Discord bot created for the AD server. Its current features include a QOTD system which posts automatically daily, a Chore of the Day feed which posts twice a day, as well some smaller text features (/uwu)
+Junimo is a Discord bot created for the AD server. Its current features include:
+- A Question of the Day (QOTD) system
+- Starboard
+- A counting channel with rewards + penalties
+- A chore of the day reminder system
+- Text triggers
+- An `/uwu` command
 
 As this bot is, for the moment, not expected to be used in other servers, some elements from the AD guild are hardcoded into the files. These will be detailed below within each feature.
 
