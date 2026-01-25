@@ -19,8 +19,8 @@ COUNTER_FILE = "confession_counter.txt"
 LATEST_CONFESSION_FILE = "latest_confession.txt"
 PENDING_CONFESSIONS_FILE = "pending_confessions.json"
 
-DENIAL_LOG_TIMEZONE = "America/Chicago"  # used for /confession denials display
-DENIAL_LOG_TZ_LABEL = "CST"              # label shown in embed
+DENIAL_LOG_TIMEZONE = "America/Chicago"  
+DENIAL_LOG_TZ_LABEL = "CST"            
 
 COLOR_CONFESSION = "#DCA8FF"
 COLOR_REPLY = "#ECD0FF"
@@ -502,3 +502,4 @@ async def denial_log(interaction: discord.Interaction, user: discord.Member):
 @app_commands.context_menu(name="Reply to Confession")
 async def reply_to_confession_context(interaction: discord.Interaction, message: discord.Message):
     await interaction.response.send_modal(ConfessionReplyModal(message.id))
+
