@@ -7,7 +7,28 @@ import aiohttp
 import os
 import aiomysql
 
+# =========================
+# CONFIGURATION
+# =========================
+
+# Do not change the timezone or the datetime format. 
+# It is necessary for it to be in America/Chicago to work with the PebbleHost server.
+TIMEZONE_NAME = "America/Chicago"
+DATETIME_FORMAT = "%Y-%m-%d %H:%M"
+
+# See .env file to change the webhook URL
+WEBHOOK_ENV_VAR = "WEBHOOK_URL"
+
+ALLOWED_INTERVAL_DAYS = (7, 14, 28)
+
+CHORE_PING_ROLE_ID = "1332568557313200188"
+CHORE_EMBED_COLOR = 0xFFA4C6
+
+# =========================
+# BOT HOOKUP
+# =========================
 bot = None
+
 
 def set_bot(bot_instance):
     global bot
@@ -26,10 +47,13 @@ def set_bot(bot_instance):
         try:
             await interaction.response.defer(ephemeral=True)
 
-            post_time = datetime.strptime(first_post_at, "%Y-%m-%d %H:%M").replace(tzinfo=ZoneInfo("America/Chicago"))
+            post_time = datetime.strptime(first_post_at, DATETIME_FORMAT).replace(
+                tzinfo=ZoneInfo(TIMEZONE_NAME)
+            )
 
-            if interval_days not in (7, 14, 28):
-                await interaction.followup.send("Interval must be 7, 14, or 28 days.")
+            if interval_days not in ALLOWED_INTERVAL_DAYS:
+                allowed = ", ".join(map(str, ALLOWED_INTERVAL_DAYS))
+                await interaction.followup.send(f"Interval must be {allowed} days.")
                 return
 
             async with bot.pool.acquire() as conn:
@@ -39,31 +63,39 @@ def set_bot(bot_instance):
                         INSERT INTO chores (guild_id, name, description, first_post_at, interval_days, gif_url)
                         VALUES (%s, %s, %s, %s, %s, %s)
                         """,
-                        (interaction.guild.id, name, description, post_time, interval_days, gif_url)
+                        (interaction.guild.id, name, description, post_time, interval_days, gif_url),
                     )
 
             await interaction.followup.send(f"Chore added: {description}")
+
         except ValueError:
-            await interaction.followup.send("Date/time format must be YYYY-MM-DD HH:MM (24-hour)")
+            await interaction.followup.send(
+                f"Date/time format must be {DATETIME_FORMAT.replace('%Y', 'YYYY').replace('%m', 'MM').replace('%d', 'DD').replace('%H', 'HH').replace('%M', 'MM')} (24-hour)"
+            )
         except Exception as e:
             print("ERROR in add_chore:", e)
             await interaction.followup.send("Something went wrong adding the chore.")
 
+    #bot.tree.add_command(add_chore)
+
+
 @tasks.loop(minutes=1)
 async def auto_post_chores():
-    now = datetime.now(ZoneInfo("America/Chicago"))
+    now = datetime.now(ZoneInfo(TIMEZONE_NAME))
 
     async with bot.pool.acquire() as conn:
         async with conn.cursor(aiomysql.DictCursor) as cur:
-            await cur.execute("""
+            await cur.execute(
+                """
                 SELECT * FROM chores
                 WHERE is_active = TRUE
-            """)
+                """
+            )
             chores = await cur.fetchall()
 
-    webhook_url = os.getenv("WEBHOOK_URL")
+    webhook_url = os.getenv(WEBHOOK_ENV_VAR)
     if not webhook_url:
-        print("Webhook URL not found.")
+        print(f"{WEBHOOK_ENV_VAR} not found.")
         return
 
     async with aiohttp.ClientSession() as session:
@@ -72,13 +104,11 @@ async def auto_post_chores():
             last_posted = chore["last_posted"]
             interval = chore["interval_days"]
 
-            # Tag naive timestamps with America/Chicago timezone
             if first_post_at and first_post_at.tzinfo is None:
-                first_post_at = first_post_at.replace(tzinfo=ZoneInfo("America/Chicago"))
+                first_post_at = first_post_at.replace(tzinfo=ZoneInfo(TIMEZONE_NAME))
             if last_posted and last_posted.tzinfo is None:
-                last_posted = last_posted.replace(tzinfo=ZoneInfo("America/Chicago"))
+                last_posted = last_posted.replace(tzinfo=ZoneInfo(TIMEZONE_NAME))
 
-            # Skip if it's not yet time for the first post
             if last_posted is None:
                 if now < first_post_at:
                     continue
@@ -87,29 +117,25 @@ async def auto_post_chores():
                 if now < next_post:
                     continue
 
-            # Post the chore
             embed = {
                 "title": chore["name"],
                 "description": chore["description"],
-                "color": 0xFFA4C6,
+                "color": CHORE_EMBED_COLOR,
             }
             if chore["gif_url"]:
                 embed["image"] = {"url": chore["gif_url"]}
 
-            role_id = "1332568557313200188"
             payload = {
-                "content": f"<@&{role_id}>",
+                "content": f"<@&{CHORE_PING_ROLE_ID}>",
                 "embeds": [embed],
-                "allowed_mentions": {
-                    "roles": [role_id]
-                }
+                "allowed_mentions": {"roles": [CHORE_PING_ROLE_ID]},
             }
-            await session.post(webhook_url, json=payload)
 
-            # Store now as-is (in America/Chicago)
+            await session.post(webhook_url, json=payload)
+            
             async with bot.pool.acquire() as conn:
                 async with conn.cursor() as cur:
                     await cur.execute(
                         "UPDATE chores SET last_posted = %s WHERE id = %s",
-                        (now, chore["id"])
+                        (now, chore["id"]),
                     )
