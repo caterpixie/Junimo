@@ -37,10 +37,11 @@ Valid date format is: Y-m-d H:M. Must be in America/Chicago timezone (one hour e
 
 ### Updating Chore of the Day
 I'm gonna be real, chore of the day is a mess that is difficult to edit and add chores into because the chore rotation is complex. If we choose to edit it it would need to be restarted from scratch. To do this: 
-    1. From the SQL database, delete all the entries in the "chores" table. This will give us a blank slate to put chores into.
-    2. Uncomment this line in `chores.py`: #bot.tree.add_command(add_chore).
-    3. Restart the PebbleHost server. This will add the `add_chore` command into the commands list so it will show up in Discord.
-    4. Manually add the chores using the command (necessary variables in order detailed above).
+
+1. From the SQL database, delete all the entries in the "chores" table. This will give us a blank slate to put chores into.
+2. Uncomment this line in `chores.py`: #bot.tree.add_command(add_chore).
+3. Restart the PebbleHost server. This will add the `add_chore` command into the commands list so it will show up in Discord.
+4. Manually add the chores using the command (necessary variables in order detailed above).
 
 All code for this portion of the bot is found in the `chores.py` file. All configuration can be done in the top portion of the file, labeled "CONFIGURATION"
 
