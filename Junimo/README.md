@@ -27,15 +27,15 @@ Explanation of variables that can be changed:
 - `THREAD_NAME`: Name of the thread that is created under the QOTD embed where users can post their answers.
 - `THREAD_AUTO_ARCHIVE_MINUTES`: How many minutes of inactivity in a thread before the thread is archived automatically.
 - `EMBED_COLOR`: Color of the embed. Default is #9CEC61.
-- `QUEUE_PAGE_SIZE`: How many entries will be shown in a single page when displaying the queue.
+- `QUEUE_PAGE_SIZE`: How many entries will be shown in a single page when displaying the queue.  
 
-## Chore of the Day System
-### Commands
+## Chore of the Day System  
+### Commands  
 - `add_chore <name> <description> <first post time> <interval in days> <gif direct url>`: Adds a chore to the `chore` database. This command is not called in the `main.py` file as it was only used for the setup of the database. However it is kept in the files in the case that this feed needs to be edited or re-made.
 
 Valid date format is: Y-m-d H:M. Must be in America/Chicago timezone (one hour earlier than CST)
 
-### Updating Chore of the Day
+### Updating Chore of the Day  
 I'm gonna be real, chore of the day is a mess that is difficult to edit and add chores into because the chore rotation is complex. If we choose to edit it it would need to be restarted from scratch. To do this: 
 
 1. From the SQL database, delete all the entries in the "chores" table. This will give us a blank slate to put chores into.
@@ -50,7 +50,7 @@ Explanation of variables that can be changed:
 - `CHORE_PING_ROLE_ID`: Role ID for the chore of the day ping role.
 - `CHORE_EMBED_COLOR`: Color of the embed. Default is 0xFFA4C6.
 
-Posting is done through the Junimaid webhook for the #of-the-day server in an embed. **The webhook URL can be updated in the .env file**  
+Posting is done through the Junimaid webhook for the #of-the-day server in an embed. **The webhook URL can be updated in the .env file**    
 
 ## Starboard
 
