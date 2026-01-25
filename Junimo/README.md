@@ -78,7 +78,7 @@ Explanation of variables that can be changed:
 - `TRIGGER_BYPASS_MESSAGE`: Secret trigger for the hot men pics. Is deleted immediately after being posted to avoid user abuse. If it ends up getting abused/found out, it can be changed to another random string as long as the trigger in the triggers SQL table is also changed.</br></br>
 
 ## Misc Commands
-- `/uwu`: Takes in text input and UwU-ifies it
+- `/uwu`: Takes in text input and UwU-ifies it</br></br>
 
 ## Databases
 `qotds`
@@ -115,6 +115,7 @@ CREATE TABLE triggers (
   response_text TEXT
 );
 ```
+</br></br>
 
 ## Dependencies
 - `discord.py`
