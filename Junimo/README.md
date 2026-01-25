@@ -29,7 +29,6 @@ Explanation of variables that can be changed:
 - `EMBED_COLOR`: Color of the embed. Default is #9CEC61.
 - `QUEUE_PAGE_SIZE`: How many entries will be shown in a single page when displaying the queue.</br></br>
 
-
 ## Chore of the Day System</br>
 ### Commands  
 - `add_chore <name> <description> <first post time> <interval in days> <gif direct url>`: Adds a chore to the `chore` database. This command is not called in the `main.py` file as it was only used for the setup of the database. However it is kept in the files in the case that this feed needs to be edited or re-made.
@@ -49,14 +48,34 @@ All code for this portion of the bot is found in the `chores.py` file. All confi
 Explanation of variables that can be changed:
 - `ALLOWED_INTERVAL_DAYS`: Accepted intervals, in days, for the `/add_chore` command. Example: if you want to post a specific chore every 3 days, you would need to add "3" to this list.
 - `CHORE_PING_ROLE_ID`: Role ID for the chore of the day ping role.
-- `CHORE_EMBED_COLOR`: Color of the embed. Default is 0xFFA4C6.  
+- `CHORE_EMBED_COLOR`: Color of the embed. Default is 0xFFA4C6.</br></br>
 
 Posting is done through the Junimaid webhook for the #of-the-day server in an embed. **The webhook URL can be updated in the .env file**</br></br>  
 
-## Starboard
+## Starboard</br>
+### Updating Starboard
+All code for this portion of the bot is found in the `starboard.py` file. All configuration can be done in the top portion of the file, labeled "CONFIGURATION"
 
+Explanation of variables that can be changed:
+- `STARBOARD_CHANNEL_ID`: Channel ID where starred messages will be posted.
+- `EXCLUDED_CHANNEL_IDS`: Array of channels where starred messages will be ignored.
+- `STAR_EMOJI`: Emoji used to star messages and send them to the starboard.
+- `STAR_THRESHOLD`: Number of reactions needed to be sent to the starboard channel.
+- `EMBED_COLOR`: Color of the embed. Default is #9CEC61.</br></br>
 
+## Counting
+### Updating Counting
+All code for this portion of the bot is found in the `counting.py` file. All configuration can be done in the top portion of the file, labeled "CONFIGURATION"
 
+Explanation of variables that can be changed:
+- `COUNTING_CHANNEL_ID`: Channel ID where counting is possible.
+- `LOSER_ROLE_ID`: Role ID for punishment role.
+- `LOSER_ROLE_DURATION`: Duration of punishment role, in seconds.
+- `MILESTONES`: Array of numbers at which a "reward" (hot man pic) will be posted using the secret trigger.
+- `FINAL_MILESTONE`: A special last milestone
+- `FUNNY_NUMBERS`: An array of special milestones because they are funny numbers.
+- `EMBED_COLOR`: Color of the embed. Default is #99FCFF.
+- `TRIGGER_BYPASS_MESSAGE`: Secret trigger for the hot men pics. Is deleted immediately after being posted to avoid user abuse. If it ends up getting abused/found out, it can be changed to another random string as long as the trigger in the triggers SQL table is also changed.</br></br>
 
 ## Misc Commands
 - `/uwu`: Takes in text input and UwU-ifies it
@@ -84,6 +103,16 @@ CREATE TABLE chores (
     gif_url TEXT,
     last_posted DATETIME,
     is_active BOOLEAN DEFAULT TRUE
+);
+```
+`triggers`
+```sql
+CREATE TABLE triggers (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  guild_id BIGINT,
+  trigger_text TEXT,
+  response_type VARCHAR(20),
+  response_text TEXT
 );
 ```
 
