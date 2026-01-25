@@ -8,7 +8,7 @@ Junimo is a Discord bot created for the AD server. Its current features include:
 - Text triggers
 - An `/uwu` command
 
-Many features of this bot are hardcoded as it is only meant for use within the AD server. This README will detail what all the features do as well as the basics on how to edit these hardcoded features.
+Many features of this bot are hardcoded as it is only meant for use within the AD server. This README will detail what all the features do as well as the basics on how to edit these hardcoded features.<\br>
 
 ## QOTD System
 ### Commands
