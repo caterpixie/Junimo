@@ -115,7 +115,7 @@ CREATE TABLE triggers (
   response_text TEXT
 );
 ```
-</br></br>
+</br>
 
 ## Dependencies
 - `discord.py`
