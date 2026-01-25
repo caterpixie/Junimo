@@ -31,7 +31,9 @@ Explanation of variables that can be changed:
 
 ## Chore of the Day System
 ### Commands
-- `add_chore`: Adds a chore to the `chore` database. This command is not called in the `main.py` file as it was only used for the setup of the database. However it is kept in the files in the case that this feed needs to be edited or re-made.
+- `add_chore <name> <description> <first post time> <interval in days> <gif direct url>`: Adds a chore to the `chore` database. This command is not called in the `main.py` file as it was only used for the setup of the database. However it is kept in the files in the case that this feed needs to be edited or re-made.
+
+Valid date format is: Y-m-d H:M. Must be in America/Chicago timezone (one hour earlier than CST)
 
 ### Updating Chore of the Day
 I'm gonna be real, chore of the day is a mess that is difficult to edit and add chores into because the chore rotation is complex. If we choose to edit it it would need to be restarted from scratch. To do this: 
@@ -54,7 +56,7 @@ Posting is done through the Junimaid webhook for the #of-the-day server in an em
 
 
 
-### Misc Commands
+## Misc Commands
 - `/uwu`: Takes in text input and UwU-ifies it
 
 ## Databases
