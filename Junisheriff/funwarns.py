@@ -15,7 +15,7 @@ BALD_ROLE_ID = 1411215127255973938
 PISS_DURATION_SECONDS = 900     
 FOOT_DURATION_SECONDS = 1800  
 
-ALLOWED_GUILD_ID = None  #For testing
+ALLOWED_GUILD_ID = 123456789012345678
 
 EMBED_COLOR_HEX = "#99FCFF"
 PISS_EMOJI = "<:piss:1368444697638600715>"
@@ -231,4 +231,5 @@ async def ungag(interaction: discord.Interaction, user: Member):
         await interaction.response.send_message("I don't have permission to remove the timeout.", ephemeral=True)
     except discord.HTTPException as e:
         await interaction.response.send_message(f"Failed to remove timeout: {e}", ephemeral=True)
+
 
