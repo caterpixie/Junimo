@@ -11,6 +11,7 @@ Junimo is a Discord bot created for the AD server. Its current features include:
 Many features of this bot are hardcoded as it is only meant for use within the AD server. This README will detail what all the features do as well as the basics on how to edit these hardcoded features.
 
 ## QOTD System
+### Commands
 - `/qotd add <question> [image]`: Adds a question to the queue.
 - `/qotd post`: Manually posts the next question in queue. Note that this is posted in the channel in which it is called, and must therefore be called in the #of-the-day channel
 - `/qotd view`: Lists the upcoming questions in the queue, indexed.
