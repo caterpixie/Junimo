@@ -14,7 +14,7 @@ Explanation of variables that can be changed:
 - `LOG_CHANNEL_ID`: Channel ID for the case-logs channel.
 - `ADMIN_ROLE_IDS`: Role IDs for the moderation permission roles. Used to bypass link posting but will not bypass the slur filter.
 - `ALLOWED_GIF_DOMAINS`: Used to bypass link filter for specific domains in General Chat.
-- `SLUR_LIST_FILE`: Text file where all recognized slurs are located. Can easily be edited/added to by editing this text file.</br></br>
+- `SLUR_LIST_FILE`: Text file where all recognized slurs are located. Can easily be edited/added to by editing this text file in PebbleHost only.</br></br>
 
 ## Logging
 All code for this portion of the bot is found in the log.py file. All configuration can be done in the top portion of the file, labeled "CONFIGURATION"
