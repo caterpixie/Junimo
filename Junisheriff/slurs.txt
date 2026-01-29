@@ -74,9 +74,6 @@ gipp
 kyke
 p3do
 p3dos
+testslur
 p*do
 p*dos
-testmeonlysoidontgetcancelled
-
-
-
