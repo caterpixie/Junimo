@@ -207,7 +207,7 @@ async def warn(interaction: discord.Interaction, user: discord.Member, reason: s
         # Auto-kick after 1st warn
         try:
             dm_kick = discord.Embed(
-                description="You have been automatically kicked from the After Dark server after receiving a warning.",
+                description="You have been automatically kicked from the After Dark server after receiving a warning. You can re-join whenever you'd like, but please make sure to read the rules. Another warning will lead to being muted.",
                 color=discord.Color.red(),
             )
             dm_kick.timestamp = now
@@ -666,3 +666,4 @@ async def lockdown_server(interaction: discord.Interaction, reason: str = "No re
     modlog_channel = guild.get_channel(CASE_LOG_CHANNEL_ID)
     if modlog_channel:
         await modlog_channel.send(embed=log_embed)
+
