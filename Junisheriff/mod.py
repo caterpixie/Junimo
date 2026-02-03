@@ -440,6 +440,89 @@ async def ban(
         print("Modlog channel not found or CASE_LOG_CHANNEL_ID is incorrect.")
 
 
+@mod_group.command(name="unban", description="Unbans a user by their ID")
+async def unban(
+    interaction: discord.Interaction,
+    user_id: str,
+    reason: str
+):
+    await interaction.response.defer(ephemeral=True)
+
+    # Validate ID
+    try:
+        target_id = int(user_id)
+    except ValueError:
+        return await interaction.followup.send(
+            "This command uses the user ID to look up users int he ban list. Please provide a valid user ID.",
+            ephemeral=True
+        )
+
+    guild = interaction.guild
+    now = datetime.datetime.now(datetime.timezone.utc)
+
+    # Fetch ban entry (so we can confirm they're actually banned + get user object)
+    try:
+        ban_entry = await guild.fetch_ban(discord.Object(id=target_id))
+    except discord.NotFound:
+        return await interaction.followup.send(
+            "That user is not currently banned (or the ID is wrong).",
+            ephemeral=True
+        )
+    except discord.Forbidden:
+        return await interaction.followup.send(
+            "I don't have permission to view bans / unban users. (Need Ban Members permission.)",
+            ephemeral=True
+        )
+    except discord.HTTPException as e:
+        return await interaction.followup.send(
+            f"Failed to fetch ban info: {e}",
+            ephemeral=True
+        )
+
+    banned_user = ban_entry.user  # discord.User
+
+    # Unban
+    try:
+        await guild.unban(banned_user, reason=f"{reason} | Unbanned by {interaction.user} ({interaction.user.id})")
+    except discord.Forbidden:
+        return await interaction.followup.send(
+            "I don't have permission to unban users. (Check role permissions/hierarchy.)",
+            ephemeral=True
+        )
+    except discord.HTTPException as e:
+        return await interaction.followup.send(
+            f"Failed to unban: {e}",
+            ephemeral=True
+        )
+
+    # Confirm to moderator
+    confirm_embed = discord.Embed(
+        description=f"Unbanned {banned_user} (`{banned_user.id}`).\nReason: {reason}",
+        color=discord.Color.from_str(EMBED_COLOR_HEX),
+        timestamp=now
+    )
+    await interaction.followup.send(embed=confirm_embed, ephemeral=True)
+
+    # Log to modlog
+    modlog_channel = guild.get_channel(CASE_LOG_CHANNEL_ID)
+    if modlog_channel:
+        log_embed = discord.Embed(
+            title="User unbanned",
+            color=discord.Color.green(),
+            timestamp=now
+        )
+        log_embed.set_author(name=str(banned_user), icon_url=safe_avatar_url(banned_user))
+        log_embed.add_field(name="User", value=f"{banned_user} (`{banned_user.id}`)", inline=False)
+        log_embed.add_field(name="Moderator", value=interaction.user.mention, inline=False)
+        log_embed.add_field(name="Reason", value=reason, inline=False)
+        log_embed.set_footer(text=f"ID:{banned_user.id}")
+
+        try:
+            await modlog_channel.send(embed=log_embed)
+        except Exception as e:
+            print(f"Failed to send unban log to modlog channel: {e}")
+
+
 # ================= KICKING COMMANDS =================
 
 @mod_group.command(name="kick", description="Kicks a user")
@@ -675,6 +758,7 @@ async def lockdown_server(interaction: discord.Interaction, reason: str = "No re
     modlog_channel = guild.get_channel(CASE_LOG_CHANNEL_ID)
     if modlog_channel:
         await modlog_channel.send(embed=log_embed)
+
 
 
 
