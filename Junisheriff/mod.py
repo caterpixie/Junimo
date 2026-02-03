@@ -497,7 +497,7 @@ async def unban(
 
     # Confirm to moderator
     confirm_embed = discord.Embed(
-        description=f"Unbanned {banned_user} (`{banned_user.id}`).\nReason: {reason}",
+        description=f"Unbanned {banned_user} (ID: `{banned_user.id}`).\n\nReason: {reason}",
         color=discord.Color.from_str(EMBED_COLOR_HEX),
         timestamp=now
     )
@@ -512,9 +512,9 @@ async def unban(
             timestamp=now
         )
         log_embed.set_author(name=str(banned_user), icon_url=safe_avatar_url(banned_user))
-        log_embed.add_field(name="User", value=f"{banned_user} (`{banned_user.id}`)", inline=False)
-        log_embed.add_field(name="Moderator", value=interaction.user.mention, inline=False)
-        log_embed.add_field(name="Reason", value=reason, inline=False)
+        log_embed.add_field(name="User", value=f"{banned_user} (`{banned_user.id}`)")
+        log_embed.add_field(name="Moderator", value=interaction.user.mention)
+        log_embed.add_field(name="Reason", value=reason)
         log_embed.set_footer(text=f"ID:{banned_user.id}")
 
         try:
@@ -758,6 +758,7 @@ async def lockdown_server(interaction: discord.Interaction, reason: str = "No re
     modlog_channel = guild.get_channel(CASE_LOG_CHANNEL_ID)
     if modlog_channel:
         await modlog_channel.send(embed=log_embed)
+
 
 
 
