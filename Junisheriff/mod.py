@@ -380,7 +380,7 @@ async def ban(
     user: discord.Member,
     reason: str,
     appeal: bool = True,
-    preserve_messages: bool = False
+    preserve_messages: bool = True
 ):
     await interaction.response.defer(ephemeral=True)
 
@@ -666,5 +666,6 @@ async def lockdown_server(interaction: discord.Interaction, reason: str = "No re
     modlog_channel = guild.get_channel(CASE_LOG_CHANNEL_ID)
     if modlog_channel:
         await modlog_channel.send(embed=log_embed)
+
 
 
