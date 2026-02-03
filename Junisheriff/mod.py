@@ -169,6 +169,7 @@ async def warn(interaction: discord.Interaction, user: discord.Member, reason: s
     logembed.add_field(name="Moderator", value=interaction.user.mention)
     logembed.add_field(name="Reason", value=reason)
     logembed.timestamp = now
+    logembed.set_footer(text=user.id)
 
     modlog_channel = interaction.guild.get_channel(CASE_LOG_CHANNEL_ID)
     if modlog_channel:
@@ -666,6 +667,7 @@ async def lockdown_server(interaction: discord.Interaction, reason: str = "No re
     modlog_channel = guild.get_channel(CASE_LOG_CHANNEL_ID)
     if modlog_channel:
         await modlog_channel.send(embed=log_embed)
+
 
 
 
