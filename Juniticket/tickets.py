@@ -56,7 +56,6 @@ TICKET_TYPES = {
 
 # For the ticket panel in the support channel
 TICKET_PANEL = {
-    "header_image": "https://i.imgur.com/aJMFW3t.png",
     "main_description": (
         "Still need to talk to staff about your mods, need to report a bug, or have some questions about the server?\n\nClick the button below to create a ticket!"
     ),
@@ -534,7 +533,8 @@ async def embed_setup(interaction: discord.Interaction):
     if not ticket_embed_channel:
         await interaction.response.send_message("Error: Ticket/support channel not found.", ephemeral=True)
         return
-    
+
+   """
     headers = {
     "User-Agent": "Mozilla/5.0" 
     }
@@ -560,6 +560,7 @@ async def embed_setup(interaction: discord.Interaction):
 
     buf = io.BytesIO(data)
     buf.seek(0)
+    """
 
     file = discord.File("assets/ticket_header.png", filename="ticket_header.png")
 
