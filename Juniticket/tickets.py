@@ -224,11 +224,11 @@ async def log_ticket_close(
 
     if participants:
         formatted = [
-            f"{m.mention} (`{m.id}`)"
+            f"{m.mention} (`{m.id}`)\n"
             for m in participants[:20]
         ]
 
-        mentions = ", ".join(formatted)
+        mentions = " ".join(formatted)
 
         if len(participants) > 20:
             mentions += f"\n+ {len(participants) - 20} more"
