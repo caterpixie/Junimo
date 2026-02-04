@@ -12,7 +12,6 @@ from datetime import datetime, timezone
 # CONFIGURATION
 # ============================================================
 
-HEADER_IMAGE = "https://i.imgur.com/aJMFW3t.png"
 EMBED_LOG_COLOR = "#D71919"
 
 TICKET_CHANNEL_ID = 1423892472097931326
@@ -562,7 +561,7 @@ async def embed_setup(interaction: discord.Interaction):
     buf = io.BytesIO(data)
     buf.seek(0)
 
-    file = discord.File(fp=buf, filename="ticket-banner.png")
+    file = discord.File("assets/ticket_header.png", filename="ticket_header.png")
 
     title_embed = discord.Embed(
         color=discord.Color.from_str(TICKET_PANEL["color"])
