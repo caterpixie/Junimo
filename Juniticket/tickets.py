@@ -546,7 +546,7 @@ async def embed_setup(interaction: discord.Interaction):
         color=discord.Color.from_str(TICKET_PANEL["color"])
     )
 
-    await ticket_embed_channel.send(embed=title_embed, file=header_file)
+    await ticket_embed_channel.send(file=header_file)
 
     if TICKET_PANEL["troubleshooting"]["enabled"]:
         troubleshooting_embed = discord.Embed(
