@@ -35,7 +35,8 @@ class Client(commands.Bot):
 
 
 intents = discord.Intents.default()
-intents.message_content = True 
+intents.message_content = True
+intents.members = True
 
 bot = Client(command_prefix="??", intents=intents)
 
