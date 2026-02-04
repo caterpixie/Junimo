@@ -534,33 +534,31 @@ async def embed_setup(interaction: discord.Interaction):
         await interaction.response.send_message("Error: Ticket/support channel not found.", ephemeral=True)
         return
 
-   """
-    headers = {
-    "User-Agent": "Mozilla/5.0" 
-    }
-    
-    async with aiohttp.ClientSession(headers=headers) as session:
-        async with session.get(HEADER_IMAGE, allow_redirects=True) as resp:
-            if resp.status != 200:
-                await interaction.response.send_message(
-                    f"Failed to fetch image (HTTP {resp.status}).",
-                    ephemeral=True
-                )
-                return
-
-            content_type = resp.headers.get("Content-Type", "")
-            data = await resp.read()
-
-    if not content_type.startswith("image/") or data[:10].lower().startswith(b"<!doctype") or data[:6].lower().startswith(b"<html"):
-        await interaction.response.send_message(
-            "Imgur returned a webpage instead of an image (blocked/redirected). Try using a Discord attachment or another direct image host.",
-            ephemeral=True
-        )
-        return
-
-    buf = io.BytesIO(data)
-    buf.seek(0)
-    """
+#    headers = {
+#    "User-Agent": "Mozilla/5.0" 
+#    }
+#    
+#    async with aiohttp.ClientSession(headers=headers) as session:
+#        async with session.get(HEADER_IMAGE, allow_redirects=True) as resp:
+#            if resp.status != 200:
+#                await interaction.response.send_message(
+#                    f"Failed to fetch image (HTTP {resp.status}).",
+#                   ephemeral=True
+#                )
+#                return
+#
+#            content_type = resp.headers.get("Content-Type", "")
+#            data = await resp.read()
+#
+#    if not content_type.startswith("image/") or data[:10].lower().startswith(b"<!doctype") or data[:6].lower().startswith(b"<html"):
+#        await interaction.response.send_message(
+#            "Imgur returned a webpage instead of an image (blocked/redirected). Try using a Discord attachment or another direct image host.",
+#            ephemeral=True
+#        )
+#        return
+#
+#   buf = io.BytesIO(data)
+#    buf.seek(0)
 
     file = discord.File("assets/ticket_header.png", filename="ticket_header.png")
 
