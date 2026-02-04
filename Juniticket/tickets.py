@@ -533,41 +533,20 @@ async def embed_setup(interaction: discord.Interaction):
     if not ticket_embed_channel:
         await interaction.response.send_message("Error: Ticket/support channel not found.", ephemeral=True)
         return
+       
+    header_file = discord.File("ticket-header.png", filename="ticket-header.png")
 
-#    s = {
-#    "User-Agent": "Mozilla/5.0" 
-#    }
-#    
-#    async with aiohttp.ClientSession(s=s) as session:
-#        async with session.get(_IMAGE, allow_redirects=True) as resp:
-#            if resp.status != 200:
-#                await interaction.response.send_message(
-#                    f"Failed to fetch image (HTTP {resp.status}).",
-#                   ephemeral=True
-#                )
-#                return
-#
-#            content_type = resp.s.get("Content-Type", "")
-#            data = await resp.read()
-#
-#    if not content_type.startswith("image/") or data[:10].lower().startswith(b"<!doctype") or data[:6].lower().startswith(b"<html"):
-#        await interaction.response.send_message(
-#            "Imgur returned a webpage instead of an image (blocked/redirected). Try using a Discord attachment or another direct image host.",
-#            ephemeral=True
-#        )
-#        return
-#
-#   buf = io.BytesIO(data)
-#    buf.seek(0)
-
-    file = discord.File("ticket-header.png", filename="ticket-header.png")
-      
     title_embed = discord.Embed(
-           color=discord.Color.from_str(TICKET_PANEL["color"])
+        color=discord.Color.from_str(TICKET_PANEL["color"])
     )
     title_embed.set_image(url="attachment://ticket_header.png")
-      
-    await ticket_embed_channel.send(embed=title_embed, file=file)
+
+    main_embed = discord.Embed(
+        description=TICKET_PANEL["main_description"],
+        color=discord.Color.from_str(TICKET_PANEL["color"])
+    )
+
+    await ticket_embed_channel.send(embed=title_embed, file=header_file)
 
     if TICKET_PANEL["troubleshooting"]["enabled"]:
         troubleshooting_embed = discord.Embed(
@@ -577,4 +556,5 @@ async def embed_setup(interaction: discord.Interaction):
         await ticket_embed_channel.send(embed=troubleshooting_embed)
 
     await ticket_embed_channel.send(embed=main_embed, view=TicketPanelView())
+
     await interaction.response.send_message("Ticket panel sent!", ephemeral=True)
