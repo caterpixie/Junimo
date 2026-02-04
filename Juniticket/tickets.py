@@ -560,7 +560,7 @@ async def embed_setup(interaction: discord.Interaction):
 #   buf = io.BytesIO(data)
 #    buf.seek(0)
 
-    file = discord.File("assets/ticket_header.png", filename="ticket_header.png")
+    file = discord.File("assets/ticket-header.png", filename="ticket-header.png")
       
     title_embed = discord.Embed(
            color=discord.Color.from_str(TICKET_PANEL["color"])
