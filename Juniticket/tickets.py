@@ -14,41 +14,43 @@ from datetime import datetime, timezone
 
 EMBED_LOG_COLOR = "#D71919"
 
-TICKET_CHANNEL_ID = 1423892472097931326
-SUPPORT_CATEGORY_ID = 1423894614582235257
-LOG_CHANNEL_ID = 1466281964930727936
+TICKET_CHANNEL_ID = 1468754182696603699
+SUPPORT_CATEGORY_ID = 1322429823846711317
+LOG_CHANNEL_ID = 1322431016601911371
 
 MOD_ROLE_IDS = {
-   1370967596534595624
+   1322423969361432616 # admin
+   1468519827302780979 # head mods
+   1322426196033536010 # regular mods
 }
 
 # For the embeds created in the individual ticket channels for the user
 TICKET_TYPES = {
     "server-support": {
         "name_prefix": "support",
-        "write_roles": [],  
-        "view_roles": [],
+        "write_roles": [1322423969361432616,1468519827302780979],  
+        "view_roles": [1322423969361432616,1468519827302780979],
         "title": "Server Support Ticket",
         "welcome": "thanks for opening a server support ticket! Please describe your issue, and we will be with you shortly."
     },
     "mod-help": {
         "name_prefix": "mod-help",
-        "write_roles": [],  
-        "view_roles": [],
+        "write_roles": [1322423969361432616,1468519827302780979],  
+        "view_roles": [1322423969361432616,1468519827302780979],
         "title": "Mod Help Ticket",
         "welcome": "thank you for submitting a mod help ticket! Please make sure that you have checked the troubleshooting guide. Once you have, describe your issue and we will be with you as soon as we can."
     },
     "bug-report": {
         "name_prefix": "bug-report",
-        "write_roles": [],  
-        "view_roles": [],  
+        "write_roles": [1322423969361432616],  
+        "view_roles": [1322423969361432616],  
         "title": "Bug Report Ticket",
         "welcome": "thank you for submitting a bug report ticket! Please describe as well as provide some screenshots of the issue, and we will be with you as soon as we can."
     },
     "other": {
         "name_prefix": "other",
-        "write_roles": [],  
-        "view_roles": [],
+        "write_roles": [1322423969361432616,1468519827302780979],  
+        "view_roles": [1322423969361432616,1468519827302780979],
         "title": "Some Other Kinda Ticket",
         "welcome": "thanks for opening a ticket! Please describe your issue, and we will be with you shortly."
     }
