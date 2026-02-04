@@ -560,19 +560,14 @@ async def embed_setup(interaction: discord.Interaction):
 #   buf = io.BytesIO(data)
 #    buf.seek(0)
 
-    file = discord.File("ticket-header.png", filename="ticket-header.png")
-
+    file = discord.File("assets/ticket_header.png", filename="ticket_header.png")
+      
     title_embed = discord.Embed(
-        color=discord.Color.from_str(TICKET_PANEL["color"])
+           color=discord.Color.from_str(TICKET_PANEL["color"])
     )
-    title_embed.set_image(url=TICKET_PANEL["header_image"])
-
-    main_embed = discord.Embed(
-        description=TICKET_PANEL["main_description"],
-        color=discord.Color.from_str(TICKET_PANEL["color"])
-    )
-
-    await ticket_embed_channel.send(file=file)
+    title_embed.set_image(url="attachment://ticket_header.png")
+      
+    await ticket_embed_channel.send(embed=title_embed, file=file)
 
     if TICKET_PANEL["troubleshooting"]["enabled"]:
         troubleshooting_embed = discord.Embed(
