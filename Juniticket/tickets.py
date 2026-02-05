@@ -469,7 +469,7 @@ class TicketPanelView(ui.View):
 
 class TicketTypeView(ui.View):
     def __init__(self):
-        super().__init__(timeout=60)
+        super().__init__(timeout=None)
         self.add_item(TicketTypeSelect())
 
 class OpenTicketButton(ui.Button):
@@ -539,7 +539,7 @@ class CloseTicketView(ui.View):
    
 class ConfirmCloseView(ui.View):
     def __init__(self):
-        super().__init__(timeout=30)
+        super().__init__(timeout=None)
 
     @ui.button(label="Confirm", style=discord.ButtonStyle.primary, custom_id="ticket:confirm_close")
     async def confirm(self, interaction: discord.Interaction, button: ui.Button):
