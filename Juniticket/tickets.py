@@ -536,7 +536,11 @@ class ConfirmCloseView(ui.View):
 
     @ui.button(label="Confirm", style=discord.ButtonStyle.primary)
     async def confirm(self, interaction: discord.Interaction, button: ui.Button):
-        perms = interaction.channel.permissions_for(interaction.user)
+        channel = interaction.channel
+        guild = interaction.guild
+        closed_by = interaction.user
+
+        perms = channel.permissions_for(interaction.user)
         if not perms.send_messages:
             await interaction.response.send_message(
                 "Only ticket participants can confirm closing.",
@@ -544,31 +548,27 @@ class ConfirmCloseView(ui.View):
             )
             return
 
-        channel = interaction.channel
-        guild = interaction.guild
-        closed_by = interaction.user
+        await interaction.response.defer(ephemeral=True)
 
-        participants = await get_ticket_participants(channel)
-        await interaction.response.send_message(
-            "Closing ticket and generating transcript...",
-            ephemeral=True
-        )
-
-        meta = get_ticket_meta(channel)
-        opener_id = meta["opener_id"]
-        ticket_type = meta["ticket_type"]
-
-        opened_by = None
-        if opener_id:
-            opened_by = guild.get_member(opener_id)
-            if opened_by is None:
-                try:
-                    opened_by = await guild.fetch_member(opener_id)
-                except Exception:
-                    opened_by = None
-
-        transcript_path = None
         try:
+            await interaction.followup.send("Closing ticket and generating transcript...", ephemeral=True)
+
+            participants = await get_ticket_participants(channel)
+
+            meta = get_ticket_meta(channel)
+            opener_id = meta["opener_id"]
+            ticket_type = meta["ticket_type"]
+
+            opened_by = None
+            if opener_id:
+                opened_by = guild.get_member(opener_id)
+                if opened_by is None:
+                    try:
+                        opened_by = await guild.fetch_member(opener_id)
+                    except Exception:
+                        opened_by = None
+
+            transcript_path = None
             transcript_path, slug = await export_ticket_to_html(channel)
             transcript_url = await upload_transcript_to_r2(transcript_path, slug)
 
@@ -589,16 +589,16 @@ class ConfirmCloseView(ui.View):
                 transcript_url=transcript_url
             )
 
+            if transcript_path:
+                cleanup_file(transcript_path)
+
+            await channel.delete(reason="Ticket closed")
+
         except Exception as e:
-            await interaction.followup.send(
-                f"Transcript export failed: `{e}`",
-                ephemeral=True
-            )
-
-        if transcript_path:
-            cleanup_file(transcript_path)
-
-        await channel.delete(reason="Ticket closed")
+            try:
+                await interaction.followup.send(f"Ticket close failed: `{e}`", ephemeral=True)
+            except Exception:
+                pass
        
 ticket_group = TicketGroup()
 
