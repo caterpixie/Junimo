@@ -320,7 +320,7 @@ class TicketTypeSelect(ui.Select):
         
         overwrites = {
             guild.default_role: discord.PermissionOverwrite(view_channel=False),
-            author: discord.PermissionOverwrite(view_channel=True, send_messages=True),
+            author: discord.PermissionOverwrite(view_channel=True, send_messages=True, attach_files=True, embed_links=True, read_message_history=True),
         }
 
         for role_id in config["write_roles"]:
@@ -329,7 +329,9 @@ class TicketTypeSelect(ui.Select):
                 overwrites[role] = discord.PermissionOverwrite(
                     view_channel=True,
                     send_messages=True,
-                    read_message_history=True
+                    read_message_history=True,
+                    attach_files=True,
+                    embed_links=True
                 )
 
         for role_id in config["view_roles"]:
