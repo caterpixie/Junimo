@@ -64,7 +64,7 @@ TICKET_PANEL = {
     "troubleshooting": {
         "enabled": True,
         "text": (
-            "Need help with your mods? All of your questions can be answered in this [troubleshooting guide](https://www.nexusmods.com/stardewvalley/articles/3926)!"
+            "Need help with your mods? Most of your questions can be answered in this [troubleshooting guide](https://www.nexusmods.com/stardewvalley/articles/3926)!"
         ),
     },
     "button": {
