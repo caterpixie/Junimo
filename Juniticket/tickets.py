@@ -91,7 +91,7 @@ def safe_avatar_url(user):
 def is_mod(member: discord.Member) -> bool:
     return any(role.id in MOD_ROLE_IDS for role in member.roles)
 
-def can_interact(interaction: discord.Interaction) -> bool:
+def can_interact_in_ticket(interaction: discord.Interaction) -> bool:
     perms = interaction.channel.permissions_for(interaction.user)
     return perms.send_messages
 
@@ -449,12 +449,24 @@ class CloseTicketView(ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
+    def _can_use_ticket_buttons(self, interaction: discord.Interaction) -> bool:
+        # Only people who can write in THIS ticket can use ticket buttons
+        perms = interaction.channel.permissions_for(interaction.user)
+        return perms.send_messages
+
     @ui.button(
         label="Close Ticket",
         style=discord.ButtonStyle.secondary,
         emoji="🔒"
     )
     async def close_ticket(self, interaction: discord.Interaction, button: ui.Button):
+        if not self._can_use_ticket_buttons(interaction):
+            await interaction.response.send_message(
+                "Only ticket participants can use this.",
+                ephemeral=True
+            )
+            return
+
         await interaction.response.send_message(
             "Are you sure you want to close this ticket?",
             view=ConfirmCloseView()
@@ -465,8 +477,11 @@ class CloseTicketView(ui.View):
         style=discord.ButtonStyle.secondary,
     )
     async def add_user(self, interaction: discord.Interaction, button: ui.Button):
-        if not isinstance(interaction.user, discord.Member) or not is_mod(interaction.user):
-            await interaction.response.send_message("Only moderators can use this.", ephemeral=True)
+        if not self._can_use_ticket_buttons(interaction):
+            await interaction.response.send_message(
+                "Only ticket participants can use this.",
+                ephemeral=True
+            )
             return
 
         await interaction.response.send_message(
@@ -481,12 +496,24 @@ class ConfirmCloseView(ui.View):
 
     @ui.button(label="Confirm", style=discord.ButtonStyle.primary)
     async def confirm(self, interaction: discord.Interaction, button: ui.Button):
+        # ✅ Only people who can write in THIS ticket can confirm closing
+        perms = interaction.channel.permissions_for(interaction.user)
+        if not perms.send_messages:
+            await interaction.response.send_message(
+                "Only ticket participants can confirm closing.",
+                ephemeral=True
+            )
+            return
+
         channel = interaction.channel
         guild = interaction.guild
         closed_by = interaction.user
 
         participants = await get_ticket_participants(channel)
-        await interaction.response.send_message("Closing ticket and generating transcript...", ephemeral=True)
+        await interaction.response.send_message(
+            "Closing ticket and generating transcript...",
+            ephemeral=True
+        )
 
         meta = get_ticket_meta(channel)
         opener_id = meta["opener_id"]
@@ -524,7 +551,10 @@ class ConfirmCloseView(ui.View):
             )
 
         except Exception as e:
-            await interaction.followup.send(f"Transcript export failed: `{e}`", ephemeral=True)
+            await interaction.followup.send(
+                f"Transcript export failed: `{e}`",
+                ephemeral=True
+            )
 
         if transcript_path:
             cleanup_file(transcript_path)
