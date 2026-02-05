@@ -512,7 +512,6 @@ class CloseTicketView(ui.View):
     @ui.button(
         label="Add User (ID)",
         style=discord.ButtonStyle.secondary,
-        emoji="🆔"
     )
     async def add_user(self, interaction: discord.Interaction, button: ui.Button):
         if not self._can_use_ticket_buttons(interaction):
