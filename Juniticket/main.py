@@ -29,6 +29,8 @@ class Client(commands.Bot):
         )
 
         self.add_view(TicketPanelView())
+        self.add_view(CloseTicketView())  
+        self.add_view(ConfirmCloseView())  
         
         self.tree.add_command(ticket_group)
         await self.tree.sync()
