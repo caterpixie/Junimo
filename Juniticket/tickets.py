@@ -474,7 +474,12 @@ class TicketTypeView(ui.View):
 
 class OpenTicketButton(ui.Button):
     def __init__(self):
-        super().__init__(label="Create Ticket", style=discord.ButtonStyle.secondary, emoji="📨")
+        super().__init__(
+            label="Create Ticket",
+            style=discord.ButtonStyle.secondary,
+            emoji="📨",
+            custom_id="ticket_open" 
+        )
 
     async def callback(self, interaction: discord.Interaction):
         await interaction.response.send_message(
