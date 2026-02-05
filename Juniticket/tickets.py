@@ -108,11 +108,11 @@ def get_ticket_meta(channel: discord.TextChannel) -> dict:
 async def user_has_open_ticket(guild: discord.Guild, user: discord.Member):
     category = guild.get_channel(SUPPORT_CATEGORY_ID)
     if not category:
-        return False
+        return None
 
     for channel in category.text_channels:
-        perms = channel.permissions_for(user)
-        if perms.view_channel:
+        meta = get_ticket_meta(channel)
+        if meta["opener_id"] == user.id:
             return channel
 
     return None
