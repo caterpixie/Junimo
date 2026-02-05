@@ -28,6 +28,8 @@ class Client(commands.Bot):
             autocommit=True,
         )
 
+        set_ticket_bot(self)
+
         self.add_view(TicketPanelView())
         self.add_view(CloseTicketView())  
         self.add_view(ConfirmCloseView())  
