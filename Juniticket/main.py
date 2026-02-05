@@ -27,8 +27,12 @@ class Client(commands.Bot):
             db=parsed.path[1:],
             autocommit=True,
         )
+
+        self.add_view(TicketPanelView())
+        
         self.tree.add_command(ticket_group)
         await self.tree.sync()
+
     
     async def on_ready(self):
         print(f"Logged on as {self.user}")
