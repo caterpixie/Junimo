@@ -488,7 +488,6 @@ class CloseTicketView(ui.View):
         super().__init__(timeout=None)
 
     def _can_use_ticket_buttons(self, interaction: discord.Interaction) -> bool:
-      
         perms = interaction.channel.permissions_for(interaction.user)
         return perms.send_messages
 
@@ -511,25 +510,26 @@ class CloseTicketView(ui.View):
         )
 
     @ui.button(
-    label="Add User (ID)",
-    style=discord.ButtonStyle.secondary
-)
-async def add_user(self, interaction: discord.Interaction, button: ui.Button):
-    if not self._can_use_ticket_buttons(interaction):
-        await interaction.response.send_message(
-            "Only ticket participants can use this.",
-            ephemeral=True
-        )
-        return
+        label="Add User (ID)",
+        style=discord.ButtonStyle.secondary,
+        emoji="🆔"
+    )
+    async def add_user(self, interaction: discord.Interaction, button: ui.Button):
+        if not self._can_use_ticket_buttons(interaction):
+            await interaction.response.send_message(
+                "Only ticket participants can use this.",
+                ephemeral=True
+            )
+            return
 
-    if not isinstance(interaction.user, discord.Member) or not is_mod(interaction.user):
-        await interaction.response.send_message(
-            "Only staff can use this.",
-            ephemeral=True
-        )
-        return
+        if not isinstance(interaction.user, discord.Member) or not is_mod(interaction.user):
+            await interaction.response.send_message(
+                "Only staff can use this.",
+                ephemeral=True
+            )
+            return
 
-    await interaction.response.send_modal(AddUserByIDModal())
+        await interaction.response.send_modal(AddUserByIDModal())
    
 class ConfirmCloseView(ui.View):
     def __init__(self):
