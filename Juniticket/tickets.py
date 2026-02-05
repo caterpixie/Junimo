@@ -91,6 +91,10 @@ def safe_avatar_url(user):
 def is_mod(member: discord.Member) -> bool:
     return any(role.id in MOD_ROLE_IDS for role in member.roles)
 
+def can_interact(interaction: discord.Interaction) -> bool:
+    perms = interaction.channel.permissions_for(interaction.user)
+    return perms.send_messages
+
 def get_ticket_meta(channel: discord.TextChannel) -> dict:
     """
     Reads opener + type from channel.topic.
