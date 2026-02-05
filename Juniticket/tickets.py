@@ -445,76 +445,50 @@ class OpenTicketButton(ui.Button):
             ephemeral=True
         )
 
-class ConfirmCloseView(ui.View):
+class CloseTicketView(ui.View):
     def __init__(self):
-        super().__init__(timeout=30)
+        super().__init__(timeout=None)
 
-    @ui.button(label="Confirm", style=discord.ButtonStyle.primary)
-    async def confirm(self, interaction: discord.Interaction, button: ui.Button):
-        # ✅ Only people who can write in THIS ticket can confirm closing
+    def _can_use_ticket_buttons(self, interaction: discord.Interaction) -> bool:
+        # Only people who can write in THIS ticket can use ticket buttons
         perms = interaction.channel.permissions_for(interaction.user)
-        if not perms.send_messages:
+        return perms.send_messages
+
+    @ui.button(
+        label="Close Ticket",
+        style=discord.ButtonStyle.secondary,
+        emoji="🔒"
+    )
+    async def close_ticket(self, interaction: discord.Interaction, button: ui.Button):
+        if not self._can_use_ticket_buttons(interaction):
             await interaction.response.send_message(
-                "Only ticket participants can confirm closing.",
+                "Only ticket participants can use this.",
                 ephemeral=True
             )
             return
 
-        channel = interaction.channel
-        guild = interaction.guild
-        closed_by = interaction.user
-
-        participants = await get_ticket_participants(channel)
         await interaction.response.send_message(
-            "Closing ticket and generating transcript...",
-            ephemeral=True
+            "Are you sure you want to close this ticket?",
+            view=ConfirmCloseView()
         )
 
-        meta = get_ticket_meta(channel)
-        opener_id = meta["opener_id"]
-        ticket_type = meta["ticket_type"]
-
-        opened_by = None
-        if opener_id:
-            opened_by = guild.get_member(opener_id)
-            if opened_by is None:
-                try:
-                    opened_by = await guild.fetch_member(opener_id)
-                except Exception:
-                    opened_by = None
-
-        transcript_path = None
-        try:
-            transcript_path, slug = await export_ticket_to_html(channel)
-            transcript_url = await upload_transcript_to_r2(transcript_path, slug)
-
-            await log_ticket_close(
-                guild=guild,
-                closed_by=closed_by,
-                channel=channel,
-                opened_by=opened_by,
-                ticket_type=ticket_type,
-                transcript_url=transcript_url,
-                participants=participants
-            )
-
-            await dm_transcript_to_non_mod_participants(
-                participants=participants,
-                guild=guild,
-                channel=channel,
-                transcript_url=transcript_url
-            )
-
-        except Exception as e:
-            await interaction.followup.send(
-                f"Transcript export failed: `{e}`",
+    @ui.button(
+        label="Add User",
+        style=discord.ButtonStyle.secondary,
+    )
+    async def add_user(self, interaction: discord.Interaction, button: ui.Button):
+        if not self._can_use_ticket_buttons(interaction):
+            await interaction.response.send_message(
+                "Only ticket participants can use this.",
                 ephemeral=True
             )
+            return
 
-        if transcript_path:
-            cleanup_file(transcript_path)
-
-        await channel.delete(reason="Ticket closed")
+        await interaction.response.send_message(
+            "Select a user to add to this ticket:",
+            view=AddUserView(),
+            ephemeral=True
+        )
    
 class ConfirmCloseView(ui.View):
     def __init__(self):
@@ -586,7 +560,7 @@ class ConfirmCloseView(ui.View):
             cleanup_file(transcript_path)
 
         await channel.delete(reason="Ticket closed")
-
+       
 ticket_group = TicketGroup()
 
 @ticket_group.command(name="setup", description="Sends the embed to the ticket channel")
