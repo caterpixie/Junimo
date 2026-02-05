@@ -8,7 +8,13 @@ import aiomysql
 import urllib.parse
 
 import tickets
-from tickets import ticket_group, set_bot as set_ticket_bot
+from tickets import (
+    ticket_group,
+    set_bot as set_ticket_bot,
+    TicketPanelView,
+    CloseTicketView,
+    ConfirmCloseView,
+)
 
 class Client(commands.Bot):
     def __init__(self, **kwargs):
