@@ -478,7 +478,7 @@ class OpenTicketButton(ui.Button):
             label="Create Ticket",
             style=discord.ButtonStyle.secondary,
             emoji="📨",
-            custom_id="ticket_open" 
+            custom_id="ticket:open" 
         )
 
     async def callback(self, interaction: discord.Interaction):
@@ -499,7 +499,8 @@ class CloseTicketView(ui.View):
     @ui.button(
         label="Close Ticket",
         style=discord.ButtonStyle.secondary,
-        emoji="🔒"
+        emoji="🔒",
+        custom_id="ticket:close"
     )
     async def close_ticket(self, interaction: discord.Interaction, button: ui.Button):
         if not self._can_use_ticket_buttons(interaction):
@@ -517,6 +518,7 @@ class CloseTicketView(ui.View):
     @ui.button(
         label="Add User",
         style=discord.ButtonStyle.secondary,
+        custom_id="ticket:add_user_id"
     )
     async def add_user(self, interaction: discord.Interaction, button: ui.Button):
         if not self._can_use_ticket_buttons(interaction):
@@ -539,7 +541,7 @@ class ConfirmCloseView(ui.View):
     def __init__(self):
         super().__init__(timeout=30)
 
-    @ui.button(label="Confirm", style=discord.ButtonStyle.primary)
+    @ui.button(label="Confirm", style=discord.ButtonStyle.primary, custom_id="ticket:confirm_close")
     async def confirm(self, interaction: discord.Interaction, button: ui.Button):
         channel = interaction.channel
         guild = interaction.guild
