@@ -472,24 +472,26 @@ class CloseTicketView(ui.View):
             view=ConfirmCloseView()
         )
 
-    @ui.button(
-        label="Add User",
-        style=discord.ButtonStyle.secondary,
-    )
-    async def add_user(self, interaction: discord.Interaction, button: ui.Button):
-        if not self._can_use_ticket_buttons(interaction):
-            await interaction.response.send_message(
-                "Only ticket participants can use this.",
-                ephemeral=True
-            )
-            return
-
-        await interaction.response.send_message(
-            "Select a user to add to this ticket:",
-            view=AddUserView(),
-            ephemeral=True
-        )
-    
+      @ui.button(
+          label="Add User",
+          style=discord.ButtonStyle.secondary,
+      )
+      async def add_user(self, interaction: discord.Interaction, button: ui.Button):
+          perms = interaction.channel.permissions_for(interaction.user)
+      
+          if not perms.send_messages or not is_mod(interaction.user):
+              await interaction.response.send_message(
+                  "Only moderators who are participants in this ticket can add users.",
+                  ephemeral=True
+              )
+              return
+      
+          await interaction.response.send_message(
+              "Select a user to add to this ticket:",
+              view=AddUserView(),
+              ephemeral=True
+          )
+   
 class ConfirmCloseView(ui.View):
     def __init__(self):
         super().__init__(timeout=30)
