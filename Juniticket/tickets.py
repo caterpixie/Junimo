@@ -382,84 +382,85 @@ class AddUserByIDModal(ui.Modal, title="Add user to ticket (ID only)"):
         max_length=25
     )
 
-   async def on_submit(self, interaction: discord.Interaction):
-       channel: discord.TextChannel = interaction.channel
-       guild: discord.Guild = interaction.guild
-   
-       perms = channel.permissions_for(interaction.user)
-       if not perms.send_messages:
-           await interaction.response.send_message(
-               "Only ticket participants can do this.",
-               ephemeral=True
-           )
-           return
-   
-       if not isinstance(interaction.user, discord.Member) or not is_mod(interaction.user):
-           await interaction.response.send_message(
-               "Only staff can do this.",
-               ephemeral=True
-           )
-           return
-   
-       raw = str(self.user_id.value).strip()
-       if not raw.isdigit():
-           await interaction.response.send_message(
-               "That doesn’t look like a valid user ID.",
-               ephemeral=True
-           )
-           return
-   
-       uid = int(raw)
-   
-       member = guild.get_member(uid)
-       if member is None:
-           try:
-               member = await guild.fetch_member(uid)
-           except discord.NotFound:
-               await interaction.response.send_message(
-                   "That user isn’t in this server.",
-                   ephemeral=True
-               )
-               return
-           except discord.Forbidden:
-               await interaction.response.send_message(
-                   "I don’t have permission to fetch members.",
-                   ephemeral=True
-               )
-               return
-           except discord.HTTPException:
-               await interaction.response.send_message(
-                   "Failed to fetch that user. Try again.",
-                   ephemeral=True
-               )
-               return
-   
-       if member.bot:
-           await interaction.response.send_message(
-               "You can’t add a bot to a ticket.",
-               ephemeral=True
-           )
-           return
-   
-       if channel.permissions_for(member).view_channel:
-           await interaction.response.send_message(
-               "That user already has access to this ticket.",
-               ephemeral=True
-           )
-           return
-   
-       await channel.set_permissions(
-           member,
-           view_channel=True,
-           read_message_history=True,
-           send_messages=True
-       )
-   
-       await interaction.response.send_message(
-           f"Added {member.mention} to {channel.mention}.",
-           ephemeral=True
-       )
-       await dm_user_ticket_attention(member, guild, channel)
+    async def on_submit(self, interaction: discord.Interaction):
+        channel: discord.TextChannel = interaction.channel
+        guild: discord.Guild = interaction.guild
+
+        perms = channel.permissions_for(interaction.user)
+        if not perms.send_messages:
+            await interaction.response.send_message(
+                "Only ticket participants can do this.",
+                ephemeral=True
+            )
+            return
+
+        if not isinstance(interaction.user, discord.Member) or not is_mod(interaction.user):
+            await interaction.response.send_message(
+                "Only staff can do this.",
+                ephemeral=True
+            )
+            return
+
+        raw = str(self.user_id.value).strip()
+        if not raw.isdigit():
+            await interaction.response.send_message(
+                "That doesn’t look like a valid user ID.",
+                ephemeral=True
+            )
+            return
+
+        uid = int(raw)
+
+        member = guild.get_member(uid)
+        if member is None:
+            try:
+                member = await guild.fetch_member(uid)
+            except discord.NotFound:
+                await interaction.response.send_message(
+                    "That user isn’t in this server.",
+                    ephemeral=True
+                )
+                return
+            except discord.Forbidden:
+                await interaction.response.send_message(
+                    "I don’t have permission to fetch members.",
+                    ephemeral=True
+                )
+                return
+            except discord.HTTPException:
+                await interaction.response.send_message(
+                    "Failed to fetch that user. Try again.",
+                    ephemeral=True
+                )
+                return
+
+        if member.bot:
+            await interaction.response.send_message(
+                "You can’t add a bot to a ticket.",
+                ephemeral=True
+            )
+            return
+
+        if channel.permissions_for(member).view_channel:
+            await interaction.response.send_message(
+                "That user already has access to this ticket.",
+                ephemeral=True
+            )
+            return
+
+        await channel.set_permissions(
+            member,
+            view_channel=True,
+            read_message_history=True,
+            send_messages=True
+        )
+
+        await interaction.response.send_message(
+            f"Added {member.mention} to {channel.mention}.",
+            ephemeral=True
+        )
+       
+        await dm_user_ticket_attention(member, guild, channel)
    
 class TicketPanelView(ui.View):
     def __init__(self):
