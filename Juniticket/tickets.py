@@ -510,7 +510,7 @@ class CloseTicketView(ui.View):
         )
 
     @ui.button(
-        label="Add User (ID)",
+        label="Add User",
         style=discord.ButtonStyle.secondary,
     )
     async def add_user(self, interaction: discord.Interaction, button: ui.Button):
