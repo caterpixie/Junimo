@@ -239,7 +239,7 @@ async def log_member_update(before: discord.Member, after: discord.Member):
             description=f"User {before.mention} has selected the -17 role. SIC 'EM",
             color=discord.Color.red(),
         )
-        minor_embed.set_footer(text=f"ID:{user.id}")
+        minor_embed.set_footer(text=f"ID:{before.id}")
         mod_channel = bot.get_channel(OFFICIAL_MOD_CHANNEL_ID)
         if mod_channel:
             role_mention = f"<@&{MINOR_ALERT_PING_ROLE_ID}>"
@@ -280,4 +280,5 @@ async def log_voice_state_update(user: discord.Member, before: discord.VoiceStat
             icon_url = user.avatar.url if user.avatar else user.default_avatar.url
             embed.set_author(name=str(user), icon_url=icon_url)
             await log_event(USER_LOG_CHANNEL_ID, embed)
+
 
