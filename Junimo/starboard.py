@@ -17,7 +17,7 @@ EXCLUDED_CHANNEL_IDS = [
     1322430599679447131,
 ]
 
-STAR_EMOJI = "🍅"
+STAR_EMOJI = {"🍅","⭐"}
 STAR_THRESHOLD = 3
 
 EMBED_COLOR = "#9CEC61"
@@ -39,8 +39,9 @@ def setup_starboard(bot_instance: discord.Client):
 
     @bot_instance.event
     async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
+        emoji = str(payload.emoji)
 
-        if str(payload.emoji) != STAR_EMOJI:
+        if emoji not in STAR_EMOJIS:
             return
 
         if payload.channel_id in EXCLUDED_CHANNEL_IDS:
@@ -55,11 +56,11 @@ def setup_starboard(bot_instance: discord.Client):
         except discord.NotFound:
             return
 
-        # Count star reactions
         count = 0
         for reaction in message.reactions:
-            if str(reaction.emoji) == STAR_EMOJI:
+            if str(reaction.emoji) == emoji:
                 count = reaction.count
+                break
 
         if count < STAR_THRESHOLD:
             return
@@ -69,7 +70,7 @@ def setup_starboard(bot_instance: discord.Client):
             return
 
         embed = discord.Embed(
-            description=f"{message.content}\n\n[Jump to Message!]({message.jump_url})" or "[No text]",
+            description=(f"{message.content}\n\n[Jump to Message!]({message.jump_url})" if message.content else f"[No text]\n\n[Jump to Message!]({message.jump_url})"),
             color=discord.Color.from_str(EMBED_COLOR),
         )
         embed.set_author(
@@ -81,12 +82,14 @@ def setup_starboard(bot_instance: discord.Client):
         if message.attachments:
             embed.set_image(url=message.attachments[0].url)
 
-        if message.id in starred_messages:
+        key = (message.id, emoji)
+
+        if key in starred_messages:
             try:
-                old_msg = await starboard.fetch_message(starred_messages[message.id])
-                await old_msg.edit(content=f"{STAR_EMOJI} {count}", embed=embed)
+                old_msg = await starboard.fetch_message(starred_messages[key])
+                await old_msg.edit(content=f"{emoji} {count}", embed=embed)
             except discord.NotFound:
-                del starred_messages[message.id]
+                del starred_messages[key]
         else:
-            starboard_msg = await starboard.send(content=f"{STAR_EMOJI} {count}", embed=embed)
-            starred_messages[message.id] = starboard_msg.id
+            starboard_msg = await starboard.send(content=f"{emoji} {count}", embed=embed)
+            starred_messages[key] = starboard_msg.id
