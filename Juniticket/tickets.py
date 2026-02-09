@@ -29,28 +29,28 @@ TICKET_TYPES = {
     "server-support": {
         "name_prefix": "support",
         "write_roles": [1322423969361432616,1468519827302780979],  
-        "view_roles": [1322423969361432616,1468519827302780979,1322426196033536010],
+        "view_roles": [1322426196033536010],
         "title": "Server Support Ticket",
         "welcome": "thanks for opening a server support ticket! Please describe your issue, and we will be with you shortly."
     },
     "mod-help": {
         "name_prefix": "mod-help",
         "write_roles": [1322423969361432616,1468519827302780979],  
-        "view_roles": [1322423969361432616,1468519827302780979,1322426196033536010],
+        "view_roles": [1322426196033536010],
         "title": "Mod Help Ticket",
         "welcome": "thank you for submitting a mod help ticket! Please make sure that you have checked the troubleshooting guide. Once you have, describe your issue and we will be with you as soon as we can."
     },
     "bug-report": {
         "name_prefix": "bug-report",
         "write_roles": [1322423969361432616],  
-        "view_roles": [1322423969361432616,1468519827302780979],  
+        "view_roles": [1468519827302780979],  
         "title": "Bug Report Ticket",
         "welcome": "thank you for submitting a bug report ticket! Please describe as well as provide some screenshots of the issue, and we will be with you as soon as we can."
     },
     "other": {
         "name_prefix": "other",
         "write_roles": [1322423969361432616,1468519827302780979],  
-        "view_roles": [1322423969361432616,1468519827302780979,1322426196033536010],
+        "view_roles": [1322426196033536010],
         "title": "Some Other Kinda Ticket",
         "welcome": "thanks for opening a ticket! Please describe your issue, and we will be with you shortly."
     }
