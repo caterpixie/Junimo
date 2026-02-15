@@ -9,7 +9,6 @@ from safebrowsing import is_phishing_link
 
 SERVER_ID = 1322423728457384018
 
-GENERAL_CHANNEL_ID = 1322423730982490185
 LOG_CHANNEL_ID = 1322430975480692789
 
 NO_LINKS_CHANNEL_ID = 1322423730982490185  # general
@@ -187,6 +186,7 @@ async def check_phishing(message):
             return True
 
     return False
+
 
 
 
