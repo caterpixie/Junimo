@@ -17,17 +17,42 @@ async def trigger_on_message(message: discord.Message):
     async with bot.pool.acquire() as conn:
         async with conn.cursor(aiomysql.DictCursor) as cur:
             await cur.execute("""
-                SELECT trigger_text, response_type, response_text FROM triggers
+                SELECT trigger_text, response_type, response_text, required_role_ids
+                FROM triggers
                 WHERE guild_id = %s
             """, (message.guild.id,))
             rows = await cur.fetchall()
 
     content = message.content.lower()
+
     for row in rows:
         trigger_text = row["trigger_text"].lower()
+
         if trigger_text in content:
+
+            # role restrictions
+            required_roles_raw = row.get("required_role_ids")
+
+            if required_roles_raw:
+                try:
+                    required_roles = json.loads(required_roles_raw)
+                    if not isinstance(required_roles, list):
+                        required_roles = []
+                except json.JSONDecodeError:
+                    required_roles = []
+
+                user_role_ids = {r.id for r in message.author.roles}
+                admin_role_ids = set(ADMIN_ROLE_IDS)
+
+                if not (
+                    user_role_ids.intersection(required_roles)
+                    or user_role_ids.intersection(admin_role_ids)
+                ):
+                    continue  
+
             if row["response_type"] == "plain":
                 await message.channel.send(row["response_text"])
+
             elif row["response_type"] == "random":
                 try:
                     options = json.loads(row["response_text"])
@@ -38,6 +63,7 @@ async def trigger_on_message(message: discord.Message):
                         await message.channel.send("No valid links available.")
                 except json.JSONDecodeError:
                     await message.channel.send("Invalid random link list.")
+
             elif row["response_type"] == "embed":
                 try:
                     embed_data = json.loads(row["response_text"])
@@ -57,9 +83,9 @@ async def trigger_on_message(message: discord.Message):
                     try:
                         embed.timestamp = datetime.fromisoformat(embed_data["timestamp"])
                     except Exception:
-                        pass 
+                        pass
 
-                # Author block
+                # Author
                 if "author" in embed_data:
                     author = embed_data["author"]
                     if isinstance(author, dict):
@@ -71,7 +97,7 @@ async def trigger_on_message(message: discord.Message):
                     else:
                         embed.set_author(name=str(author))
 
-                # Footer block
+                # Footer
                 if "footer" in embed_data:
                     footer = embed_data["footer"]
                     if isinstance(footer, dict):
@@ -82,7 +108,7 @@ async def trigger_on_message(message: discord.Message):
                     else:
                         embed.set_footer(text=str(footer))
 
-                # Thumbnail and image
+                # Images
                 if "thumbnail" in embed_data:
                     embed.set_thumbnail(url=embed_data["thumbnail"])
                 if "image" in embed_data:
@@ -98,8 +124,8 @@ async def trigger_on_message(message: discord.Message):
                         )
 
                 await message.channel.send(embed=embed)
-            break
 
+            break  
 def set_bot(bot_instance):
     global bot
     bot = bot_instance
