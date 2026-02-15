@@ -94,26 +94,39 @@ async def log_event(channel_id: int, embed: discord.Embed):
 
 # -------- Checks --------
 
-async def check_no_links_in_general(message):
-    if message.channel.id != GENERAL_CHANNEL_ID:
+async def check_no_links(message):
+    
+    CHANNEL_NO_LINKS = 1322423730982490185     # general
+    CHANNEL_GIF_ONLY = 1472458580815904943     # spicy-general
+
+    if message.channel.id not in [CHANNEL_NO_LINKS, CHANNEL_GIF_ONLY]:
         return False
 
-    # Allow if user has a bypass role
     if any(role.id in ADMIN_ROLE_IDS for role in message.author.roles):
         return False
 
     urls = re.findall(r'https?://\S+', message.content)
-    for url in urls:
-        if any(domain in url for domain in ALLOWED_GIF_DOMAINS):
-            continue
+
+    if not urls:
+        return False
+
+    if message.channel.id == CHANNEL_NO_LINKS:
         try:
             await message.delete()
         except discord.NotFound:
             pass
         return True
 
-    return False
+    if message.channel.id == CHANNEL_GIF_ONLY:
+        for url in urls:
+            if not any(domain in url for domain in ALLOWED_GIF_DOMAINS):
+                try:
+                    await message.delete()
+                except discord.NotFound:
+                    pass
+                return True
 
+    return False
 
 async def check_slurs(message):
     content = message.content.lower()
@@ -174,3 +187,4 @@ async def check_phishing(message):
             return True
 
     return False
+
