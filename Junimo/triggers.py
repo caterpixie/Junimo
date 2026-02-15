@@ -42,11 +42,9 @@ async def trigger_on_message(message: discord.Message):
                     required_roles = []
 
                 user_role_ids = {r.id for r in message.author.roles}
-                admin_role_ids = set(ADMIN_ROLE_IDS)
 
                 if not (
                     user_role_ids.intersection(required_roles)
-                    or user_role_ids.intersection(admin_role_ids)
                 ):
                     continue  
 
