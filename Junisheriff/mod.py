@@ -16,7 +16,7 @@ LOCKDOWN_ANNOUNCE_CHANNEL_ID = 1372430570822307890
 
 GAG_ROLE_ID = 1322686350063042610 
 
-APPEAL_FORM_URL = "https://forms.gle/SzbABy1Jkv2oGpr97"
+APPEAL_FORM_URL = "https://forms.gle/WewQpkxHz2e6vJCx9"
 
 WARNS_PER_PAGE = 10
 WARN_LOG_TIMEZONE = "America/Chicago"  
@@ -758,6 +758,7 @@ async def lockdown_server(interaction: discord.Interaction, reason: str = "No re
     modlog_channel = guild.get_channel(CASE_LOG_CHANNEL_ID)
     if modlog_channel:
         await modlog_channel.send(embed=log_embed)
+
 
 
 
