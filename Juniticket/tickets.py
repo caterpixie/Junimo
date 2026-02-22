@@ -454,7 +454,9 @@ class AddUserByIDModal(ui.Modal, title="Add user to ticket (ID only)"):
             member,
             view_channel=True,
             read_message_history=True,
-            send_messages=True
+            send_messages=True,
+            attach_files=True,
+            embed_links=True
         )
 
         await interaction.response.send_message(
