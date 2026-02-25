@@ -677,7 +677,7 @@ async def unmute(interaction: discord.Interaction, user: discord.Member, guild: 
 # ================= LOCKDOWN COMMANDS =================
 
 @mod_group.command(name="lockdown_channel", description="Locks the current channel for all users")
-async def lockdown_channel(interaction: discord.Interaction, reason: str = "No reason provided", guild: discord.Guild):
+async def lockdown_channel(interaction: discord.Interaction, guild: discord.Guild, reason: str = "No reason provided"):
     guild = interaction.guild
     channel = interaction.channel
     everyone_role = guild.default_role
@@ -761,6 +761,7 @@ async def lockdown_server(interaction: discord.Interaction, reason: str = "No re
     modlog_channel = guild.get_channel(CASE_LOG_CHANNEL_ID)
     if modlog_channel:
         await modlog_channel.send(embed=log_embed)
+
 
 
 
