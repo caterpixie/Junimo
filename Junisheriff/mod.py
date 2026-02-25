@@ -178,9 +178,10 @@ async def warn(interaction: discord.Interaction, user: discord.Member, reason: s
     # Try to DM about the warn itself
     try:
         dm_embed = discord.Embed(
-            description=f"You have been warned in **{guild_name}**.\n\n**Reason:** {reason}",
+            description=f"You have been issued a warning in {guild_name}.",
             color=discord.Color.red()
         )
+        dm_embed.add_field(name="Reason", value=reason)
         dm_embed.timestamp = now
         await user.send(embed=dm_embed)
     except discord.Forbidden:
@@ -759,5 +760,6 @@ async def lockdown_server(interaction: discord.Interaction, reason: str = "No re
     modlog_channel = guild.get_channel(CASE_LOG_CHANNEL_ID)
     if modlog_channel:
         await modlog_channel.send(embed=log_embed)
+
 
 
