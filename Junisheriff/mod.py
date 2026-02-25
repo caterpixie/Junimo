@@ -32,7 +32,7 @@ BAN_DELETE_DAYS_DEFAULT = 7
 # ============================================
 
 bot = None
-
+guild_name = interaction.guild.name
 
 def set_bot(bot_instance):
     global bot
@@ -178,7 +178,7 @@ async def warn(interaction: discord.Interaction, user: discord.Member, reason: s
     # Try to DM about the warn itself
     try:
         dm_embed = discord.Embed(
-            description=f"You have been warned in the server After Dark.\n\n**Reason:** {reason}",
+            description=f"You have been warned in **{guild_name}**.\n\n**Reason:** {reason}",
             color=discord.Color.red()
         )
         dm_embed.timestamp = now
@@ -759,3 +759,4 @@ async def lockdown_server(interaction: discord.Interaction, reason: str = "No re
     modlog_channel = guild.get_channel(CASE_LOG_CHANNEL_ID)
     if modlog_channel:
         await modlog_channel.send(embed=log_embed)
+
