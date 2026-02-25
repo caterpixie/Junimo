@@ -138,7 +138,7 @@ def safe_avatar_url(user):
 # ================= WARNING COMMANDS =================
 
 @mod_group.command(name="warn", description="Warn a user")
-async def warn(interaction: discord.Interaction, user: discord.Member, reason: str):
+async def warn(interaction: discord.Interaction, user: discord.Member, reason: str, guild: discord.Guild):
     # Insert warn into DB
     async with bot.pool.acquire() as conn:
         async with conn.cursor() as cur:
@@ -292,7 +292,7 @@ async def warn(interaction: discord.Interaction, user: discord.Member, reason: s
 
 
 @mod_group.command(name="warnings", description="Displays a user's past warns")
-async def warn_log(interaction: discord.Interaction, user: discord.Member):
+async def warn_log(interaction: discord.Interaction, user: discord.Member, guild: discord.Guild):
     async with bot.pool.acquire() as conn:
         async with conn.cursor(aiomysql.DictCursor) as cur:
             await cur.execute(
@@ -335,7 +335,7 @@ async def warn_log(interaction: discord.Interaction, user: discord.Member):
 
 
 @mod_group.command(name="clearwarns", description="Clear all warnings for a user")
-async def clear_warns(interaction: discord.Interaction, user: discord.Member):
+async def clear_warns(interaction: discord.Interaction, user: discord.Member, guild: discord.Guild):
     async with bot.pool.acquire() as conn:
         async with conn.cursor() as cur:
             await cur.execute(
@@ -351,7 +351,7 @@ async def clear_warns(interaction: discord.Interaction, user: discord.Member):
 
 
 @mod_group.command(name="delwarn", description="Delete a specific warning by its index in the user's log")
-async def delete_warn(interaction: discord.Interaction, user: discord.Member):
+async def delete_warn(interaction: discord.Interaction, user: discord.Member, guild: discord.Guild):
     async with bot.pool.acquire() as conn:
         async with conn.cursor(aiomysql.DictCursor) as cur:
             await cur.execute(
@@ -383,7 +383,8 @@ async def ban(
     user: discord.Member,
     reason: str,
     appeal: bool = True,
-    preserve_messages: bool = True
+    preserve_messages: bool = True,
+    guild: discord.Guild
 ):
     await interaction.response.defer(ephemeral=True)
 
@@ -444,7 +445,8 @@ async def ban(
 async def unban(
     interaction: discord.Interaction,
     user_id: str,
-    reason: str
+    reason: str,
+    guild: discord.Guild
 ):
     await interaction.response.defer(ephemeral=True)
 
@@ -526,7 +528,7 @@ async def unban(
 # ================= KICKING COMMANDS =================
 
 @mod_group.command(name="kick", description="Kicks a user")
-async def kick(interaction: discord.Interaction, user: discord.Member, reason: str):
+async def kick(interaction: discord.Interaction, user: discord.Member, reason: str, guild: discord.Guild):
     now = datetime.datetime.now(datetime.timezone.utc)
 
     try:
@@ -565,7 +567,7 @@ async def kick(interaction: discord.Interaction, user: discord.Member, reason: s
 # ================= MUTING COMMANDS =================
 
 @mod_group.command(name="mute", description="Adds the gag role to the user (/srs modding only)")
-async def mute(interaction: discord.Interaction, user: discord.Member, reason: str, duration: str = None):
+async def mute(interaction: discord.Interaction, user: discord.Member, reason: str, duration: str = None, guild: discord.Guild):
     gag_role = interaction.guild.get_role(GAG_ROLE_ID)
     now = datetime.datetime.now(datetime.timezone.utc)
 
@@ -626,7 +628,7 @@ async def mute(interaction: discord.Interaction, user: discord.Member, reason: s
 
 
 @mod_group.command(name="unmute", description="Removes the gag role from a user")
-async def unmute(interaction: discord.Interaction, user: discord.Member):
+async def unmute(interaction: discord.Interaction, user: discord.Member, guild: discord.Guild):
     gag_role = interaction.guild.get_role(GAG_ROLE_ID)
     now = datetime.datetime.now(datetime.timezone.utc)
 
@@ -675,7 +677,7 @@ async def unmute(interaction: discord.Interaction, user: discord.Member):
 # ================= LOCKDOWN COMMANDS =================
 
 @mod_group.command(name="lockdown_channel", description="Locks the current channel for all users")
-async def lockdown_channel(interaction: discord.Interaction, reason: str = "No reason provided"):
+async def lockdown_channel(interaction: discord.Interaction, reason: str = "No reason provided", guild: discord.Guild):
     guild = interaction.guild
     channel = interaction.channel
     everyone_role = guild.default_role
@@ -710,7 +712,7 @@ async def lockdown_channel(interaction: discord.Interaction, reason: str = "No r
 
 
 @mod_group.command(name="lockdown_server", description="Locks down all channels in the server, except the mod channels")
-async def lockdown_server(interaction: discord.Interaction, reason: str = "No reason provided"):
+async def lockdown_server(interaction: discord.Interaction, reason: str = "No reason provided", guild: discord.Guild):
     await interaction.response.defer()
 
     guild = interaction.guild
@@ -759,6 +761,7 @@ async def lockdown_server(interaction: discord.Interaction, reason: str = "No re
     modlog_channel = guild.get_channel(CASE_LOG_CHANNEL_ID)
     if modlog_channel:
         await modlog_channel.send(embed=log_embed)
+
 
 
 
