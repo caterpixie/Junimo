@@ -712,7 +712,7 @@ async def lockdown_channel(interaction: discord.Interaction, guild: discord.Guil
 
 
 @mod_group.command(name="lockdown_server", description="Locks down all channels in the server, except the mod channels")
-async def lockdown_server(interaction: discord.Interaction, reason: str = "No reason provided", guild: discord.Guild):
+async def lockdown_server(interaction: discord.Interaction, guild: discord.Guild, reason: str = "No reason provided"):
     await interaction.response.defer()
 
     guild = interaction.guild
@@ -761,6 +761,7 @@ async def lockdown_server(interaction: discord.Interaction, reason: str = "No re
     modlog_channel = guild.get_channel(CASE_LOG_CHANNEL_ID)
     if modlog_channel:
         await modlog_channel.send(embed=log_embed)
+
 
 
 
