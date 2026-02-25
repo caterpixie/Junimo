@@ -32,7 +32,6 @@ BAN_DELETE_DAYS_DEFAULT = 7
 # ============================================
 
 bot = None
-guild_name = interaction.guild.name
 
 def set_bot(bot_instance):
     global bot
@@ -151,6 +150,7 @@ async def warn(interaction: discord.Interaction, user: discord.Member, reason: s
             )
 
     now = datetime.datetime.now(datetime.timezone.utc)
+    guild_name = interaction.guild.name
 
     # Acknowledge to moderator
     embed = discord.Embed(
@@ -759,4 +759,5 @@ async def lockdown_server(interaction: discord.Interaction, reason: str = "No re
     modlog_channel = guild.get_channel(CASE_LOG_CHANNEL_ID)
     if modlog_channel:
         await modlog_channel.send(embed=log_embed)
+
 
