@@ -178,7 +178,7 @@ async def warn(interaction: discord.Interaction, user: discord.Member, reason: s
     # Try to DM about the warn itself
     try:
         dm_embed = discord.Embed(
-            description=f"You have been warned in the server After Dark.\n\n**Reason:** {reason}",
+            description=f"You have been warned in {guild.name}.\n\n**Reason:** {reason}",
             color=discord.Color.red()
         )
         dm_embed.timestamp = now
@@ -208,7 +208,7 @@ async def warn(interaction: discord.Interaction, user: discord.Member, reason: s
         # Auto-kick after 1st warn
         try:
             dm_kick = discord.Embed(
-                description="You have been automatically kicked from the After Dark server after receiving a warning. You can re-join whenever you'd like, but please make sure to read the rules. Another warning will lead to being muted.",
+                description=f"You have been automatically kicked from {guild.name} after receiving a warning. You can re-join whenever you'd like, but please make sure to read the rules. Another warning will lead to being muted.",
                 color=discord.Color.red(),
             )
             dm_kick.timestamp = now
@@ -277,7 +277,7 @@ async def warn(interaction: discord.Interaction, user: discord.Member, reason: s
         try:
             dm_embed = discord.Embed(
                 description=(
-                    "You have been automuted in the After Dark server after receiving 2 warnings. "
+                    f"You have been automuted in {guild.name} after receiving 2 warnings.\n"
                     "In order for this mute to be lifted, you will need to open a ticket in the server."
                 ),
                 color=discord.Color.red(),
@@ -392,7 +392,7 @@ async def ban(
     # Try DM first
     try:
         dm_embed = discord.Embed(
-            description=f"You have been banned from the server After Dark.\n\n**Reason:** {reason}",
+            description=f"You have been banned {guild.name}.\n\n**Reason:** {reason}",
             color=discord.Color.red(),
             timestamp=now
         )
@@ -531,7 +531,7 @@ async def kick(interaction: discord.Interaction, user: discord.Member, reason: s
 
     try:
         dm_embed = discord.Embed(
-            description=f"You have been kicked from the server After Dark.\n\n**Reason:** {reason}",
+            description=f"You have been kicked from {guild.name}.\n\n**Reason:** {reason}",
             color=discord.Color.orange(),
             timestamp=now
         )
@@ -569,11 +569,11 @@ async def mute(interaction: discord.Interaction, user: discord.Member, reason: s
     gag_role = interaction.guild.get_role(GAG_ROLE_ID)
     now = datetime.datetime.now(datetime.timezone.utc)
 
-    duration_text = f" || Duration: {duration}" if duration else " || Please open a ticket in After Dark to be unmuted."
+    duration_text = f" || Duration: {duration}" if duration else f" || Please open a ticket in {guild.name} to be unmuted."
 
     try:
         dm_embed = discord.Embed(
-            description=f"You have been muted in the server After Dark.\n\n**Reason:** {reason}{duration_text}",
+            description=f"You have been muted in {guild.name}.\n\n**Reason:** {reason}{duration_text}",
             color=discord.Color.orange(),
             timestamp=now
         )
@@ -652,7 +652,7 @@ async def unmute(interaction: discord.Interaction, user: discord.Member):
         try:
             dm_embed = discord.Embed(
                 description=(
-                    "You have been unmuted in the server After Dark.\n"
+                    f"You have been unmuted {guild.name}.\n"
                     "Please review the server rules; note that the next moderation action will be a 30 day ban from the server."
                 ),
                 color=discord.Color.green(),
@@ -759,6 +759,7 @@ async def lockdown_server(interaction: discord.Interaction, reason: str = "No re
     modlog_channel = guild.get_channel(CASE_LOG_CHANNEL_ID)
     if modlog_channel:
         await modlog_channel.send(embed=log_embed)
+
 
 
 
