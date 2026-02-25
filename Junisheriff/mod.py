@@ -138,7 +138,7 @@ def safe_avatar_url(user):
 # ================= WARNING COMMANDS =================
 
 @mod_group.command(name="warn", description="Warn a user")
-async def warn(interaction: discord.Interaction, user: discord.Member, reason: str, guild: discord.Guild):
+async def warn(interaction: discord.Interaction, user: discord.Member, reason: str):
     # Insert warn into DB
     async with bot.pool.acquire() as conn:
         async with conn.cursor() as cur:
@@ -151,6 +151,7 @@ async def warn(interaction: discord.Interaction, user: discord.Member, reason: s
             )
 
     now = datetime.datetime.now(datetime.timezone.utc)
+    guild = discord.Guild
 
     # Acknowledge to moderator
     embed = discord.Embed(
@@ -761,6 +762,7 @@ async def lockdown_server(interaction: discord.Interaction, guild: discord.Guild
     modlog_channel = guild.get_channel(CASE_LOG_CHANNEL_ID)
     if modlog_channel:
         await modlog_channel.send(embed=log_embed)
+
 
 
 
