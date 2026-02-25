@@ -604,10 +604,10 @@ async def mute(interaction: discord.Interaction, user: discord.Member, reason: s
 
     logembed = discord.Embed(title="User muted", color=discord.Color.orange(), timestamp=now)
     logembed.set_author(name=str(user), icon_url=safe_avatar_url(user))
-    logembed.add_field(name="User", value=user.mention)
+    logembed.add_field(name="User", value=user.mention, inline=True)
     logembed.add_field(name="Moderator", value=interaction.user.mention, inline=True)
-    logembed.add_field(name="Duration", value=duration, inline=False)
-    logembed.add_field(name="Reason", value=reason, inline=True)
+    logembed.add_field(name="Duration", value=duration, inline=True)
+    logembed.add_field(name="Reason", value=reason, inline=False)
     logembed.set_footer(text=f"ID:{user.id}")
 
     modlog_channel = interaction.guild.get_channel(CASE_LOG_CHANNEL_ID)
@@ -759,6 +759,7 @@ async def lockdown_server(interaction: discord.Interaction, reason: str = "No re
     modlog_channel = guild.get_channel(CASE_LOG_CHANNEL_ID)
     if modlog_channel:
         await modlog_channel.send(embed=log_embed)
+
 
 
 
