@@ -567,7 +567,7 @@ async def kick(interaction: discord.Interaction, user: discord.Member, reason: s
 # ================= MUTING COMMANDS =================
 
 @mod_group.command(name="mute", description="Adds the gag role to the user (/srs modding only)")
-async def mute(interaction: discord.Interaction, user: discord.Member, reason: str, duration: str = None, guild: discord.Guild):
+async def mute(interaction: discord.Interaction, user: discord.Member, guild: discord.Guild, reason: str, duration: str = None):
     gag_role = interaction.guild.get_role(GAG_ROLE_ID)
     now = datetime.datetime.now(datetime.timezone.utc)
 
@@ -761,6 +761,7 @@ async def lockdown_server(interaction: discord.Interaction, reason: str = "No re
     modlog_channel = guild.get_channel(CASE_LOG_CHANNEL_ID)
     if modlog_channel:
         await modlog_channel.send(embed=log_embed)
+
 
 
 
