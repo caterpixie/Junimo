@@ -139,10 +139,6 @@ def safe_avatar_url(user):
 
 @mod_group.command(name="warn", description="Warn a user")
 async def warn(interaction: discord.Interaction, user: discord.Member, reason: str):
-    guild = interaction.guild
-    guild_name = get_guild_name(interaction)
-    now = datetime.datetime.now(datetime.timezone.utc)
-
     # Insert warn into DB
     async with bot.pool.acquire() as conn:
         async with conn.cursor() as cur:
@@ -151,41 +147,41 @@ async def warn(interaction: discord.Interaction, user: discord.Member, reason: s
                 INSERT INTO warns (guild_id, user_id, mod_name, reason)
                 VALUES (%s, %s, %s, %s)
                 """,
-                (guild.id if guild else 0, user.id, interaction.user.name, reason),
+                (interaction.guild.id, user.id, interaction.user.name, reason),
             )
+
+    now = datetime.datetime.now(datetime.timezone.utc)
 
     # Acknowledge to moderator
     embed = discord.Embed(
         description=f"{user.mention} has been warned. || Reason: {reason}",
-        color=discord.Color.from_str(EMBED_COLOR_HEX),
-        timestamp=now
+        color=discord.Color.from_str(EMBED_COLOR_HEX)
     )
     await interaction.response.send_message(embed=embed, ephemeral=True)
 
     # Log warn
     logembed = discord.Embed(
         title="User warned",
-        color=discord.Color.orange(),
-        timestamp=now
+        color=discord.Color.orange()
     )
     logembed.set_author(name=str(user), icon_url=safe_avatar_url(user))
     logembed.add_field(name="User", value=user.mention)
     logembed.add_field(name="Moderator", value=interaction.user.mention)
     logembed.add_field(name="Reason", value=reason)
+    logembed.timestamp = now
     logembed.set_footer(text=f"ID:{user.id}")
 
-    if guild:
-        modlog_channel = guild.get_channel(CASE_LOG_CHANNEL_ID)
-        if modlog_channel:
-            await modlog_channel.send(embed=logembed)
+    modlog_channel = interaction.guild.get_channel(CASE_LOG_CHANNEL_ID)
+    if modlog_channel:
+        await modlog_channel.send(embed=logembed)
 
     # Try to DM about the warn itself
     try:
         dm_embed = discord.Embed(
-            description=f"You have been warned in {guild_name}.\n\n**Reason:** {reason}",
-            color=discord.Color.red(),
-            timestamp=now
+            description=f"You have been warned in the server After Dark.\n\n**Reason:** {reason}",
+            color=discord.Color.red()
         )
+        dm_embed.timestamp = now
         await user.send(embed=dm_embed)
     except discord.Forbidden:
         if interaction.response.is_done():
@@ -202,7 +198,7 @@ async def warn(interaction: discord.Interaction, user: discord.Member, reason: s
                 FROM warns
                 WHERE guild_id = %s AND user_id = %s
                 """,
-                (guild.id if guild else 0, user.id),
+                (interaction.guild.id, user.id),
             )
             row = await cur.fetchone()
             warn_count = row[0] if row else 0
@@ -212,14 +208,10 @@ async def warn(interaction: discord.Interaction, user: discord.Member, reason: s
         # Auto-kick after 1st warn
         try:
             dm_kick = discord.Embed(
-                description=(
-                    f"You have been automatically kicked from {guild_name} after receiving a warning. "
-                    "You can re-join whenever you'd like, but please make sure to read the rules. "
-                    "Another warning will lead to being muted."
-                ),
+                description="You have been automatically kicked from the After Dark server after receiving a warning. You can re-join whenever you'd like, but please make sure to read the rules. Another warning will lead to being muted.",
                 color=discord.Color.red(),
-                timestamp=now
             )
+            dm_kick.timestamp = now
             await user.send(embed=dm_kick)
         except discord.Forbidden:
             if interaction.response.is_done():
@@ -252,23 +244,20 @@ async def warn(interaction: discord.Interaction, user: discord.Member, reason: s
             title="User auto-kicked",
             description=f"{user.mention} has been kicked after receiving their first warning.",
             color=discord.Color.orange(),
-            timestamp=now
         )
         kick_log.set_author(name=str(user), icon_url=safe_avatar_url(user))
         kick_log.add_field(name="Reason", value=reason, inline=False)
+        kick_log.timestamp = now
         kick_log.set_footer(text=f"ID:{user.id}")
 
-        if guild:
-            modlog_channel = guild.get_channel(CASE_LOG_CHANNEL_ID)
-            if modlog_channel:
-                await modlog_channel.send(embed=kick_log)
+        if modlog_channel:
+            await modlog_channel.send(embed=kick_log)
 
     elif warn_count == 2:
         # Auto-mute after second warn
-        if guild:
-            gag_role = guild.get_role(GAG_ROLE_ID)
-            if gag_role:
-                await user.add_roles(gag_role, reason="Automute after 2 warnings")
+        gag_role = interaction.guild.get_role(GAG_ROLE_ID)
+        if gag_role:
+            await user.add_roles(gag_role, reason="Automute after 2 warnings")
 
         automute_logembed = discord.Embed(
             title="User automuted",
@@ -277,25 +266,23 @@ async def warn(interaction: discord.Interaction, user: discord.Member, reason: s
                 "They will need to open a ticket in order to be unmuted."
             ),
             color=discord.Color.orange(),
-            timestamp=now
         )
         automute_logembed.set_author(name=str(user), icon_url=safe_avatar_url(user))
+        automute_logembed.timestamp = now
         automute_logembed.set_footer(text=f"ID:{user.id}")
 
-        if guild:
-            modlog_channel = guild.get_channel(CASE_LOG_CHANNEL_ID)
-            if modlog_channel:
-                await modlog_channel.send(embed=automute_logembed)
+        if modlog_channel:
+            await modlog_channel.send(embed=automute_logembed)
 
         try:
             dm_embed = discord.Embed(
                 description=(
-                    f"You have been automuted in {guild_name} after receiving 2 warnings.\n"
+                    "You have been automuted in the After Dark server after receiving 2 warnings. "
                     "In order for this mute to be lifted, you will need to open a ticket in the server."
                 ),
                 color=discord.Color.red(),
-                timestamp=now
             )
+            dm_embed.timestamp = now
             await user.send(embed=dm_embed)
         except discord.Forbidden:
             if interaction.response.is_done():
@@ -306,10 +293,6 @@ async def warn(interaction: discord.Interaction, user: discord.Member, reason: s
 
 @mod_group.command(name="warnings", description="Displays a user's past warns")
 async def warn_log(interaction: discord.Interaction, user: discord.Member):
-    guild = interaction.guild
-    if not guild:
-        return await interaction.response.send_message("This command can only be used in a server.", ephemeral=True)
-
     async with bot.pool.acquire() as conn:
         async with conn.cursor(aiomysql.DictCursor) as cur:
             await cur.execute(
@@ -318,12 +301,12 @@ async def warn_log(interaction: discord.Interaction, user: discord.Member):
                 WHERE guild_id = %s AND user_id = %s
                 ORDER BY timestamp DESC
                 """,
-                (guild.id, user.id)
+                (interaction.guild.id, user.id)
             )
             records = await cur.fetchall()
 
     if not records:
-        await interaction.response.send_message(f"{user.name} has no warns logged.", ephemeral=True)
+        await interaction.response.send_message(f"{user.name} has no warns logged.")
         return
 
     per_page = WARNS_PER_PAGE
@@ -348,35 +331,27 @@ async def warn_log(interaction: discord.Interaction, user: discord.Member):
         pages.append(embed)
 
     view = Pages(pages)
-    await interaction.response.send_message(embed=pages[0], view=view, ephemeral=True)
+    await interaction.response.send_message(embed=pages[0], view=view)
 
 
 @mod_group.command(name="clearwarns", description="Clear all warnings for a user")
 async def clear_warns(interaction: discord.Interaction, user: discord.Member):
-    guild = interaction.guild
-    if not guild:
-        return await interaction.response.send_message("This command can only be used in a server.", ephemeral=True)
-
     async with bot.pool.acquire() as conn:
         async with conn.cursor() as cur:
             await cur.execute(
                 "DELETE FROM warns WHERE guild_id = %s AND user_id = %s",
-                (guild.id, user.id)
+                (interaction.guild.id, user.id)
             )
 
     embed = discord.Embed(
         description=f"Warnings for {user.mention} have been cleared.",
         color=discord.Color.green()
     )
-    await interaction.response.send_message(embed=embed, ephemeral=True)
+    await interaction.response.send_message(embed=embed)
 
 
-@mod_group.command(name="delwarn", description="Delete a specific warning by selecting it")
+@mod_group.command(name="delwarn", description="Delete a specific warning by its index in the user's log")
 async def delete_warn(interaction: discord.Interaction, user: discord.Member):
-    guild = interaction.guild
-    if not guild:
-        return await interaction.response.send_message("This command can only be used in a server.", ephemeral=True)
-
     async with bot.pool.acquire() as conn:
         async with conn.cursor(aiomysql.DictCursor) as cur:
             await cur.execute(
@@ -385,20 +360,19 @@ async def delete_warn(interaction: discord.Interaction, user: discord.Member):
                 WHERE guild_id = %s AND user_id = %s
                 ORDER BY timestamp DESC
                 """,
-                (guild.id, user.id)
+                (interaction.guild.id, user.id)
             )
             records = await cur.fetchall()
 
-    if not records:
-        await interaction.response.send_message(f"{user.mention} has no warnings.", ephemeral=True)
-        return
+        if not records:
+            await interaction.response.send_message(f"{user.mention} has no warnings.", ephemeral=True)
+            return
 
-    view = WarnDropdown(user, records)
-    await interaction.response.send_message(
-        f"Select a warning to delete for {user.name}",
-        view=view,
-        ephemeral=True
-    )
+        view = WarnDropdown(user, records)
+        await interaction.response.send_message(
+            f"Select a warning to delete for {user.name}",
+            view=view
+        )
 
 
 # ================= BANNING COMMANDS =================
@@ -411,19 +385,14 @@ async def ban(
     appeal: bool = True,
     preserve_messages: bool = True
 ):
-    guild = interaction.guild
-    if not guild:
-        return await interaction.response.send_message("This command can only be used in a server.", ephemeral=True)
-
-    guild_name = guild.name
-    now = datetime.datetime.now(datetime.timezone.utc)
-
     await interaction.response.defer(ephemeral=True)
+
+    now = datetime.datetime.now(datetime.timezone.utc)
 
     # Try DM first
     try:
         dm_embed = discord.Embed(
-            description=f"You have been banned from {guild_name}.\n\n**Reason:** {reason}",
+            description=f"You have been banned from the server After Dark.\n\n**Reason:** {reason}",
             color=discord.Color.red(),
             timestamp=now
         )
@@ -437,7 +406,7 @@ async def ban(
     # Ban
     delete_days = 0 if preserve_messages else BAN_DELETE_DAYS_DEFAULT
     try:
-        await guild.ban(user, reason=reason, delete_message_days=delete_days)
+        await interaction.guild.ban(user, reason=reason, delete_message_days=delete_days)
     except Exception as e:
         return await interaction.followup.send(f"Failed to ban user: {e}", ephemeral=True)
 
@@ -449,23 +418,26 @@ async def ban(
     await interaction.followup.send(embed=embed, ephemeral=True)
 
     # Log
+    icon = user.avatar.url if user.avatar else None
     logembed = discord.Embed(
         title="User banned",
         color=discord.Color.red(),
         timestamp=now
     )
-    logembed.set_author(name=str(user), icon_url=safe_avatar_url(user))
-    logembed.add_field(name="User", value=f"{user} (`{user.id}`)")
+    logembed.set_author(name=str(user), icon_url=icon)
+    logembed.add_field(name="User", value=user.name)
     logembed.add_field(name="Moderator", value=interaction.user.mention)
     logembed.add_field(name="Reason", value=reason)
     logembed.set_footer(text=f"ID:{user.id}")
 
-    modlog_channel = guild.get_channel(CASE_LOG_CHANNEL_ID)
+    modlog_channel = interaction.guild.get_channel(CASE_LOG_CHANNEL_ID)
     if modlog_channel:
         try:
             await modlog_channel.send(embed=logembed)
         except Exception as e:
             print(f"Failed to send log to modlog channel: {e}")
+    else:
+        print("Modlog channel not found or CASE_LOG_CHANNEL_ID is incorrect.")
 
 
 @mod_group.command(name="unban", description="Unbans a user by their ID")
@@ -474,10 +446,6 @@ async def unban(
     user_id: str,
     reason: str
 ):
-    guild = interaction.guild
-    if not guild:
-        return await interaction.response.send_message("This command can only be used in a server.", ephemeral=True)
-
     await interaction.response.defer(ephemeral=True)
 
     # Validate ID
@@ -485,13 +453,14 @@ async def unban(
         target_id = int(user_id)
     except ValueError:
         return await interaction.followup.send(
-            "This command uses the user ID to look up users in the ban list. Please provide a valid user ID.",
+            "This command uses the user ID to look up users int he ban list. Please provide a valid user ID.",
             ephemeral=True
         )
 
+    guild = interaction.guild
     now = datetime.datetime.now(datetime.timezone.utc)
 
-    # Fetch ban entry
+    # Fetch ban entry (so we can confirm they're actually banned + get user object)
     try:
         ban_entry = await guild.fetch_ban(discord.Object(id=target_id))
     except discord.NotFound:
@@ -526,7 +495,7 @@ async def unban(
             ephemeral=True
         )
 
-    # Confirm
+    # Confirm to moderator
     confirm_embed = discord.Embed(
         description=f"Unbanned {banned_user} (ID: `{banned_user.id}`).\n\nReason: {reason}",
         color=discord.Color.from_str(EMBED_COLOR_HEX),
@@ -534,7 +503,7 @@ async def unban(
     )
     await interaction.followup.send(embed=confirm_embed, ephemeral=True)
 
-    # Log
+    # Log to modlog
     modlog_channel = guild.get_channel(CASE_LOG_CHANNEL_ID)
     if modlog_channel:
         log_embed = discord.Embed(
@@ -558,12 +527,11 @@ async def unban(
 
 @mod_group.command(name="kick", description="Kicks a user")
 async def kick(interaction: discord.Interaction, user: discord.Member, reason: str):
-    guild_name = get_guild_name(interaction)
     now = datetime.datetime.now(datetime.timezone.utc)
 
     try:
         dm_embed = discord.Embed(
-            description=f"You have been kicked from {guild_name}.\n\n**Reason:** {reason}",
+            description=f"You have been kicked from the server After Dark.\n\n**Reason:** {reason}",
             color=discord.Color.orange(),
             timestamp=now
         )
@@ -574,12 +542,7 @@ async def kick(interaction: discord.Interaction, user: discord.Member, reason: s
         else:
             await interaction.response.send_message(f"Unable to DM {user.mention}", ephemeral=True)
 
-    try:
-        await interaction.guild.kick(user, reason=reason)
-    except discord.Forbidden:
-        return await interaction.followup.send("I don't have permission to kick that user.", ephemeral=True)
-    except discord.HTTPException as e:
-        return await interaction.followup.send(f"Failed to kick: {e}", ephemeral=True)
+    await interaction.guild.kick(user, reason=reason)
 
     embed = discord.Embed(
         description=f"{user.mention} has been kicked. || Reason: {reason}",
@@ -594,33 +557,23 @@ async def kick(interaction: discord.Interaction, user: discord.Member, reason: s
     logembed.add_field(name="Reason", value=reason)
     logembed.set_footer(text=f"ID:{user.id}")
 
-    guild = interaction.guild
-    if guild:
-        modlog_channel = guild.get_channel(CASE_LOG_CHANNEL_ID)
-        if modlog_channel:
-            await modlog_channel.send(embed=logembed)
+    modlog_channel = interaction.guild.get_channel(CASE_LOG_CHANNEL_ID)
+    if modlog_channel:
+        await modlog_channel.send(embed=logembed)
 
 
 # ================= MUTING COMMANDS =================
 
 @mod_group.command(name="mute", description="Adds the gag role to the user (/srs modding only)")
 async def mute(interaction: discord.Interaction, user: discord.Member, reason: str, duration: str = None):
-    guild = interaction.guild
-    if not guild:
-        return await interaction.response.send_message("This command can only be used in a server.", ephemeral=True)
-
-    gag_role = guild.get_role(GAG_ROLE_ID)
-    if not gag_role:
-        return await interaction.response.send_message("Gag role not found (check GAG_ROLE_ID).", ephemeral=True)
-
-    guild_name = guild.name
+    gag_role = interaction.guild.get_role(GAG_ROLE_ID)
     now = datetime.datetime.now(datetime.timezone.utc)
 
-    duration_text = f" || Duration: {duration}" if duration else f" || Please open a ticket in {guild_name} to be unmuted."
+    duration_text = f" || Duration: {duration}" if duration else " || Please open a ticket in After Dark to be unmuted."
 
     try:
         dm_embed = discord.Embed(
-            description=f"You have been muted in {guild_name}.\n\n**Reason:** {reason}{duration_text}",
+            description=f"You have been muted in the server After Dark.\n\n**Reason:** {reason}{duration_text}",
             color=discord.Color.orange(),
             timestamp=now
         )
@@ -632,7 +585,7 @@ async def mute(interaction: discord.Interaction, user: discord.Member, reason: s
             await interaction.response.send_message(f"Unable to DM {user.mention}", ephemeral=True)
 
     try:
-        await user.add_roles(gag_role, reason=reason)
+        await user.add_roles(gag_role)
     except discord.Forbidden:
         await interaction.response.send_message(
             "I don't have permission to assign that role (check role hierarchy or permissions).",
@@ -653,11 +606,11 @@ async def mute(interaction: discord.Interaction, user: discord.Member, reason: s
     logembed.set_author(name=str(user), icon_url=safe_avatar_url(user))
     logembed.add_field(name="User", value=user.mention, inline=True)
     logembed.add_field(name="Moderator", value=interaction.user.mention, inline=True)
-    logembed.add_field(name="Duration", value=duration or "Indefinite", inline=True)
+    logembed.add_field(name="Duration", value=duration, inline=True)
     logembed.add_field(name="Reason", value=reason, inline=False)
     logembed.set_footer(text=f"ID:{user.id}")
 
-    modlog_channel = guild.get_channel(CASE_LOG_CHANNEL_ID)
+    modlog_channel = interaction.guild.get_channel(CASE_LOG_CHANNEL_ID)
     if modlog_channel:
         await modlog_channel.send(embed=logembed)
 
@@ -667,31 +620,18 @@ async def mute(interaction: discord.Interaction, user: discord.Member, reason: s
     try:
         sleep_seconds = parse_duration(duration)
         await asyncio.sleep(sleep_seconds)
-        await user.remove_roles(gag_role, reason="Mute duration expired")
+        await user.remove_roles(gag_role)
     except ValueError as e:
         await interaction.followup.send(str(e), ephemeral=True)
-    except discord.Forbidden:
-        await interaction.followup.send("I couldn't unmute them (permission/hierarchy issue).", ephemeral=True)
 
 
 @mod_group.command(name="unmute", description="Removes the gag role from a user")
 async def unmute(interaction: discord.Interaction, user: discord.Member):
-    guild = interaction.guild
-    if not guild:
-        return await interaction.response.send_message("This command can only be used in a server.", ephemeral=True)
-
-    gag_role = guild.get_role(GAG_ROLE_ID)
-    if not gag_role:
-        return await interaction.response.send_message("Gag role not found (check GAG_ROLE_ID).", ephemeral=True)
-
+    gag_role = interaction.guild.get_role(GAG_ROLE_ID)
     now = datetime.datetime.now(datetime.timezone.utc)
-    guild_name = guild.name
 
     if gag_role in user.roles:
-        try:
-            await user.remove_roles(gag_role, reason="Manual unmute")
-        except discord.Forbidden:
-            return await interaction.response.send_message("I don't have permission to remove that role.", ephemeral=True)
+        await user.remove_roles(gag_role)
 
         embed = discord.Embed(
             description=f"{user.mention} has been unmuted.",
@@ -705,14 +645,14 @@ async def unmute(interaction: discord.Interaction, user: discord.Member):
         logembed.add_field(name="Moderator", value=interaction.user.mention)
         logembed.set_footer(text=f"ID:{user.id}")
 
-        modlog_channel = guild.get_channel(CASE_LOG_CHANNEL_ID)
+        modlog_channel = interaction.guild.get_channel(CASE_LOG_CHANNEL_ID)
         if modlog_channel:
             await modlog_channel.send(embed=logembed)
 
         try:
             dm_embed = discord.Embed(
                 description=(
-                    f"You have been unmuted in {guild_name}.\n"
+                    "You have been unmuted in the server After Dark.\n"
                     "Please review the server rules; note that the next moderation action will be a 30 day ban from the server."
                 ),
                 color=discord.Color.green(),
@@ -737,12 +677,8 @@ async def unmute(interaction: discord.Interaction, user: discord.Member):
 @mod_group.command(name="lockdown_channel", description="Locks the current channel for all users")
 async def lockdown_channel(interaction: discord.Interaction, reason: str = "No reason provided"):
     guild = interaction.guild
-    if not guild:
-        return await interaction.response.send_message("This command can only be used in a server.", ephemeral=True)
-
     channel = interaction.channel
     everyone_role = guild.default_role
-    now = datetime.datetime.now(datetime.timezone.utc)
 
     try:
         await channel.set_permissions(everyone_role, send_messages=False, reason=reason)
@@ -750,8 +686,7 @@ async def lockdown_channel(interaction: discord.Interaction, reason: str = "No r
         embed = discord.Embed(
             title="Channel Locked",
             description=f"{channel.mention} has been locked down",
-            color=discord.Color.from_str(EMBED_COLOR_HEX),
-            timestamp=now
+            color=discord.Color.from_str(EMBED_COLOR_HEX)
         )
         await interaction.response.send_message(embed=embed)
         await channel.send(embed=embed)
@@ -760,11 +695,11 @@ async def lockdown_channel(interaction: discord.Interaction, reason: str = "No r
             title="Channel Lockdown",
             description=f"{channel.mention} locked.",
             color=discord.Color.red(),
-            timestamp=now
+            timestamp=datetime.datetime.now(datetime.timezone.utc)
         )
         log_embed.add_field(name="Moderator", value=interaction.user.mention)
         log_embed.add_field(name="Reason", value=reason)
-        log_embed.set_footer(text=f"Mod ID:{interaction.user.id}")
+        log_embed.set_footer(text=f"ID:{user.id}")
 
         modlog_channel = guild.get_channel(CASE_LOG_CHANNEL_ID)
         if modlog_channel:
@@ -776,13 +711,10 @@ async def lockdown_channel(interaction: discord.Interaction, reason: str = "No r
 
 @mod_group.command(name="lockdown_server", description="Locks down all channels in the server, except the mod channels")
 async def lockdown_server(interaction: discord.Interaction, reason: str = "No reason provided"):
-    guild = interaction.guild
-    if not guild:
-        return await interaction.response.send_message("This command can only be used in a server.", ephemeral=True)
-
     await interaction.response.defer()
-    now = datetime.datetime.now(datetime.timezone.utc)
 
+    guild = interaction.guild
+    now = datetime.datetime.now(datetime.timezone.utc)
     everyone_role = guild.default_role
 
     new_permissions = everyone_role.permissions
@@ -794,15 +726,14 @@ async def lockdown_server(interaction: discord.Interaction, reason: str = "No re
     )
 
     try:
-        await everyone_role.edit(permissions=new_permissions, reason=reason)
+        await everyone_role.edit(permissions=new_permissions)
     except discord.Forbidden:
         return await interaction.followup.send("I don't have permission to edit the default role.", ephemeral=True)
 
     embed = discord.Embed(
         title="Server Locked",
         description="Server has been locked down. Mods can still talk in mod channels.",
-        color=discord.Color.from_str(EMBED_COLOR_HEX),
-        timestamp=now
+        color=discord.Color.from_str(EMBED_COLOR_HEX)
     )
     await interaction.followup.send(embed=embed)
 
@@ -811,8 +742,7 @@ async def lockdown_server(interaction: discord.Interaction, reason: str = "No re
         general_embed = discord.Embed(
             title="Server Locked",
             description="The server has been locked down. Once the mod team has handled the situation, it will be reopened.",
-            color=discord.Color.from_str(EMBED_COLOR_HEX),
-            timestamp=now
+            color=discord.Color.from_str(EMBED_COLOR_HEX)
         )
         await announce_channel.send(embed=general_embed)
 
@@ -824,7 +754,7 @@ async def lockdown_server(interaction: discord.Interaction, reason: str = "No re
     )
     log_embed.add_field(name="Moderator", value=interaction.user.mention)
     log_embed.add_field(name="Reason", value=reason)
-    log_embed.set_footer(text=f"Mod ID:{interaction.user.id}")
+    log_embed.set_footer(text=f"ID:{user.id}")
 
     modlog_channel = guild.get_channel(CASE_LOG_CHANNEL_ID)
     if modlog_channel:
